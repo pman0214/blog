@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <title>pLog &middot; articles tagged "blog"</title>
+    <link rel="shortcut icon" href="http://pman0214.github.io/blog/favicon.ico" />
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/screen.css" type="text/css" />
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments.css" type="text/css" />
+</head>
+<body>
+    <header>
+        <nav>
+                <li class="ephemeral selected"><a href="http://pman0214.github.io/blog/tag/blog.html">blog</a></li>
+            <li><a href="http://pman0214.github.io/blog">Home</a></li>
+            <li><a href="http://pman0214.github.io/blog/archives.html">Archives</a></li>
+        </nav>
+        <div class="header_box">
+            <h1><a href="http://pman0214.github.io/blog">pLog</a></h1>
+        </div>
+    </header>
+    <div id="wrapper">
+        <div id="content">
+            <h4 class="date"> 4 26, 2015</h4>
+            <article class="post">
+<h2 class="title">
+                    <a href="http://pman0214.github.io/blog/pelican-blog-github.html" rel="bookmark" title="Permanent Link to &quot;Pelican+GitHub Pagesでブログ引っ越し&quot;">Pelican+GitHub Pagesでブログ引っ越し</a>
+                </h2>
+
+                <p>これまで<a href="http://pman0214.blog37.fc2.com/">FC2ブログ</a>にお世話になってきたが、</p>
+<ul>
+<li>技術系なネタが多いため、ソースコード等が書きやすいとうれしい</li>
+<li>自在なレイアウトができるとうれしい</li>
+</ul>
+<p>などの理由からGitHub Pagesを使うことにした。
+あんまり書かないかもしれないけど・・・。</p>
+<p>ともあれ、Pelicanを使ってこのブログを構築したので、そのときのメモ。</p>
+<h1>Pelicanを使ったブログ構築作業</h1>
+<h2>概要</h2>
+<p>このブログはPelicanを使って静的ページを構成している。
+生成に使用したソースを公開するのは気が引けるので、生成したhtmlファイル群だけを公開することとした。
+このためにちょっと特殊な使い方をしている。</p>
+<h2>前提</h2>
+<p>pythonやvirtualenv、makeなどは導入されているものとする。</p>
+<h2>構築</h2>
+<ol>
+<li>
+<p>ローカルマシンにpelican用の環境を構築。</p>
+<ul>
+<li>
+<p>適当なディレクトリを作成。</p>
+<div class="highlight"><pre>mkdir ~/blog
+cd !$
+</pre></div>
+
+
+</li>
+<li>
+<p>virtualenv環境でpelicanを導入。Markdownを使いたいので、Markdownも導入しておく。</p>
+<div class="highlight"><pre>virtualenv --system-site-packages ./
+source bin/activate
+pip install pelican
+pip install Markdown
+</pre></div>
+
+
+</li>
+<li>
+<p><code>.gitignore</code>ファイルを作成しておく。なお、<code>.DS_Store</code>などはグローバルに無視する設定をしているので除外してある。</p>
+<div class="highlight"><pre><span class="na">.Python</span>
+<span class="nf">bin</span><span class="err">/</span>
+<span class="nf">include</span><span class="err">/</span>
+<span class="nf">lib</span><span class="err">/</span>
+<span class="nf">man</span><span class="err">/</span>
+<span class="nf">local</span><span class="err">/</span>
+<span class="nf">output</span><span class="err">/</span>
+<span class="nf">pip-selfcheck.json</span>
+<span class="nf">cache</span><span class="err">/</span>
+<span class="err">*</span><span class="na">.pyc</span>
+</pre></div>
+
+
+</li>
+<li>
+<p><code>pelican-quickstart</code>を実行して各種設定を施す。</p>
+</li>
+<li>ここでいったんcommitしておくと幸せになれるかも。</li>
+<li>gitレポジトリを作成。<code>git status</code>して出てきたファイルを追加してcommit。<div class="highlight"><pre>git init .
+git status
+git add Makefile .gitignore develop_server.sh ...
+git commit -m &quot;Initial commit with pelican files.&quot;
+</pre></div>
+
+
+</li>
+</ul>
+</li>
+<li>
+<p>htmlファイル群の出力先である<code>output</code>ディレクトリが消えないようにする。</p>
+<ul>
+<li>
+<p><code>publishconf.py</code>を修正</p>
+<div class="highlight"><pre><span class="gh">diff --git a/publishconf.py b/publishconf.py</span>
+<span class="gh">index 98162b2..dfb1731 100644</span>
+<span class="gd">--- a/publishconf.py</span>
+<span class="gi">+++ b/publishconf.py</span>
+<span class="gu">@@ -16,7 +16,7 @@ RELATIVE_URLS = False</span>
+ FEED_ALL_ATOM = &#39;feeds/all.atom.xml&#39;
+ CATEGORY_FEED_ATOM = &#39;feeds/%s.atom.xml&#39;
+
+<span class="gd">-DELETE_OUTPUT_DIRECTORY = True</span>
+<span class="gi">+DELETE_OUTPUT_DIRECTORY = False</span>
+
+ # Following items are often useful when publishing
+</pre></div>
+
+
+</li>
+<li>
+<p><code>Makefile</code>も修正しておく。<code>make clean</code>すると消えてしまうので。</p>
+<div class="highlight"><pre><span class="gh">diff --git a/Makefile b/Makefile</span>
+<span class="gh">index dc640c3..35df450 100644</span>
+<span class="gd">--- a/Makefile</span>
+<span class="gi">+++ b/Makefile</span>
+<span class="gu">@@ -58,7 +58,7 @@ html:</span>
+        $(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+
+ clean:
+<span class="gd">-   [ ! -d $(OUTPUTDIR) ] || rm -rf $(OUTPUTDIR)</span>
+<span class="gi">+   [ ! -d $(OUTPUTDIR) ] || echo rm -rf $(OUTPUTDIR)</span>
+
+ regenerate:
+        $(PELICAN) -r $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+</pre></div>
+
+
+</li>
+</ul>
+</li>
+<li>
+<p>ここで再びgit add &amp; git commit。</p>
+</li>
+<li>
+<p>そのままのMarkdownではGitHubに慣れている人にはツライので、各種のライブラリ（？）を導入。</p>
+<ul>
+<li>
+<p>mdx_linkfyとmdx_del_insを導入。</p>
+<div class="highlight"><pre>pip install mdx_linkify
+pip install mdx_del_ins
+</pre></div>
+
+
+</li>
+<li>
+<p><code>pelicanconf.py</code>に以下を追加する。</p>
+<div class="highlight"><pre>MD_EXTENSIONS = [&#39;del_ins&#39;, &#39;fenced_code&#39;, &#39;codehilite(css_class=highlight)&#39;, &#39;tables&#39;]
+</pre></div>
+
+
+</li>
+</ul>
+</li>
+</ol>
+<h2>試しに記事を書いてみる</h2>
+<ol>
+<li>
+<p>記事は<code>content</code>の下に配置する。</p>
+<ul>
+<li>
+<p>管理を単純にするため、投稿日をファイル名とすることにした。</p>
+<div class="highlight"><pre>touch content `date +%Y%m%d`.md
+open !$
+</pre></div>
+
+
+</li>
+<li>
+<p>先頭に各種情報を書いておく。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>htmlファイル群を生成して表示してみる。</p>
+<ul>
+<li>
+<p>htmlファイル群を生成。</p>
+<div class="highlight"><pre>make html
+</pre></div>
+
+
+</li>
+<li>
+<p>localでWebサーバを起動。</p>
+<div class="highlight"><pre>make serve
+</pre></div>
+
+
+</li>
+<li>
+<p>あとはブラウザで<a href="http://localhost:8000">http://localhost:8000</a>を表示すればOK。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2>テーマの変更</h2>
+<p>デフォルトはブログっぽくないので変更する。</p>
+<ol>
+<li>テーマを検討する。<a href="http://pelicanthemes.com/">Pelican Themes</a>で確認できる。</li>
+<li>
+<p>テーマ用レポジトリを取得する。</p>
+<ul>
+<li>
+<p>テーマのレポジトリをsubmoduleとして追加する。</p>
+<div class="highlight"><pre>git submodule add git@github.com:getpelican/pelican-themes.git themes
+</pre></div>
+
+
+</li>
+<li>
+<p>先ほどのテーマのディレクトリがsubmoduleであれば、それを取得する。この記事執筆時点では<a href="https://github.com/jody-frankowski/blue-penguin/">blue-penguin</a>を選択した。</p>
+<div class="highlight"><pre>cd themes
+git submodule init blue-penguin
+git submodule update blue-penguin
+</pre></div>
+
+
+</li>
+</ul>
+</li>
+<li>
+<p><code>pelicanconf.py</code>に以下のように設定する。</p>
+<div class="highlight"><pre>THEME = &quot;pelican-themes/blue-penguin&quot;
+</pre></div>
+
+
+</li>
+</ol>
+<h2>公開用レポジトリの設定</h2>
+<ol>
+<li>GitHubに<code>blog</code>という名前のレポジトリを作成。ここに公開用のhtmlファイル群をpushする。自分は<a href="https://github.com/pman0214/blog">https://github.com/pman0214/blog</a>を作成した。</li>
+<li>
+<p><code>output</code>の下をレポジトリにしてしまえばOK。ただし、レポジトリのGitHub Pageを使うため、<code>gh-pages</code>ブランチにcommit &amp; pushする必要がある。</p>
+<ul>
+<li>
+<p><code>output</code>ディレクトリをgitレポジトリにする。</p>
+<div class="highlight"><pre>cd output
+git init ./
+</pre></div>
+
+
+</li>
+<li>
+<p><code>gh-pages</code>ブランチに切り替え。</p>
+<div class="highlight"><pre>git checkout -b gh-pages
+</pre></div>
+
+
+</li>
+<li>
+<p>全ファイルをadd、そしてcommit。</p>
+<div class="highlight"><pre>git add *
+git commit -m &quot;Article `date +%Y%m%d`.&quot;
+</pre></div>
+
+
+</li>
+<li>
+<p>GitHubにpushできるようにする。自分の場合はこんな感じ。</p>
+<div class="highlight"><pre>git remote add origin git@github.com:pman0214/blog.git
+git push origin gh-pages
+</pre></div>
+
+
+</li>
+</ul>
+</li>
+<li>
+<p>公開されたページを確認する。</p>
+<ul>
+<li><code>http://account.github.com/repository</code>でアクセスできるはず。</li>
+<li>このブログは<a href="http://pman0214.github.io/blog">http://pman0214.github.io/blog</a>となる。</li>
+</ul>
+</li>
+</ol>
+<h1>参考ページ</h1>
+<ul>
+<li><a href="http://blog.sotm.jp/2014/01/04/Pelican-Markdown-GithubPages-install-guide/">Human as a Serviceな日々 - Pelican + Markdown + GitHub Pagesで管理するブログの作り方</a></li>
+<li><a href="http://mathamy.com/migrating-to-github-pages-using-pelican.html">Amy Hanlon - Migrating to GitHub Pages using Pelican</a></li>
+<li><a href="http://qiita.com/5t111111/items/d745af778969bf00f038">Qiita - PelicanでGitHub Flavored Markdown(GFM)をマジで使いたい！</a></li>
+</ul>
+
+                <div class="clear"></div>
+                <div class="info">
+                    <a href="http://pman0214.github.io/blog/pelican-blog-github.html">posted at 18:00</a>&nbsp;&middot;&nbsp;<a href="http://pman0214.github.io/blog/category/ozhi-rase.html" rel="tag">お知らせ</a>&nbsp;&middot;&nbsp;<a href="http://pman0214.github.io/blog/tag/info.html" class="tags">info</a>&nbsp;<a href="http://pman0214.github.io/blog/tag/blog.html" class="tags selected">blog</a>&nbsp;<a href="http://pman0214.github.io/blog/tag/python.html" class="tags">python</a>&nbsp;<a href="http://pman0214.github.io/blog/tag/pelican.html" class="tags">pelican</a>&nbsp;<a href="http://pman0214.github.io/blog/tag/github.html" class="tags">github</a>
+                </div>
+
+            </article>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <footer>
+                <p>
+                <a href="https://github.com/jody-frankowski/blue-penguin">Blue Penguin</a> Theme
+                &middot;
+                Powered by <a href="http://getpelican.com">Pelican</a>
+            </footer>
+        </div>
+        <div class="clear"></div>
+    </div>
+</body>
+</html>
