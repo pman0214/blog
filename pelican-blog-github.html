@@ -89,6 +89,9 @@ pip install Markdown
 </li>
 <li>
 <p><code>pelican-quickstart</code>を実行して各種設定を施す。</p>
+<ul>
+<li><strong>2015/04/27追記:</strong> 自分の場合は<code>pelicanconf.py</code>の<code>SITEURL</code>がうまく設定できていなかった。この設定ができていないとCSSのURLがまずいことになり、うまく動かない場合がある。</li>
+</ul>
 </li>
 <li>ここでいったんcommitしておくと幸せになれるかも。</li>
 <li>gitレポジトリを作成。<code>git status</code>して出てきたファイルを追加してcommit。<div class="highlight"><pre>git init .
@@ -249,6 +252,13 @@ git submodule update blue-penguin
 </pre></div>
 
 
+<ul>
+<li><strong>2015/04/27追記:</strong> 間違ってます。正しくはこうです。<div class="highlight"><pre>THEME = &quot;themes/blue-penguin&quot;
+</pre></div>
+
+
+</li>
+</ul>
 </li>
 </ol>
 <h2>公開用レポジトリの設定</h2>
