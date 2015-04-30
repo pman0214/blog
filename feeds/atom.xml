@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-04-30T12:55:00+09:00</updated><entry><title>EFIブートするUSBメモリでdebianをインストール</title><link href="http://pman0214.github.io/blog/debian-install-efi.html" rel="alternate"></link><updated>2015-04-30T12:55:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-04-30:blog/debian-install-efi.html</id><summary type="html">&lt;h1&gt;概要&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;EFIブートするUSBメモリを作成し、これを使ってdebianをインストールする。&lt;/li&gt;
+&lt;li&gt;古いXserveをdebian化しようとした中での例。&lt;ul&gt;
+&lt;li&gt;インストールできたものの、うまく起動しない状態で終わってます。多分ドライバ周り・・・。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;grubを導入したUSBメモリを用意してしまえば、カーネルや初期RAMディスク、ISOイメージを書き換えるだけでよくなる。この作業はUSBメモリのファイルを書き換えるだけなので、debian機は不要。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;必要なもの&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2GBくらいのUSBメモリ&lt;ul&gt;
+&lt;li&gt;中身は完全に消える。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;母艦となるdebian機&lt;ul&gt;
+&lt;li&gt;VMでも構わないが、USBメモリをmountできないとダメ。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;手順&lt;/h1&gt;
+&lt;h2&gt;grubの準備&lt;/h2&gt;
+&lt;p&gt;まずは母艦となるdebianでEFI対応のgrubを用意する。インストールしたいアーキテクチャに合わせたものを用意する。今回はx86の64bit版で。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo apt-get install grub-efi-x86_64-bin
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;USBメモリにパーティションを作る。&lt;code&gt;/dev/sdb&lt;/code&gt;の部分はUSBメモリのデバイス名を指定する。分からん場合は&lt;code&gt;sudo dmesg&lt;/code&gt;とかで調べるべし。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo fdisk /dev/sdb
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;あとはよしなに。FAT32にするのが良い。どんなマシンでもFAT32なら読めるみたいなので（確証なし）。partition IDをbにするとWin95 FAT32になる。&lt;/p&gt;
+&lt;p&gt;FAT32でフォーマット。&lt;code&gt;-v&lt;/code&gt;は詳細表示、&lt;code&gt;-c&lt;/code&gt;は不良ブロック精査、&lt;code&gt;-F&lt;/code&gt;は形式。16にすればFAT16になる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo mkfs.vfat -v -c -F 32 /dev/sdb1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Q. mkfs.vfatなんてないんだけど。&lt;/li&gt;
+&lt;li&gt;A. dosfstoolsを入れるべし。&lt;div class="highlight"&gt;&lt;pre&gt;sudo apt-get install dosfstools
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;USBメモリをマウントし、EFIのディレクトリを指定してgrubをUSBメモリに書き込む。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo mount /dev/sdb1 /mnt
+sudo grub-install —target=x86_64-efi —efi-directory=/mnt —boot-directory=/mnt/boot —no-floppy
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;ちなみに、Macで起動するためにはEFIの下を&lt;code&gt;boot/bootx64.efi&lt;/code&gt;にしないとダメらしい。本当かしらん。まぁ、変更しておくということで。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo mv /mnt/efi/boot/grubx64.efi /mnt/efi/boot/bootx64.efi
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;grub.cfgを&lt;code&gt;boot/grub&lt;/code&gt;に作成する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo mkdir -p /mnt/boot/grub
+sudo vi /mnt/boot/grub/grub.cfg
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;grub.cfg&lt;/code&gt;はこんな感じ。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# Load Graphical modules
+insmod efi_gop
+insmod efi_uga
+
+# Load Font module
+insmod font
+
+
+# Setup GFXTERM along with loading unifont.pf2 font file
+
+if loadfont &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;/fonts/unifont.pf2
+then
+   insmod gfxterm
+   set gfxmode=&amp;quot;auto&amp;quot;
+   set gfxpayload=keep
+   terminal_output gfxterm
+
+   set color_normal=light-blue/black
+   set color_highlight=light-cyan/blue
+fi
+
+insmod part_gpt
+insmod part_msdos
+insmod fat
+insmod ext2
+
+# Timeout for menu
+set timeout=5
+
+# Set default boot entry as Entry 0
+set default=0
+
+menuentry &amp;quot;Debian Install (expert mode)&amp;quot; {
+  set root=(hd0,msdos1)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off priority=low ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+menuentry &amp;quot;Debian Install&amp;quot; {
+  set root=(hd0,msdos1)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;これでgrubの準備は完了。&lt;/p&gt;
+&lt;h2&gt;debianインストーラの導入&lt;/h2&gt;
+&lt;p&gt;自分はいつも&lt;a href="https://www.debian.org/devel/debian-installer/"&gt;debian開発者ページ（？）&lt;/a&gt;からインストーラを取得している。
+ここで手に入るのはtesting版。だと思う。日次スナップショットはうまく起動しない場合もあるので注意。&lt;/p&gt;
+&lt;p&gt;「その他のイメージ＞インストール先アーキテクチャ＞hd-media」とたどる。&lt;/p&gt;
+&lt;p&gt;ここから&lt;code&gt;vmlinuz&lt;/code&gt;（カーネル）と&lt;code&gt;initrd.gz&lt;/code&gt;（初期RAMディスク）を取得する。
+また、元のページから「netinst CDイメージ」も取得しておく。&lt;/p&gt;
+&lt;p&gt;あとはこれを配置するだけ。USBメモリをmountし、以下のように配置する。FAT32でフォーマットしてあるとMacからでもWinからでも配置できるので便利。MacのEFIで読めるのはFATとHFS+とかだった気がするけど定かではない。FAT32なら大丈夫だった。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="left"&gt;ファイル&lt;/th&gt;
+&lt;th align="left"&gt;配置場所&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="left"&gt;netinst CDイメージ（.isoファイル）&lt;/td&gt;
+&lt;td align="left"&gt;USBメモリのトップ/&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td align="left"&gt;vmlinuz&lt;/td&gt;
+&lt;td align="left"&gt;USBメモリのトップ/boot/&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td align="left"&gt;initrd.gz&lt;/td&gt;
+&lt;td align="left"&gt;USBメモリのトップ/boot/&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1&gt;インストールはどうやるの？&lt;/h1&gt;
+&lt;p&gt;普通にUSBメモリからEFIで起動させればOK。&lt;/p&gt;
+&lt;p&gt;インストーラでパーティションを切るときに、EFI用のディレクトリを作成しないとダメ。100MBくらいで十分なはずだけど、200MBくらいを確保している。&lt;/p&gt;
+&lt;p&gt;Windowsが入っているマシンとかに後からdebianを追加するときは、すでにあるEFIシステムパーティションが利用できる。もちろん、WindowsがEFIブートでインストールされていれば、の話だが。&lt;/p&gt;</summary><category term="debian"></category><category term="efi"></category></entry><entry><title>Pelican+GitHub Pagesでブログ引っ越し</title><link href="http://pman0214.github.io/blog/pelican-blog-github.html" rel="alternate"></link><updated>2015-04-26T18:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-04-26:blog/pelican-blog-github.html</id><summary type="html">&lt;p&gt;これまで&lt;a href="http://pman0214.blog37.fc2.com/"&gt;FC2ブログ&lt;/a&gt;にお世話になってきたが、&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;技術系なネタが多いため、ソースコード等が書きやすいとうれしい&lt;/li&gt;
+&lt;li&gt;自在なレイアウトができるとうれしい&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;などの理由からGitHub Pagesを使うことにした。
+あんまり書かないかもしれないけど・・・。&lt;/p&gt;
+&lt;p&gt;ともあれ、Pelicanを使ってこのブログを構築したので、そのときのメモ。&lt;/p&gt;
+&lt;h1&gt;Pelicanを使ったブログ構築作業&lt;/h1&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;このブログはPelicanを使って静的ページを構成している。
+生成に使用したソースを公開するのは気が引けるので、生成したhtmlファイル群だけを公開することとした。
+このためにちょっと特殊な使い方をしている。&lt;/p&gt;
+&lt;h2&gt;前提&lt;/h2&gt;
+&lt;p&gt;pythonやvirtualenv、makeなどは導入されているものとする。&lt;/p&gt;
+&lt;h2&gt;構築&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;ローカルマシンにpelican用の環境を構築。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;適当なディレクトリを作成。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;mkdir ~/blog
+cd !$
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;virtualenv環境でpelicanを導入。Markdownを使いたいので、Markdownも導入しておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;virtualenv --system-site-packages ./
+source bin/activate
+pip install pelican
+pip install Markdown
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;.gitignore&lt;/code&gt;ファイルを作成しておく。なお、&lt;code&gt;.DS_Store&lt;/code&gt;などはグローバルに無視する設定をしているので除外してある。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="na"&gt;.Python&lt;/span&gt;
+&lt;span class="nf"&gt;bin&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
+&lt;span class="nf"&gt;include&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
+&lt;span class="nf"&gt;lib&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
+&lt;span class="nf"&gt;man&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
+&lt;span class="nf"&gt;local&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
+&lt;span class="nf"&gt;output&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
+&lt;span class="nf"&gt;pip-selfcheck.json&lt;/span&gt;
+&lt;span class="nf"&gt;cache&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
+&lt;span class="err"&gt;*&lt;/span&gt;&lt;span class="na"&gt;.pyc&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;pelican-quickstart&lt;/code&gt;を実行して各種設定を施す。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;2015/04/27追記:&lt;/strong&gt; 自分の場合は&lt;code&gt;pelicanconf.py&lt;/code&gt;の&lt;code&gt;SITEURL&lt;/code&gt;がうまく設定できていなかった。この設定ができていないとCSSのURLがまずいことになり、うまく動かない場合がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ここでいったんcommitしておくと幸せになれるかも。&lt;/li&gt;
+&lt;li&gt;gitレポジトリを作成。&lt;code&gt;git status&lt;/code&gt;して出てきたファイルを追加してcommit。&lt;div class="highlight"&gt;&lt;pre&gt;git init .
+git status
+git add Makefile .gitignore develop_server.sh ...
+git commit -m &amp;quot;Initial commit with pelican files.&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;htmlファイル群の出力先である&lt;code&gt;output&lt;/code&gt;ディレクトリが消えないようにする。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;publishconf.py&lt;/code&gt;を修正&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gh"&gt;diff --git a/publishconf.py b/publishconf.py&lt;/span&gt;
+&lt;span class="gh"&gt;index 98162b2..dfb1731 100644&lt;/span&gt;
+&lt;span class="gd"&gt;--- a/publishconf.py&lt;/span&gt;
+&lt;span class="gi"&gt;+++ b/publishconf.py&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -16,7 +16,7 @@ RELATIVE_URLS = False&lt;/span&gt;
+ FEED_ALL_ATOM = &amp;#39;feeds/all.atom.xml&amp;#39;
+ CATEGORY_FEED_ATOM = &amp;#39;feeds/%s.atom.xml&amp;#39;
+
+&lt;span class="gd"&gt;-DELETE_OUTPUT_DIRECTORY = True&lt;/span&gt;
+&lt;span class="gi"&gt;+DELETE_OUTPUT_DIRECTORY = False&lt;/span&gt;
+
+ # Following items are often useful when publishing
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Makefile&lt;/code&gt;も修正しておく。&lt;code&gt;make clean&lt;/code&gt;すると消えてしまうので。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gh"&gt;diff --git a/Makefile b/Makefile&lt;/span&gt;
+&lt;span class="gh"&gt;index dc640c3..35df450 100644&lt;/span&gt;
+&lt;span class="gd"&gt;--- a/Makefile&lt;/span&gt;
+&lt;span class="gi"&gt;+++ b/Makefile&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -58,7 +58,7 @@ html:&lt;/span&gt;
+        $(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+
+ clean:
+&lt;span class="gd"&gt;-   [ ! -d $(OUTPUTDIR) ] || rm -rf $(OUTPUTDIR)&lt;/span&gt;
+&lt;span class="gi"&gt;+   [ ! -d $(OUTPUTDIR) ] || echo rm -rf $(OUTPUTDIR)&lt;/span&gt;
+
+ regenerate:
+        $(PELICAN) -r $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ここで再びgit add &amp;amp; git commit。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;そのままのMarkdownではGitHubに慣れている人にはツライので、各種のライブラリ（？）を導入。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;mdx_linkfyとmdx_del_insを導入。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;pip install mdx_linkify
+pip install mdx_del_ins
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;pelicanconf.py&lt;/code&gt;に以下を追加する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;MD_EXTENSIONS = [&amp;#39;del_ins&amp;#39;, &amp;#39;fenced_code&amp;#39;, &amp;#39;codehilite(css_class=highlight)&amp;#39;, &amp;#39;tables&amp;#39;]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;試しに記事を書いてみる&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;記事は&lt;code&gt;content&lt;/code&gt;の下に配置する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;管理を単純にするため、投稿日をファイル名とすることにした。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;touch content `date +%Y%m%d`.md
+open !$
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;先頭に各種情報を書いておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;Title&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Pelican&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;GitHub&lt;/span&gt; &lt;span class="n"&gt;Pages&lt;/span&gt;&lt;span class="err"&gt;でブログ引っ越し&lt;/span&gt;
+&lt;span class="n"&gt;Date&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2015&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;04&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;26&lt;/span&gt; &lt;span class="mi"&gt;18&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;
+&lt;span class="n"&gt;Category&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="err"&gt;カテゴリ&lt;/span&gt;
+&lt;span class="n"&gt;Tags&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;blog&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;python&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pelican&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;github&lt;/span&gt;
+&lt;span class="n"&gt;Slug&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pelican&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;blog&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;github&lt;/span&gt;  &lt;span class="err"&gt;←&lt;/span&gt;&lt;span class="n"&gt;permanent&lt;/span&gt; &lt;span class="n"&gt;link&lt;/span&gt;&lt;span class="err"&gt;。「この名前&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="err"&gt;」ファイルが生成される。&lt;/span&gt;
+&lt;span class="n"&gt;Author&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pman0214&lt;/span&gt;
+&lt;span class="n"&gt;Summary&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="err"&gt;この記事の要約。&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;htmlファイル群を生成して表示してみる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;htmlファイル群を生成。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;make html
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;localでWebサーバを起動。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;make serve
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;あとはブラウザで&lt;a href="http://localhost:8000"&gt;http://localhost:8000&lt;/a&gt;を表示すればOK。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;テーマの変更&lt;/h2&gt;
+&lt;p&gt;デフォルトはブログっぽくないので変更する。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;テーマを検討する。&lt;a href="http://pelicanthemes.com/"&gt;Pelican Themes&lt;/a&gt;で確認できる。&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;テーマ用レポジトリを取得する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;テーマのレポジトリをsubmoduleとして追加する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git submodule add git@github.com:getpelican/pelican-themes.git themes
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;先ほどのテーマのディレクトリがsubmoduleであれば、それを取得する。この記事執筆時点では&lt;a href="https://github.com/jody-frankowski/blue-penguin/"&gt;blue-penguin&lt;/a&gt;を選択した。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;cd themes
+git submodule init blue-penguin
+git submodule update blue-penguin
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;pelicanconf.py&lt;/code&gt;に以下のように設定する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;THEME = &amp;quot;pelican-themes/blue-penguin&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;2015/04/27追記:&lt;/strong&gt; 間違ってます。正しくはこうです。&lt;div class="highlight"&gt;&lt;pre&gt;THEME = &amp;quot;themes/blue-penguin&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;公開用レポジトリの設定&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;GitHubに&lt;code&gt;blog&lt;/code&gt;という名前のレポジトリを作成。ここに公開用のhtmlファイル群をpushする。自分は&lt;a href="https://github.com/pman0214/blog"&gt;https://github.com/pman0214/blog&lt;/a&gt;を作成した。&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;output&lt;/code&gt;の下をレポジトリにしてしまえばOK。ただし、レポジトリのGitHub Pageを使うため、&lt;code&gt;gh-pages&lt;/code&gt;ブランチにcommit &amp;amp; pushする必要がある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;output&lt;/code&gt;ディレクトリをgitレポジトリにする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;cd output
+git init ./
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;gh-pages&lt;/code&gt;ブランチに切り替え。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git checkout -b gh-pages
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;全ファイルをadd、そしてcommit。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git add *
+git commit -m &amp;quot;Article `date +%Y%m%d`.&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;GitHubにpushできるようにする。自分の場合はこんな感じ。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git remote add origin git@github.com:pman0214/blog.git
+git push origin gh-pages
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;公開されたページを確認する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;http://account.github.com/repository&lt;/code&gt;でアクセスできるはず。&lt;/li&gt;
+&lt;li&gt;このブログは&lt;a href="http://pman0214.github.io/blog"&gt;http://pman0214.github.io/blog&lt;/a&gt;となる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;参考ページ&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://blog.sotm.jp/2014/01/04/Pelican-Markdown-GithubPages-install-guide/"&gt;Human as a Serviceな日々 - Pelican + Markdown + GitHub Pagesで管理するブログの作り方&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://mathamy.com/migrating-to-github-pages-using-pelican.html"&gt;Amy Hanlon - Migrating to GitHub Pages using Pelican&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://qiita.com/5t111111/items/d745af778969bf00f038"&gt;Qiita - PelicanでGitHub Flavored Markdown(GFM)をマジで使いたい！&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="info"></category><category term="blog"></category><category term="python"></category><category term="pelican"></category><category term="github"></category></entry></feed>
