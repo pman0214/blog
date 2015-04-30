@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <title>pLog &middot; articles tagged "efi"</title>
+    <link rel="shortcut icon" type="image/png" href="http://pman0214.github.io/blog/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="http://pman0214.github.io/blog/favicon.ico">
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/screen.css" type="text/css" />
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/print.css" type="text/css" media="print" />
+    <meta name="generator" content="Pelican" />
+</head>
+<body>
+    <header>
+        <nav>
+                <li class="ephemeral selected"><a href="http://pman0214.github.io/blog/tag/efi.html">efi</a></li>                <li><a href="http://pman0214.github.io/blog">Home</a></li>
+                <li><a href="http://pman0214.github.io/blog/archives.html">Archives</a></li>
+        </nav>
+        <div class="header_box">
+            <h1><a href="http://pman0214.github.io/blog">pLog</a></h1>
+        </div>
+    </header>
+    <div id="wrapper">
+        <div id="content">
+            <h4 class="date"> 4 30, 2015</h4>
+            <article class="post">
+<h2 class="title">
+                    <a href="http://pman0214.github.io/blog/debian-install-efi.html" rel="bookmark" title="Permanent Link to &quot;EFIブートするUSBメモリでdebianをインストール&quot;">EFIブートするUSBメモリでdebianをインストール</a>
+                </h2>
+
+                <h1>概要</h1>
+<ul>
+<li>EFIブートするUSBメモリを作成し、これを使ってdebianをインストールする。</li>
+<li>古いXserveをdebian化しようとした中での例。<ul>
+<li>インストールできたものの、うまく起動しない状態で終わってます。多分ドライバ周り・・・。</li>
+</ul>
+</li>
+<li>grubを導入したUSBメモリを用意してしまえば、カーネルや初期RAMディスク、ISOイメージを書き換えるだけでよくなる。この作業はUSBメモリのファイルを書き換えるだけなので、debian機は不要。</li>
+</ul>
+<h1>必要なもの</h1>
+<ul>
+<li>2GBくらいのUSBメモリ<ul>
+<li>中身は完全に消える。</li>
+</ul>
+</li>
+<li>母艦となるdebian機<ul>
+<li>VMでも構わないが、USBメモリをmountできないとダメ。</li>
+</ul>
+</li>
+</ul>
+<h1>手順</h1>
+<h2>grubの準備</h2>
+<p>まずは母艦となるdebianでEFI対応のgrubを用意する。インストールしたいアーキテクチャに合わせたものを用意する。今回はx86の64bit版で。</p>
+<div class="highlight"><pre>sudo apt-get install grub-efi-x86_64-bin
+</pre></div>
+
+
+<p>USBメモリにパーティションを作る。<code>/dev/sdb</code>の部分はUSBメモリのデバイス名を指定する。分からん場合は<code>sudo dmesg</code>とかで調べるべし。</p>
+<div class="highlight"><pre>sudo fdisk /dev/sdb
+</pre></div>
+
+
+<p>あとはよしなに。FAT32にするのが良い。どんなマシンでもFAT32なら読めるみたいなので（確証なし）。partition IDをbにするとWin95 FAT32になる。</p>
+<p>FAT32でフォーマット。<code>-v</code>は詳細表示、<code>-c</code>は不良ブロック精査、<code>-F</code>は形式。16にすればFAT16になる。</p>
+<div class="highlight"><pre>sudo mkfs.vfat -v -c -F 32 /dev/sdb1
+</pre></div>
+
+
+<ul>
+<li>Q. mkfs.vfatなんてないんだけど。</li>
+<li>A. dosfstoolsを入れるべし。<div class="highlight"><pre>sudo apt-get install dosfstools
+</pre></div>
+
+
+</li>
+</ul>
+<p>USBメモリをマウントし、EFIのディレクトリを指定してgrubをUSBメモリに書き込む。</p>
+<div class="highlight"><pre>sudo mount /dev/sdb1 /mnt
+sudo grub-install —target=x86_64-efi —efi-directory=/mnt —boot-directory=/mnt/boot —no-floppy
+</pre></div>
+
+
+<p>ちなみに、Macで起動するためにはEFIの下を<code>boot/bootx64.efi</code>にしないとダメらしい。本当かしらん。まぁ、変更しておくということで。</p>
+<div class="highlight"><pre>sudo mv /mnt/efi/boot/grubx64.efi /mnt/efi/boot/bootx64.efi
+</pre></div>
+
+
+<p>grub.cfgを<code>boot/grub</code>に作成する。</p>
+<div class="highlight"><pre>sudo mkdir -p /mnt/boot/grub
+sudo vi /mnt/boot/grub/grub.cfg
+</pre></div>
+
+
+<p><code>grub.cfg</code>はこんな感じ。</p>
+<div class="highlight"><pre># Load Graphical modules
+insmod efi_gop
+insmod efi_uga
+
+# Load Font module
+insmod font
+
+
+# Setup GFXTERM along with loading unifont.pf2 font file
+
+if loadfont <span class="cp">${</span><span class="n">prefix</span><span class="cp">}</span>/fonts/unifont.pf2
+then
+   insmod gfxterm
+   set gfxmode=&quot;auto&quot;
+   set gfxpayload=keep
+   terminal_output gfxterm
+
+   set color_normal=light-blue/black
+   set color_highlight=light-cyan/blue
+fi
+
+insmod part_gpt
+insmod part_msdos
+insmod fat
+insmod ext2
+
+# Timeout for menu
+set timeout=5
+
+# Set default boot entry as Entry 0
+set default=0
+
+menuentry &quot;Debian Install (expert mode)&quot; {
+  set root=(hd0,msdos1)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off priority=low ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+menuentry &quot;Debian Install&quot; {
+  set root=(hd0,msdos1)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+</pre></div>
+
+
+<p>これでgrubの準備は完了。</p>
+<h2>debianインストーラの導入</h2>
+<p>自分はいつも<a href="https://www.debian.org/devel/debian-installer/">debian開発者ページ（？）</a>からインストーラを取得している。
+ここで手に入るのはtesting版。だと思う。日次スナップショットはうまく起動しない場合もあるので注意。</p>
+<p>「その他のイメージ＞インストール先アーキテクチャ＞hd-media」とたどる。</p>
+<p>ここから<code>vmlinuz</code>（カーネル）と<code>initrd.gz</code>（初期RAMディスク）を取得する。
+また、元のページから「netinst CDイメージ」も取得しておく。</p>
+<p>あとはこれを配置するだけ。USBメモリをmountし、以下のように配置する。FAT32でフォーマットしてあるとMacからでもWinからでも配置できるので便利。MacのEFIで読めるのはFATとHFS+とかだった気がするけど定かではない。FAT32なら大丈夫だった。</p>
+<table>
+<thead>
+<tr>
+<th align="left">ファイル</th>
+<th align="left">配置場所</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">netinst CDイメージ（.isoファイル）</td>
+<td align="left">USBメモリのトップ/</td>
+</tr>
+<tr>
+<td align="left">vmlinuz</td>
+<td align="left">USBメモリのトップ/boot/</td>
+</tr>
+<tr>
+<td align="left">initrd.gz</td>
+<td align="left">USBメモリのトップ/boot/</td>
+</tr>
+</tbody>
+</table>
+<h1>インストールはどうやるの？</h1>
+<p>普通にUSBメモリからEFIで起動させればOK。</p>
+<p>インストーラでパーティションを切るときに、EFI用のディレクトリを作成しないとダメ。100MBくらいで十分なはずだけど、200MBくらいを確保している。</p>
+<p>Windowsが入っているマシンとかに後からdebianを追加するときは、すでにあるEFIシステムパーティションが利用できる。もちろん、WindowsがEFIブートでインストールされていれば、の話だが。</p>
+
+                <div class="clear"></div>
+                <div class="info">
+                    <a href="http://pman0214.github.io/blog/debian-install-efi.html">posted at 12:55</a>&nbsp;&middot;&nbsp;<a href="http://pman0214.github.io/blog/category/ji-shu.html" rel="tag">技術</a>&nbsp;&middot;&nbsp;<a href="http://pman0214.github.io/blog/tag/debian.html" class="tags">debian</a>&nbsp;<a href="http://pman0214.github.io/blog/tag/efi.html" class="tags selected">efi</a>
+                </div>
+
+            </article>
+            <div class="clear"></div>
+            <div class="clear"></div>
+<footer>
+  <p>
+    Copyright &copy <script type="text/javascript">document.write(new Date().getFullYear());</script>
+    pman0214
+    |
+    <a href="https://github.com/jody-frankowski/blue-penguin">Blue Penguin</a> Theme
+    &middot;
+    Powered by <a href="http://getpelican.com">Pelican</a>
+  </p>
+</footer>        </div>
+        <div class="clear"></div>
+    </div>
+</body>
+</html>
