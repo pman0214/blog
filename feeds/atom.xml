@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-04-30T12:55:00+09:00</updated><entry><title>EFIブートするUSBメモリでdebianをインストール</title><link href="http://pman0214.github.io/blog/debian-install-efi.html" rel="alternate"></link><updated>2015-04-30T12:55:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-04-30:blog/debian-install-efi.html</id><summary type="html">&lt;h1&gt;概要&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-05-06T18:58:00+09:00</updated><entry><title>virtualenv環境のpythonをcronで呼ぶ</title><link href="http://pman0214.github.io/blog/cron-python-virtualenv.html" rel="alternate"></link><updated>2015-05-06T18:58:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-05-06:blog/cron-python-virtualenv.html</id><summary type="html">&lt;h1&gt;概要&lt;/h1&gt;
+&lt;p&gt;virtualenv環境で開発したPythonスクリプトをcronで呼び出したいとき、ライブラリとかをどうやって指定するのか分からなかったので考えてみた。&lt;/p&gt;
+&lt;h1&gt;結論&lt;/h1&gt;
+&lt;p&gt;以下のようなスクリプトを作っておき、これを呼び出せばOK。&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/sh&lt;/span&gt;
+
+&lt;span class="nv"&gt;PROG_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/local/hoge
+&lt;span class="nb"&gt;source&lt;/span&gt; &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/bin/activate
+
+python &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/hoge.pyc
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;h1&gt;解説というほどでもないけど&lt;/h1&gt;
+&lt;p&gt;要するに、普段やっている&lt;code&gt;source bin/activate&lt;/code&gt;を呼んでおけばいいという話。&lt;/p&gt;
+&lt;p&gt;なので上記のようなスクリプトを書いておけば対応できる。
+引数がある場合にはスクリプトに引数を付ければOK。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;crontab -e&lt;/code&gt;で上記スクリプトの呼び出しを追加すれば試合終了。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# m h dom mon dow       command
+10 4 * * *              /usr/local/bin/hoge
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="python"></category><category term="cron"></category><category term="virtualenv"></category></entry><entry><title>EFIブートするUSBメモリでdebianをインストール</title><link href="http://pman0214.github.io/blog/debian-install-efi.html" rel="alternate"></link><updated>2015-04-30T12:55:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-04-30:blog/debian-install-efi.html</id><summary type="html">&lt;h1&gt;概要&lt;/h1&gt;
 &lt;ul&gt;
 &lt;li&gt;EFIブートするUSBメモリを作成し、これを使ってdebianをインストールする。&lt;/li&gt;
 &lt;li&gt;古いXserveをdebian化しようとした中での例。&lt;ul&gt;

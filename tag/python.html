@@ -24,6 +24,46 @@
     </header>
     <div id="wrapper">
         <div id="content">
+            <h4 class="date"> 5 06, 2015</h4>
+            <article class="post">
+<h2 class="title">
+                    <a href="http://pman0214.github.io/blog/cron-python-virtualenv.html" rel="bookmark" title="Permanent Link to &quot;virtualenv環境のpythonをcronで呼ぶ&quot;">virtualenv環境のpythonをcronで呼ぶ</a>
+                </h2>
+
+                <h1>概要</h1>
+<p>virtualenv環境で開発したPythonスクリプトをcronで呼び出したいとき、ライブラリとかをどうやって指定するのか分からなかったので考えてみた。</p>
+<h1>結論</h1>
+<p>以下のようなスクリプトを作っておき、これを呼び出せばOK。</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">#!/bin/sh</span>
+
+<span class="nv">PROG_DIR</span><span class="o">=</span>/usr/local/hoge
+<span class="nb">source</span> <span class="nv">$PROG_DIR</span>/bin/activate
+
+python <span class="nv">$PROG_DIR</span>/hoge.pyc
+</pre></div>
+</td></tr></table>
+
+<h1>解説というほどでもないけど</h1>
+<p>要するに、普段やっている<code>source bin/activate</code>を呼んでおけばいいという話。</p>
+<p>なので上記のようなスクリプトを書いておけば対応できる。
+引数がある場合にはスクリプトに引数を付ければOK。</p>
+<p><code>crontab -e</code>で上記スクリプトの呼び出しを追加すれば試合終了。</p>
+<div class="highlight"><pre># m h dom mon dow       command
+10 4 * * *              /usr/local/bin/hoge
+</pre></div>
+
+                <div class="clear"></div>
+                <div class="info">
+                    <a href="http://pman0214.github.io/blog/cron-python-virtualenv.html">posted at 18:58</a>&nbsp;&middot;&nbsp;<a href="http://pman0214.github.io/blog/category/ji-shu.html" rel="tag">技術</a>&nbsp;&middot;&nbsp;<a href="http://pman0214.github.io/blog/tag/python.html" class="tags selected">python</a>&nbsp;<a href="http://pman0214.github.io/blog/tag/cron.html" class="tags">cron</a>&nbsp;<a href="http://pman0214.github.io/blog/tag/virtualenv.html" class="tags">virtualenv</a>
+                </div>
+
+            </article>
+            <div class="clear"></div>
             <h4 class="date"> 4 26, 2015</h4>
             <article class="post">
 <h2 class="title">
