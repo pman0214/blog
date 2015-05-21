@@ -1,5 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 16 May 2015 15:00:00 +0900</lastBuildDate><item><title>Debian jessieにRedmineをインストールする</title><link>http://pman0214.github.io/blog/redmine-install.html</link><description>&lt;h1&gt;環境&lt;/h1&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 21 May 2015 12:18:00 +0900</lastBuildDate><item><title>RedmineをGitHubと連携させる</title><link>http://pman0214.github.io/blog/redmine-github.html</link><description>&lt;h1&gt;概要&lt;/h1&gt;
+&lt;p&gt;&lt;a href="/redmine-install.html"&gt;先日インストールしたRedmine&lt;/a&gt;だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。&lt;/p&gt;
+&lt;p&gt;svnレポジトリの場合はユーザ名・パスワードを使って自動的にcheckoutできるようなのだが、gitレポジトリではそれができないようだ。
+具体的には、gitの場合にはシステム上、すなわちサーバ上に存在するレポジトリのみを登録できるようになっている。いまだ開発途上ということだろう。&lt;/p&gt;
+&lt;p&gt;このため、GitHubと連携させるためには一手間が必要となる。&lt;/p&gt;
+&lt;h1&gt;Redmineへのweb-hookプラグインの導入&lt;/h1&gt;
+&lt;p&gt;&lt;code&gt;git&lt;/code&gt;が入っていなかったら&lt;code&gt;sudo apt-get install git-core&lt;/code&gt;で導入しておく。&lt;/p&gt;
+&lt;p&gt;GitHubからのweb-hookを使うためにはjsonを処理する必要があるため、json用のgemを導入しておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% alias sr=&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
+&lt;span class="c"&gt;% cd /home/redmine/redmine&lt;/span&gt;
+&lt;span class="c"&gt;% sr vi Gemfile.local&lt;/span&gt;
+&lt;span class="n"&gt;gem&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;json&lt;/span&gt;&amp;quot; ← ★追加する
+&lt;span class="c"&gt;% sr bundle install --without development test&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;自分の環境では&lt;code&gt;json&lt;/code&gt;が2回以上あると怒られたので、すでにどこかで書いてあったようだ。実害はないのでいいが。&lt;/p&gt;
+&lt;p&gt;GitHub hookプラグインを導入する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% cd /home/redmine/redmine/plugins&lt;/span&gt;
+&lt;span class="c"&gt;% sr git clone https://github.com/koppen/redmine_github_hook.git&lt;/span&gt;
+&lt;span class="c"&gt;% cd redmine_github_hook&lt;/span&gt;
+&lt;span class="c"&gt;% sr RAILS_ENV=production bundle install --without development test&lt;/span&gt;
+&lt;span class="c"&gt;% cd ../..&lt;/span&gt;
+&lt;span class="c"&gt;% sr RAILS_ENV=production bundle install --without development test&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Redmineを再起動する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo /etc/init.d/redmine restart&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Redmineに管理者アカウントでログインすれば、管理＞プラグインで&lt;code&gt;Redmine Github Hook plugin&lt;/code&gt;が見えるはず。&lt;/p&gt;
+&lt;h1&gt;RedmineでのGitHubレポジトリの追加&lt;/h1&gt;
+&lt;p&gt;GitHubのレポジトリを直接持ってくることはできないため、サーバ上でcloneしておく必要がある。
+ここでは非公開レポジトリを想定してデプロイキーを使ってcloneすることにする。&lt;/p&gt;
+&lt;p&gt;まずはssh鍵を作成。nginx+unicornでredmineを起動しているので、redmineを実行しているユーザは&lt;code&gt;redmine&lt;/code&gt;である。
+このユーザ用のssh鍵を作成し、デプロイキーとして登録する。
+ssh鍵の作成ではパスフレーズを設定してはいけない。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% cd /home/redmine&lt;/span&gt;
+&lt;span class="c"&gt;% alias sr=&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
+&lt;span class="c"&gt;% sr mkdir .ssh&lt;/span&gt;
+&lt;span class="c"&gt;% sr chmod 700 .ssh&lt;/span&gt;
+&lt;span class="c"&gt;% sr ssh-keygen -t ecdsa&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;できあがった公開鍵&lt;code&gt;/home/redmine/.ssh/id_ecdsa.pub&lt;/code&gt;をGitHubの当該レポジトリにデプロイキーとして登録する。&lt;/p&gt;
+&lt;p&gt;レポジトリ用のディレクトリを作成してcloneしておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sr mkdir repos&lt;/span&gt;
+&lt;span class="c"&gt;% cd repos&lt;/span&gt;
+&lt;span class="c"&gt;% sr git clone --bare git@github.com/xxxxxx/hoge.git&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Redmineにcloneしたレポジトリを追加する。
+パスは&lt;code&gt;/home/redmine/repos/hoge.git&lt;/code&gt;とすれば良い。
+この時点でレポジトリが表示できるはず。&lt;/p&gt;
+&lt;p&gt;あとはGitHubにweb-hookを登録すればOK。ここから未テスト。
+URLは&lt;code&gt;http(s)://debianサーバ/github_hook?project_id=[プロジェクトの識別子]&lt;/code&gt;とする。
+当然ながらdebianサーバは外部からアクセスできるように設定しておく。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Thu, 21 May 2015 12:18:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-21:blog/redmine-github.html</guid><category>redmine</category><category>github</category></item><item><title>Debian jessieにRedmineをインストールする</title><link>http://pman0214.github.io/blog/redmine-install.html</link><description>&lt;h1&gt;環境&lt;/h1&gt;
 &lt;ul&gt;
 &lt;li&gt;debian jessie 8.0&lt;ul&gt;
 &lt;li&gt;debianマシンはすでに用意してあるものとする。&lt;/li&gt;

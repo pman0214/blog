@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
 <head>
-    <title>debian - pLog</title>
+    <title>RedmineをGitHubと連携させる - pLog</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -9,16 +9,22 @@
 
 
 
+<link rel="canonical" href="http://pman0214.github.io/blog/redmine-github.html">
 
-    <meta name="author" content="pman0214" />
-    <meta name="keywords" content="debian" />
+        <meta name="author" content="pman0214" />
+        <meta name="keywords" content="redmine,github" />
+        <meta name="description" content="RedmineでGitHubレポジトリを登録し、web-hookで自動的にレポジトリ状態をアップデートする手順。" />
 
-    <!-- Open Graph tags -->
         <meta property="og:site_name" content="pLog" />
-        <meta property="og:type" content="website"/>
-        <meta property="og:title" content="pLog"/>
-        <meta property="og:url" content="http://pman0214.github.io/blog"/>
-        <meta property="og:description" content="pLog"/>
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="RedmineをGitHubと連携させる"/>
+        <meta property="og:url" content="http://pman0214.github.io/blog/redmine-github.html"/>
+        <meta property="og:description" content="RedmineでGitHubレポジトリを登録し、web-hookで自動的にレポジトリ状態をアップデートする手順。"/>
+        <meta property="article:published_time" content="2015-05-21" />
+            <meta property="article:section" content="技術" />
+            <meta property="article:tag" content="redmine" />
+            <meta property="article:tag" content="github" />
+            <meta property="article:author" content="pman0214" />
 
 
     <!-- Bootstrap -->
@@ -53,7 +59,7 @@ pLog            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                        <li >
+                        <li class="active">
                             <a href="http://pman0214.github.io/blog/category/ji-shu.html">技術</a>
                         </li>
                         <li >
@@ -73,20 +79,132 @@ pLog            </a>
     <div class="row">
         <div class="col-sm-9">
 
-            <article>
-                <h2><a href="http://pman0214.github.io/blog/redmine-install.html">Debian jessieにRedmineをインストールする</a></h2>
-                <div class="summary"><p>Debian jessieのnginx上にRedmine+Backlogsを導入する手順について説明する。</p>
-                    <a class="btn btn-default btn-xs" href="http://pman0214.github.io/blog/redmine-install.html">more ...</a>
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://pman0214.github.io/blog/redmine-github.html"
+                       rel="bookmark"
+                       title="Permalink to RedmineをGitHubと連携させる">
+                        RedmineをGitHubと連携させる
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2015-05-21T12:18:00+09:00"> 木 21 5月 2015</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+        /
+	<a href="http://pman0214.github.io/blog/tag/github.html">github</a>
+    
+</footer><!-- /.post-info -->                    </div>
                 </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://pman0214.github.io/blog/debian-install-efi.html">EFIブートするUSBメモリでdebianをインストール</a></h2>
-                <div class="summary"><p>EFIブートするUSBメモリを作成し、debianをインストールするまで。</p>
-                    <a class="btn btn-default btn-xs" href="http://pman0214.github.io/blog/debian-install-efi.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
+                <h1>概要</h1>
+<p><a href="/redmine-install.html">先日インストールしたRedmine</a>だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。</p>
+<p>svnレポジトリの場合はユーザ名・パスワードを使って自動的にcheckoutできるようなのだが、gitレポジトリではそれができないようだ。
+具体的には、gitの場合にはシステム上、すなわちサーバ上に存在するレポジトリのみを登録できるようになっている。いまだ開発途上ということだろう。</p>
+<p>このため、GitHubと連携させるためには一手間が必要となる。</p>
+<h1>Redmineへのweb-hookプラグインの導入</h1>
+<p><code>git</code>が入っていなかったら<code>sudo apt-get install git-core</code>で導入しておく。</p>
+<p>GitHubからのweb-hookを使うためにはjsonを処理する必要があるため、json用のgemを導入しておく。</p>
+<div class="highlight"><pre><span class="c">% alias sr=&quot;sudo -u redmine&quot;</span>
+<span class="c">% cd /home/redmine/redmine</span>
+<span class="c">% sr vi Gemfile.local</span>
+<span class="n">gem</span> &quot;<span class="n">json</span>&quot; ← ★追加する
+<span class="c">% sr bundle install --without development test</span>
+</pre></div>
+
+
+<p>自分の環境では<code>json</code>が2回以上あると怒られたので、すでにどこかで書いてあったようだ。実害はないのでいいが。</p>
+<p>GitHub hookプラグインを導入する。</p>
+<div class="highlight"><pre><span class="c">% cd /home/redmine/redmine/plugins</span>
+<span class="c">% sr git clone https://github.com/koppen/redmine_github_hook.git</span>
+<span class="c">% cd redmine_github_hook</span>
+<span class="c">% sr RAILS_ENV=production bundle install --without development test</span>
+<span class="c">% cd ../..</span>
+<span class="c">% sr RAILS_ENV=production bundle install --without development test</span>
+</pre></div>
+
+
+<p>Redmineを再起動する。</p>
+<div class="highlight"><pre><span class="c">% sudo /etc/init.d/redmine restart</span>
+</pre></div>
+
+
+<p>Redmineに管理者アカウントでログインすれば、管理＞プラグインで<code>Redmine Github Hook plugin</code>が見えるはず。</p>
+<h1>RedmineでのGitHubレポジトリの追加</h1>
+<p>GitHubのレポジトリを直接持ってくることはできないため、サーバ上でcloneしておく必要がある。
+ここでは非公開レポジトリを想定してデプロイキーを使ってcloneすることにする。</p>
+<p>まずはssh鍵を作成。nginx+unicornでredmineを起動しているので、redmineを実行しているユーザは<code>redmine</code>である。
+このユーザ用のssh鍵を作成し、デプロイキーとして登録する。
+ssh鍵の作成ではパスフレーズを設定してはいけない。</p>
+<div class="highlight"><pre><span class="c">% cd /home/redmine</span>
+<span class="c">% alias sr=&quot;sudo -u redmine&quot;</span>
+<span class="c">% sr mkdir .ssh</span>
+<span class="c">% sr chmod 700 .ssh</span>
+<span class="c">% sr ssh-keygen -t ecdsa</span>
+</pre></div>
+
+
+<p>できあがった公開鍵<code>/home/redmine/.ssh/id_ecdsa.pub</code>をGitHubの当該レポジトリにデプロイキーとして登録する。</p>
+<p>レポジトリ用のディレクトリを作成してcloneしておく。</p>
+<div class="highlight"><pre><span class="c">% sr mkdir repos</span>
+<span class="c">% cd repos</span>
+<span class="c">% sr git clone --bare git@github.com/xxxxxx/hoge.git</span>
+</pre></div>
+
+
+<p>Redmineにcloneしたレポジトリを追加する。
+パスは<code>/home/redmine/repos/hoge.git</code>とすれば良い。
+この時点でレポジトリが表示できるはず。</p>
+<p>あとはGitHubにweb-hookを登録すればOK。ここから未テスト。
+URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクトの識別子]</code>とする。
+当然ながらdebianサーバは外部からアクセスできるように設定しておく。</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'pman0214-plog'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'redmine-github';
+                var disqus_url = 'http://pman0214.github.io/blog/redmine-github.html';
+
+            var disqus_config = function () {
+                this.language = "ja";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
 
         </div>
         <div class="col-sm-3" id="sidebar">
