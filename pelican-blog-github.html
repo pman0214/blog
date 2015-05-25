@@ -142,7 +142,7 @@ pLog            </a>
 <li>
 <p>適当なディレクトリを作成。</p>
 <div class="highlight"><pre>mkdir ~/blog
-cd !$
+<span class="nb">cd</span> !<span class="err">$</span>
 </pre></div>
 
 
@@ -150,7 +150,7 @@ cd !$
 <li>
 <p>virtualenv環境でpelicanを導入。Markdownを使いたいので、Markdownも導入しておく。</p>
 <div class="highlight"><pre>virtualenv --system-site-packages ./
-source bin/activate
+<span class="nb">source </span>bin/activate
 pip install pelican
 pip install Markdown
 </pre></div>
@@ -159,16 +159,16 @@ pip install Markdown
 </li>
 <li>
 <p><code>.gitignore</code>ファイルを作成しておく。なお、<code>.DS_Store</code>などはグローバルに無視する設定をしているので除外してある。</p>
-<div class="highlight"><pre><span class="na">.Python</span>
-<span class="nf">bin</span><span class="err">/</span>
-<span class="nf">include</span><span class="err">/</span>
-<span class="nf">lib</span><span class="err">/</span>
-<span class="nf">man</span><span class="err">/</span>
-<span class="nf">local</span><span class="err">/</span>
-<span class="nf">output</span><span class="err">/</span>
-<span class="nf">pip-selfcheck.json</span>
-<span class="nf">cache</span><span class="err">/</span>
-<span class="err">*</span><span class="na">.pyc</span>
+<div class="highlight"><pre>.Python
+bin/
+include/
+lib/
+man/
+local/
+output/
+pip-selfcheck.json
+cache/
+*.pyc
 </pre></div>
 
 
@@ -183,7 +183,7 @@ pip install Markdown
 <li>gitレポジトリを作成。<code>git status</code>して出てきたファイルを追加してcommit。<div class="highlight"><pre>git init .
 git status
 git add Makefile .gitignore develop_server.sh ...
-git commit -m &quot;Initial commit with pelican files.&quot;
+git commit -m <span class="s2">&quot;Initial commit with pelican files.&quot;</span>
 </pre></div>
 
 
@@ -248,7 +248,7 @@ pip install mdx_del_ins
 </li>
 <li>
 <p><code>pelicanconf.py</code>に以下を追加する。</p>
-<div class="highlight"><pre>MD_EXTENSIONS = [&#39;del_ins&#39;, &#39;fenced_code&#39;, &#39;codehilite(css_class=highlight)&#39;, &#39;tables&#39;]
+<div class="highlight"><pre><span class="n">MD_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;del_ins&#39;</span><span class="p">,</span> <span class="s">&#39;fenced_code&#39;</span><span class="p">,</span> <span class="s">&#39;codehilite(css_class=highlight)&#39;</span><span class="p">,</span> <span class="s">&#39;tables&#39;</span><span class="p">]</span>
 </pre></div>
 
 
@@ -263,21 +263,21 @@ pip install mdx_del_ins
 <ul>
 <li>
 <p>管理を単純にするため、投稿日をファイル名とすることにした。</p>
-<div class="highlight"><pre>touch content `date +%Y%m%d`.md
-open !$
+<div class="highlight"><pre>touch content <span class="sb">`</span>date +%Y%m%d<span class="sb">`</span>.md
+open !<span class="err">$</span>
 </pre></div>
 
 
 </li>
 <li>
 <p>先頭に各種情報を書いておく。</p>
-<div class="highlight"><pre><span class="n">Title</span><span class="o">:</span> <span class="n">Pelican</span><span class="o">+</span><span class="n">GitHub</span> <span class="n">Pages</span><span class="err">でブログ引っ越し</span>
-<span class="n">Date</span><span class="o">:</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">26</span> <span class="mi">18</span><span class="o">:</span><span class="mi">00</span>
-<span class="n">Category</span><span class="o">:</span> <span class="err">カテゴリ</span>
-<span class="n">Tags</span><span class="o">:</span> <span class="n">info</span><span class="o">,</span> <span class="n">blog</span><span class="o">,</span> <span class="n">python</span><span class="o">,</span> <span class="n">pelican</span><span class="o">,</span> <span class="n">github</span>
-<span class="n">Slug</span><span class="o">:</span> <span class="n">pelican</span><span class="o">-</span><span class="n">blog</span><span class="o">-</span><span class="n">github</span>  <span class="err">←</span><span class="n">permanent</span> <span class="n">link</span><span class="err">。「この名前</span><span class="o">+</span><span class="n">html</span><span class="err">」ファイルが生成される。</span>
-<span class="n">Author</span><span class="o">:</span> <span class="n">pman0214</span>
-<span class="n">Summary</span><span class="o">:</span> <span class="err">この記事の要約。</span>
+<div class="highlight"><pre>Title: Pelican+GitHub Pagesでブログ引っ越し
+Date: 2015-04-26 18:00
+Category: カテゴリ
+Tags: info, blog, python, pelican, github
+Slug: pelican-blog-github  ←permanent link。「この名前+html」ファイルが生成される。
+Author: pman0214
+Summary: この記事の要約。
 </pre></div>
 
 
@@ -323,7 +323,7 @@ open !$
 </li>
 <li>
 <p>先ほどのテーマのディレクトリがsubmoduleであれば、それを取得する。この記事執筆時点では<a href="https://github.com/jody-frankowski/blue-penguin/">blue-penguin</a>を選択した。</p>
-<div class="highlight"><pre>cd themes
+<div class="highlight"><pre><span class="nb">cd </span>themes
 git submodule init blue-penguin
 git submodule update blue-penguin
 </pre></div>
@@ -334,12 +334,12 @@ git submodule update blue-penguin
 </li>
 <li>
 <p><code>pelicanconf.py</code>に以下のように設定する。</p>
-<div class="highlight"><pre>THEME = &quot;pelican-themes/blue-penguin&quot;
+<div class="highlight"><pre><span class="n">THEME</span> <span class="o">=</span> <span class="s">&quot;pelican-themes/blue-penguin&quot;</span>
 </pre></div>
 
 
 <ul>
-<li><strong>2015/04/27追記:</strong> 間違ってます。正しくはこうです。<div class="highlight"><pre>THEME = &quot;themes/blue-penguin&quot;
+<li><strong>2015/04/27追記:</strong> 間違ってます。正しくはこうです。<div class="highlight"><pre><span class="n">THEME</span> <span class="o">=</span> <span class="s">&quot;themes/blue-penguin&quot;</span>
 </pre></div>
 
 
@@ -355,7 +355,7 @@ git submodule update blue-penguin
 <ul>
 <li>
 <p><code>output</code>ディレクトリをgitレポジトリにする。</p>
-<div class="highlight"><pre>cd output
+<div class="highlight"><pre><span class="nb">cd </span>output
 git init ./
 </pre></div>
 
@@ -371,7 +371,7 @@ git init ./
 <li>
 <p>全ファイルをadd、そしてcommit。</p>
 <div class="highlight"><pre>git add *
-git commit -m &quot;Article `date +%Y%m%d`.&quot;
+git commit -m <span class="s2">&quot;Article `date +%Y%m%d`.&quot;</span>
 </pre></div>
 
 
@@ -459,13 +459,13 @@ git push origin gh-pages
             <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
-                            redmine
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -474,18 +474,8 @@ git push origin gh-pages
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/info.html">
-                            info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
-                            pelican
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -499,18 +489,28 @@ git push origin gh-pages
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/blog.html">
                             blog
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/efi.html">
                             efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
                         </a>
                     </li>
                 </ul>

@@ -125,81 +125,87 @@ pLog            </a>
 <h1>手順</h1>
 <h2>redmine本体</h2>
 <p>必要なツール類をインストールする。MySQLを使うことが多いのだが、個人的な好みによりPostgreSQLを使用することにする。</p>
-<div class="highlight"><pre><span class="c">% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev \</span>
-  <span class="n">make</span> <span class="n">build</span><span class="o">-</span><span class="n">essential</span> <span class="n">gcc</span> <span class="o">\</span>
-  <span class="n">imagemagick</span> <span class="n">libmagickwand</span><span class="o">-</span><span class="n">dev</span> <span class="n">git</span><span class="o">-</span><span class="n">core</span> <span class="n">subversion</span>
+<div class="highlight"><pre>% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev <span class="se">\</span>
+  make build-essential gcc <span class="se">\</span>
+  imagemagick libmagickwand-dev git-core subversion
 </pre></div>
 
 
 <p>PostgreSQLに接続してユーザやDBの作成を行う。<code>password</code>の部分はもちろん変更すべし。パスワードに記号が入っているとredmineで接続できない場合があるので、英数に限定する方がいいかも。</p>
-<div class="highlight"><pre><span class="c">% sudo -u postgres psql</span>
-<span class="n">postgres</span># <span class="n">CREATE</span> <span class="n">ROLE</span> <span class="n">redmine</span> <span class="n">LOGIN</span> <span class="n">ENCRYPTED</span> <span class="n">PASSWORD</span> <span class="s">&#39;password&#39;</span> <span class="n">NOINHERIT</span> <span class="n">VALID</span> <span class="n">UNTIL</span> <span class="s">&#39;infinity&#39;</span><span class="p">;</span>
-<span class="n">postgres</span># <span class="n">CREATE</span> <span class="n">DATABASE</span> <span class="n">redmine</span> <span class="n">WITH</span> <span class="n">ENCODING</span><span class="p">=</span><span class="s">&#39;UTF8&#39;</span> <span class="n">OWNER</span><span class="p">=</span><span class="n">redmine</span><span class="p">;</span>
-<span class="n">postgres</span># <span class="o">\</span><span class="n">q</span>
+<div class="highlight"><pre>% sudo -u postgres psql
+postgres# CREATE ROLE redmine LOGIN ENCRYPTED PASSWORD <span class="s1">&#39;password&#39;</span> NOINHERIT VALID UNTIL <span class="s1">&#39;infinity&#39;</span><span class="p">;</span>
+postgres# CREATE DATABASE redmine WITH <span class="nv">ENCODING</span><span class="o">=</span><span class="s1">&#39;UTF8&#39;</span> <span class="nv">OWNER</span><span class="o">=</span>redmine<span class="p">;</span>
+postgres# <span class="se">\q</span>
 </pre></div>
 
 
 <p>Linuxにユーザ<code>redmine</code>を追加する。</p>
-<div class="highlight"><pre><span class="c">% sudo adduser --disabled-login --gecos &#39;Redmine&#39; redmine</span>
+<div class="highlight"><pre>% sudo adduser --disabled-login --gecos <span class="s1">&#39;Redmine&#39;</span> redmine
 </pre></div>
 
 
 <p>パスワードを設定しておく。</p>
-<div class="highlight"><pre><span class="c">% sudo passwd redmine</span>
+<div class="highlight"><pre>% sudo passwd redmine
 </pre></div>
 
 
 <p>sudoグループにユーザ<code>redmine</code>を加えておく。Debianでは<code>visudo</code>でユーザを追加せず、このグループにユーザを追加するだけでsudoできるように設定されている。</p>
-<div class="highlight"><pre><span class="c">% sudo vi /etc/group</span>
-<span class="c">...</span>
-<span class="n">sudo</span><span class="p">:</span><span class="n">x</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="n">redmine</span> ← ★<span class="n">redmine</span>を追加する
-<span class="c">...</span>
+<div class="highlight"><pre>% sudo vi /etc/group
+</pre></div>
+
+
+<div class="highlight"><pre>...
+sudo:x:27:redmine ← ★redmineを追加する
+...
 </pre></div>
 
 
 <p><a href="http://www.redmine.org/">Redmineの公式web</a>からソースをゲットする。Backlogsは2.2.4と2.3.2に対応と書かれているが、今回は執筆時点での最新版2.6.5にBacklogsを導入するという暴挙に出る。</p>
 <p><code>sudo -u redmine</code>を多用するのでaliasしておく。</p>
-<div class="highlight"><pre><span class="c">% alias sr=&#39;sudo -u redmine&#39;</span>
-<span class="c">% cd /home/redmine</span>
-<span class="c">% sr wget http://www.redmine.org/releases/redmine-2.6.5.tar.gz</span>
-<span class="c">% sr tar zxvf redmine-2.6.5.tar.gz</span>
-<span class="c">% sr ln -s redmine-2.6.5 redmine</span>
-<span class="c">% cd redmine</span>
+<div class="highlight"><pre>% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s1">&#39;sudo -u redmine&#39;</span>
+% <span class="nb">cd</span> /home/redmine
+% sr wget http://www.redmine.org/releases/redmine-2.6.5.tar.gz
+% sr tar zxvf redmine-2.6.5.tar.gz
+% sr ln -s redmine-2.6.5 redmine
+% <span class="nb">cd </span>redmine
 </pre></div>
 
 
 <p>database.ymlのテンプレートをコピーし、設定を施す。</p>
 <p>MySQLの設定をコメントアウトしてPostgreSQLの設定を有効化し、設定を変更する。
 testもコメントアウトしてしまってOK。</p>
-<div class="highlight"><pre><span class="c">% sr cp config/database.yml.example config/database.yml</span>
-<span class="c">% sr vi config/database.yml</span>
-<span class="c">...</span>
-<span class="n">production</span><span class="p">:</span>
-  <span class="n">adapter</span><span class="p">:</span> <span class="n">postgresql</span>
-  <span class="n">database</span><span class="p">:</span> <span class="n">redmine</span>
-  <span class="n">host</span><span class="p">:</span> <span class="n">localhost</span>
-  <span class="n">username</span><span class="p">:</span> <span class="n">redmine</span> ← ★<span class="n">postgres</span>になっているので変更する
-  <span class="n">password</span><span class="p">:</span> &quot;<span class="n">password</span>&quot; ← ★パスワードは最初に<span class="n">PostgreSQL</span>に設定したもの。
-<span class="c">...</span>
+<div class="highlight"><pre>% sr cp config/database.yml.example config/database.yml
+% sr vi config/database.yml
+</pre></div>
+
+
+<div class="highlight"><pre><span class="nn">...</span>
+<span class="l-Scalar-Plain">production</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">adapter</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">postgresql</span>
+  <span class="l-Scalar-Plain">database</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">redmine</span>
+  <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">localhost</span>
+  <span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">redmine ← ★postgresになっているので変更する</span>
+  <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="s">&quot;password&quot;</span> <span class="l-Scalar-Plain">← ★パスワードは最初にPostgreSQLに設定したもの。</span>
+<span class="nn">...</span>
 </pre></div>
 
 
 <p>bundlerを導入してbundleする。システムのrubyを使っているのでbundlerはsudoで入れてしまう。</p>
-<div class="highlight"><pre><span class="c">% sudo gem install bundler</span>
-<span class="c">% sr bundle install --without development test</span>
+<div class="highlight"><pre>% sudo gem install bundler
+% sr bundle install --without development <span class="nb">test</span>
 </pre></div>
 
 
 <p>つづいてrake。</p>
-<div class="highlight"><pre><span class="c">% sr rake generate_secret_token</span>
-<span class="c">% sr RAILS_ENV=production rake db:migrate</span>
-<span class="c">% sr RAILS_ENV=production rake redmine:load_default_data</span>
-<span class="n">Select</span> <span class="n">Language</span><span class="p">:</span> <span class="n">ja</span> ← ★日本語を指定
+<div class="highlight"><pre>% sr rake generate_secret_token
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production rake db:migrate
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production rake redmine:load_default_data
+Select Language: ja ← ★日本語を指定
 </pre></div>
 
 
 <p>試しにサーバを動かしてみる。</p>
-<div class="highlight"><pre><span class="c">% sr ruby script/rails server webrick -e production</span>
+<div class="highlight"><pre>% sr ruby script/rails server webrick -e production
 </pre></div>
 
 
@@ -207,225 +213,237 @@ testもコメントアウトしてしまってOK。</p>
 Ctrl-Cでサーバを停止できる。</p>
 <h2>ログ消去</h2>
 <p>ログが永遠に作成されたら嫌なので、logrotateを使って自動的に消去する。</p>
-<div class="highlight"><pre><span class="c">% sudo vi /etc/logrotate.d/redmine</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">redmine</span><span class="o">/</span><span class="n">redmine</span><span class="o">/</span><span class="nb">log</span><span class="o">/*</span><span class="p">.</span><span class="nb">log</span> <span class="p">{</span>
-    <span class="n">rotate</span> <span class="mi">3</span>
-    <span class="nb">size</span> <span class="mi">1</span><span class="n">M</span>
-    <span class="n">compress</span>
-    <span class="n">missingok</span>
-    <span class="n">notifempty</span>
-    <span class="n">copytruncate</span>
-<span class="p">}</span>
+<div class="highlight"><pre>% sudo vi /etc/logrotate.d/redmine
+</pre></div>
+
+
+<div class="highlight"><pre>/home/redmine/redmine/log/*.log {
+    rotate 3
+    size 1M
+    compress
+    missingok
+    notifempty
+    copytruncate
+}
 </pre></div>
 
 
 <p>テストしてみる。</p>
-<div class="highlight"><pre><span class="c">% sudo logrotate -dv /etc/logrotate.conf</span>
+<div class="highlight"><pre>% sudo logrotate -dv /etc/logrotate.conf
 </pre></div>
 
 
 <h1>nginx + unicornにする</h1>
 <p>WEBrickを使うのはアレなのでnginxに乗っける。</p>
 <p>まずはunicornをbundleする。</p>
-<div class="highlight"><pre><span class="c">% sr vi Gemfile.local</span>
-<span class="n">gem</span> &quot;<span class="n">unicorn</span>&quot;
+<div class="highlight"><pre>% sr vi Gemfile.local
+gem <span class="s2">&quot;unicorn&quot;</span>
 </pre></div>
 
 
 <p>unicornの設定ファイルを作成する。</p>
-<div class="highlight"><pre><span class="c">% sr vi config/unicorn.rb</span>
-<span class="n">worker_processes</span> <span class="mi">2</span>
-<span class="n">working_directory</span> &quot;<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">redmine</span><span class="o">/</span><span class="n">redmine</span>&quot;
+<div class="highlight"><pre>% sr vi config/unicorn.rb
+</pre></div>
 
-<span class="n">listen</span> <span class="n">File</span><span class="p">.</span><span class="n">expand_path</span><span class="p">(</span>&quot;<span class="n">tmp</span><span class="o">/</span><span class="n">unicorn</span><span class="p">.</span><span class="n">sock</span>&quot;<span class="p">,</span> <span class="n">ENV</span><span class="p">[</span><span class="s">&#39;RAILS_ROOT&#39;</span><span class="p">])</span>
-<span class="n">listen</span> &quot;<span class="mf">127.0</span><span class="p">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">8079</span>&quot;<span class="p">,</span> <span class="p">:</span><span class="n">tcp_nopush</span> <span class="p">=</span><span class="o">&gt;</span> <span class="n">true</span>
 
-<span class="n">pid</span> <span class="n">File</span><span class="p">.</span><span class="n">expand_path</span><span class="p">(</span>&quot;<span class="n">tmp</span><span class="o">/</span><span class="n">unicorn</span><span class="p">.</span><span class="n">pid</span>&quot;<span class="p">,</span> <span class="n">ENV</span><span class="p">[</span><span class="s">&#39;RAILS_ROOT&#39;</span><span class="p">])</span>
+<div class="highlight"><pre><span class="n">worker_processes</span> <span class="mi">2</span>
+<span class="n">working_directory</span> <span class="s2">&quot;/home/redmine/redmine&quot;</span>
+
+<span class="n">listen</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;tmp/unicorn.sock&quot;</span><span class="p">,</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;RAILS_ROOT&#39;</span><span class="o">]</span><span class="p">)</span>
+<span class="n">listen</span> <span class="s2">&quot;127.0.0.1:8079&quot;</span><span class="p">,</span> <span class="ss">:tcp_nopush</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+
+<span class="n">pid</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;tmp/unicorn.pid&quot;</span><span class="p">,</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;RAILS_ROOT&#39;</span><span class="o">]</span><span class="p">)</span>
 
 <span class="n">timeout</span> <span class="mi">60</span>
 
-<span class="n">preload_app</span> <span class="n">true</span>
+<span class="n">preload_app</span> <span class="kp">true</span>
 
-<span class="n">stdout_path</span> <span class="n">File</span><span class="p">.</span><span class="n">expand_path</span><span class="p">(</span>&quot;<span class="nb">log</span><span class="o">/</span><span class="n">unicorn</span><span class="p">.</span><span class="n">stdout</span><span class="p">.</span><span class="nb">log</span>&quot;<span class="p">,</span> <span class="n">ENV</span><span class="p">[</span><span class="s">&#39;RAILS_ROOT&#39;</span><span class="p">])</span>
-<span class="n">stderr_path</span> <span class="n">File</span><span class="p">.</span><span class="n">expand_path</span><span class="p">(</span>&quot;<span class="nb">log</span><span class="o">/</span><span class="n">unicorn</span><span class="p">.</span><span class="n">stderr</span><span class="p">.</span><span class="nb">log</span>&quot;<span class="p">,</span> <span class="n">ENV</span><span class="p">[</span><span class="s">&#39;RAILS_ROOT&#39;</span><span class="p">])</span>
+<span class="n">stdout_path</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;log/unicorn.stdout.log&quot;</span><span class="p">,</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;RAILS_ROOT&#39;</span><span class="o">]</span><span class="p">)</span>
+<span class="n">stderr_path</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;log/unicorn.stderr.log&quot;</span><span class="p">,</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;RAILS_ROOT&#39;</span><span class="o">]</span><span class="p">)</span>
 
-<span class="n">GC</span><span class="p">.</span><span class="n">respond_to</span>?<span class="p">(:</span><span class="n">copy_on_write_friendly</span><span class="p">=)</span> <span class="n">and</span> <span class="n">GC</span><span class="p">.</span><span class="n">copy_on_write_friendly</span> <span class="p">=</span> <span class="n">true</span>
+<span class="no">GC</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:copy_on_write_friendly</span><span class="o">=</span><span class="p">)</span> <span class="ow">and</span> <span class="no">GC</span><span class="o">.</span><span class="n">copy_on_write_friendly</span> <span class="o">=</span> <span class="kp">true</span>
 
-<span class="n">before_fork</span> <span class="n">do</span> <span class="o">|</span><span class="n">server</span><span class="p">,</span> <span class="n">worker</span><span class="o">|</span>
-  <span class="n">defined</span>?<span class="p">(</span><span class="n">ActiveRecord</span><span class="p">::</span><span class="n">Base</span><span class="p">)</span> <span class="n">and</span> <span class="n">ActiveRecord</span><span class="p">::</span><span class="n">Base</span><span class="p">.</span><span class="n">connection</span><span class="p">.</span><span class="n">disconnect</span>!
+<span class="n">before_fork</span> <span class="k">do</span> <span class="o">|</span><span class="n">server</span><span class="p">,</span> <span class="n">worker</span><span class="o">|</span>
+  <span class="n">defined?</span><span class="p">(</span><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">)</span> <span class="ow">and</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">disconnect!</span>
 
-  <span class="n">old_pid</span> <span class="p">=</span> &quot;#<span class="p">{</span><span class="n">server</span><span class="p">.</span><span class="n">config</span><span class="p">[:</span><span class="n">pid</span><span class="p">]}.</span><span class="n">oldbin</span>&quot;
-    <span class="k">if</span> <span class="n">old_pid</span> !<span class="p">=</span> <span class="n">server</span><span class="p">.</span><span class="n">pid</span>
-      <span class="n">begin</span>
-        <span class="n">sig</span> <span class="p">=</span> <span class="p">(</span><span class="n">worker</span><span class="p">.</span><span class="n">nr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span><span class="p">=</span> <span class="n">server</span><span class="p">.</span><span class="n">worker_processes</span> ? <span class="p">:</span><span class="n">QUIT</span> <span class="p">:</span> <span class="p">:</span><span class="n">TTOU</span>
-        <span class="n">Process</span><span class="p">.</span><span class="n">kill</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">File</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="n">old_pid</span><span class="p">).</span><span class="n">to_i</span><span class="p">)</span>
-      <span class="n">rescue</span> <span class="n">Errno</span><span class="p">::</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">Errno</span><span class="p">::</span><span class="n">ESRCH</span>
+  <span class="n">old_pid</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">server</span><span class="o">.</span><span class="n">config</span><span class="o">[</span><span class="ss">:pid</span><span class="o">]</span><span class="si">}</span><span class="s2">.oldbin&quot;</span>
+    <span class="k">if</span> <span class="n">old_pid</span> <span class="o">!=</span> <span class="n">server</span><span class="o">.</span><span class="n">pid</span>
+      <span class="k">begin</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">(</span><span class="n">worker</span><span class="o">.</span><span class="n">nr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">server</span><span class="o">.</span><span class="n">worker_processes</span> <span class="p">?</span> <span class="ss">:QUIT</span> <span class="p">:</span> <span class="ss">:TTOU</span>
+        <span class="no">Process</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">old_pid</span><span class="p">)</span><span class="o">.</span><span class="n">to_i</span><span class="p">)</span>
+      <span class="k">rescue</span> <span class="no">Errno</span><span class="o">::</span><span class="no">ENOENT</span><span class="p">,</span> <span class="no">Errno</span><span class="o">::</span><span class="no">ESRCH</span>
       <span class="k">end</span>
     <span class="k">end</span>
 
-    <span class="n">sleep</span> <span class="mi">1</span>
+    <span class="nb">sleep</span> <span class="mi">1</span>
   <span class="k">end</span>
 
-<span class="n">after_fork</span> <span class="n">do</span> <span class="o">|</span><span class="n">server</span><span class="p">,</span> <span class="n">worker</span><span class="o">|</span>
-  <span class="n">defined</span>?<span class="p">(</span><span class="n">ActiveRecord</span><span class="p">::</span><span class="n">Base</span><span class="p">)</span> <span class="n">and</span> <span class="n">ActiveRecord</span><span class="p">::</span><span class="n">Base</span><span class="p">.</span><span class="n">establish_connection</span>
+<span class="n">after_fork</span> <span class="k">do</span> <span class="o">|</span><span class="n">server</span><span class="p">,</span> <span class="n">worker</span><span class="o">|</span>
+  <span class="n">defined?</span><span class="p">(</span><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">)</span> <span class="ow">and</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="o">.</span><span class="n">establish_connection</span>
 <span class="k">end</span>
 </pre></div>
 
 
 <p>initスクリプトを作成する。上の方の設定は自信無い。</p>
-<div class="highlight"><pre><span class="c">% sudo vi /etc/init.d/redmine</span>
-#!<span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">sh</span>
+<div class="highlight"><pre>% sudo vi /etc/init.d/redmine
+</pre></div>
 
-### <span class="n">BEGIN</span> <span class="n">INIT</span> <span class="n">INFO</span>
-# <span class="n">Provides</span><span class="p">:</span>          <span class="n">redmine</span>
-# <span class="n">Required</span><span class="o">-</span><span class="n">Start</span><span class="p">:</span>    $<span class="n">local_fs</span> $<span class="n">remote_fs</span> $<span class="n">network</span> $<span class="n">syslog</span>
-# <span class="n">Required</span><span class="o">-</span><span class="n">Stop</span><span class="p">:</span>     $<span class="n">local_fs</span> $<span class="n">remote_fs</span> $<span class="n">network</span> $<span class="n">syslog</span>
-# <span class="n">Default</span><span class="o">-</span><span class="n">Start</span><span class="p">:</span>     <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span>
-# <span class="n">Default</span><span class="o">-</span><span class="n">Stop</span><span class="p">:</span>      <span class="mi">0</span> <span class="mi">1</span> <span class="mi">6</span>
-# <span class="n">Short</span><span class="o">-</span><span class="n">Description</span><span class="p">:</span> <span class="n">redmine</span> <span class="n">unicorn</span>
-# <span class="n">Description</span><span class="p">:</span>       <span class="n">redmine</span> <span class="n">unicorn</span>
-# <span class="n">chkconfig</span><span class="p">:</span> <span class="o">-</span> <span class="mi">75</span> <span class="mi">25</span>
-### <span class="n">END</span> <span class="n">INIT</span> <span class="n">INFO</span>
 
-<span class="n">export</span> <span class="n">PATH</span><span class="p">=</span><span class="o">/</span><span class="n">bin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="p">:</span><span class="o">/</span><span class="n">sbin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">sbin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span>
+<div class="highlight"><pre><span class="c">#!/bin/sh</span>
 
-# <span class="n">move</span> <span class="n">to</span> <span class="n">project</span> <span class="n">root</span> <span class="n">directory</span>
-<span class="n">NAME</span><span class="p">=</span><span class="n">redmine</span>
-<span class="n">ENVIROMENT</span><span class="p">=</span><span class="n">production</span>
-<span class="n">APP_USER</span><span class="p">=</span>&quot;<span class="n">redmine</span>&quot;
+<span class="c">### BEGIN INIT INFO</span>
+<span class="c"># Provides:          redmine</span>
+<span class="c"># Required-Start:    $local_fs $remote_fs $network $syslog</span>
+<span class="c"># Required-Stop:     $local_fs $remote_fs $network $syslog</span>
+<span class="c"># Default-Start:     2 3 4 5</span>
+<span class="c"># Default-Stop:      0 1 6</span>
+<span class="c"># Short-Description: redmine unicorn</span>
+<span class="c"># Description:       redmine unicorn</span>
+<span class="c"># chkconfig: - 75 25</span>
+<span class="c">### END INIT INFO</span>
 
-<span class="n">ROOT_DIR</span><span class="p">=</span>&quot;<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">redmine</span><span class="o">/</span><span class="n">redmine</span>&quot;
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span>/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
 
-<span class="n">PID</span><span class="p">=</span>&quot;$<span class="p">{</span><span class="n">ROOT_DIR</span><span class="p">}</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">unicorn</span><span class="p">.</span><span class="n">pid</span>&quot;
-<span class="n">CONF</span><span class="p">=</span>&quot;$<span class="p">{</span><span class="n">ROOT_DIR</span><span class="p">}</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">unicorn</span><span class="p">.</span><span class="n">rb</span>&quot;
+<span class="c"># move to project root directory</span>
+<span class="nv">NAME</span><span class="o">=</span>redmine
+<span class="nv">ENVIROMENT</span><span class="o">=</span>production
+<span class="nv">APP_USER</span><span class="o">=</span><span class="s2">&quot;redmine&quot;</span>
 
-<span class="n">start</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="k">if</span> <span class="p">[</span> <span class="o">-</span><span class="n">e</span> $<span class="n">PID</span> <span class="p">];</span> <span class="n">then</span>
-    <span class="n">echo</span> &quot;$<span class="n">NAME</span> <span class="n">already</span> <span class="n">started</span>&quot;<span class="p">;</span>
-    <span class="n">exit</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="n">fi</span>
-  <span class="n">echo</span> &quot;<span class="n">start</span> $<span class="n">NAME</span>&quot;<span class="p">;</span>
-  <span class="n">cd</span> $<span class="n">ROOT_DIR</span>
-  <span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> $<span class="p">{</span><span class="n">APP_USER</span><span class="p">}</span> <span class="o">-</span><span class="n">H</span> <span class="n">bundle</span> <span class="n">exec</span> <span class="n">unicorn_rails</span> <span class="o">-</span><span class="n">c</span> $<span class="p">{</span><span class="n">CONF</span><span class="p">}</span> <span class="o">-</span><span class="n">E</span> $<span class="p">{</span><span class="n">ENVIROMENT</span><span class="p">}</span> <span class="o">-</span><span class="n">D</span>
-<span class="p">}</span>
+<span class="nv">ROOT_DIR</span><span class="o">=</span><span class="s2">&quot;/home/redmine/redmine&quot;</span>
 
-<span class="n">stop</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="k">if</span> <span class="p">[</span> ! <span class="o">-</span><span class="n">e</span> $<span class="n">PID</span> <span class="p">];</span> <span class="n">then</span>
-    <span class="n">echo</span> &quot;$<span class="n">NAME</span> <span class="n">not</span> <span class="n">started</span>&quot;<span class="p">;</span>
-    <span class="n">exit</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="n">fi</span>
-  <span class="n">echo</span> &quot;<span class="n">stop</span> $<span class="n">NAME</span>&quot;<span class="p">;</span>
-  <span class="n">kill</span> <span class="o">-</span><span class="n">QUIT</span> `<span class="nb">cat</span> $<span class="p">{</span><span class="n">PID</span><span class="p">}</span>`
-  <span class="n">rm</span> <span class="o">-</span><span class="n">f</span> $<span class="n">PID</span>
-<span class="p">}</span>
+<span class="nv">PID</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ROOT_DIR</span><span class="si">}</span><span class="s2">/tmp/unicorn.pid&quot;</span>
+<span class="nv">CONF</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ROOT_DIR</span><span class="si">}</span><span class="s2">/config/unicorn.rb&quot;</span>
 
-<span class="n">force_stop</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="k">if</span> <span class="p">[</span> ! <span class="o">-</span><span class="n">e</span> $<span class="n">PID</span> <span class="p">];</span> <span class="n">then</span>
-    <span class="n">echo</span> &quot;$<span class="n">NAME</span> <span class="n">not</span> <span class="n">started</span>&quot;<span class="p">;</span>
-    <span class="n">exit</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="n">fi</span>
-  <span class="n">echo</span> &quot;<span class="n">stop</span> $<span class="n">NAME</span>&quot;<span class="p">;</span>
-  <span class="n">kill</span> <span class="o">-</span><span class="n">TERM</span> `<span class="nb">cat</span> $<span class="p">{</span><span class="n">PID</span><span class="p">}</span>`
-  <span class="n">rm</span> <span class="o">-</span><span class="n">f</span> $<span class="n">PID</span>
-<span class="p">}</span>
+start<span class="o">()</span>
+<span class="o">{</span>
+  <span class="k">if</span> <span class="o">[</span> -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> already started&quot;</span><span class="p">;</span>
+    <span class="nb">exit </span>1<span class="p">;</span>
+  <span class="k">fi</span>
+  <span class="nb">echo</span> <span class="s2">&quot;start </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
+  <span class="nb">cd</span> <span class="nv">$ROOT_DIR</span>
+  sudo -u <span class="si">${</span><span class="nv">APP_USER</span><span class="si">}</span> -H bundle <span class="nb">exec </span>unicorn_rails -c <span class="si">${</span><span class="nv">CONF</span><span class="si">}</span> -E <span class="si">${</span><span class="nv">ENVIROMENT</span><span class="si">}</span> -D
+<span class="o">}</span>
 
-<span class="n">reload</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="k">if</span> <span class="p">[</span> ! <span class="o">-</span><span class="n">e</span> $<span class="n">PID</span> <span class="p">];</span> <span class="n">then</span>
-    <span class="n">echo</span> &quot;$<span class="n">NAME</span> <span class="n">not</span> <span class="n">started</span>&quot;<span class="p">;</span>
-    <span class="n">start</span>
-    <span class="n">exit</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">fi</span>
-  <span class="n">echo</span> &quot;<span class="n">reload</span> $<span class="n">NAME</span>&quot;<span class="p">;</span>
-  <span class="n">kill</span> <span class="o">-</span><span class="n">HUP</span> `<span class="nb">cat</span> $<span class="p">{</span><span class="n">PID</span><span class="p">}</span>`
-<span class="p">}</span>
+stop<span class="o">()</span>
+<span class="o">{</span>
+  <span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> not started&quot;</span><span class="p">;</span>
+    <span class="nb">exit </span>1<span class="p">;</span>
+  <span class="k">fi</span>
+  <span class="nb">echo</span> <span class="s2">&quot;stop </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
+  <span class="nb">kill</span> -QUIT <span class="sb">`</span>cat <span class="si">${</span><span class="nv">PID</span><span class="si">}</span><span class="sb">`</span>
+  rm -f <span class="nv">$PID</span>
+<span class="o">}</span>
 
-<span class="n">restart</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="n">stop</span>
-    <span class="n">start</span>
-<span class="p">}</span>
+force_stop<span class="o">()</span>
+<span class="o">{</span>
+  <span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> not started&quot;</span><span class="p">;</span>
+    <span class="nb">exit </span>1<span class="p">;</span>
+  <span class="k">fi</span>
+  <span class="nb">echo</span> <span class="s2">&quot;stop </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
+  <span class="nb">kill</span> -TERM <span class="sb">`</span>cat <span class="si">${</span><span class="nv">PID</span><span class="si">}</span><span class="sb">`</span>
+  rm -f <span class="nv">$PID</span>
+<span class="o">}</span>
 
-<span class="k">case</span> &quot;$<span class="mi">1</span>&quot; <span class="n">in</span>
-  <span class="n">start</span><span class="p">)</span>
-    <span class="n">start</span>
+reload<span class="o">()</span>
+<span class="o">{</span>
+  <span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> not started&quot;</span><span class="p">;</span>
+    start
+    <span class="nb">exit </span>0<span class="p">;</span>
+  <span class="k">fi</span>
+  <span class="nb">echo</span> <span class="s2">&quot;reload </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
+  <span class="nb">kill</span> -HUP <span class="sb">`</span>cat <span class="si">${</span><span class="nv">PID</span><span class="si">}</span><span class="sb">`</span>
+<span class="o">}</span>
+
+restart<span class="o">()</span>
+<span class="o">{</span>
+    stop
+    start
+<span class="o">}</span>
+
+<span class="k">case</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> in
+  start<span class="o">)</span>
+    start
     <span class="p">;;</span>
-  <span class="n">stop</span><span class="p">)</span>
-    <span class="n">stop</span>
+  stop<span class="o">)</span>
+    stop
     <span class="p">;;</span>
-  <span class="n">force</span><span class="o">-</span><span class="n">stop</span><span class="p">)</span>
-    <span class="n">force_stop</span>
+  force-stop<span class="o">)</span>
+    force_stop
     <span class="p">;;</span>
-  <span class="n">reload</span><span class="p">)</span>
-    <span class="n">reload</span>
+  reload<span class="o">)</span>
+    reload
     <span class="p">;;</span>
-  <span class="n">restart</span><span class="p">)</span>
-    <span class="n">restart</span>
+  restart<span class="o">)</span>
+    restart
     <span class="p">;;</span>
-  <span class="o">*</span><span class="p">)</span>
-    <span class="n">echo</span> &quot;<span class="n">Syntax</span> <span class="n">Error</span><span class="p">:</span> <span class="n">release</span> <span class="p">[</span><span class="n">start</span><span class="o">|</span><span class="n">stop</span><span class="o">|</span><span class="n">force</span><span class="o">-</span><span class="n">stop</span><span class="o">|</span><span class="n">reload</span><span class="o">|</span><span class="n">restart</span><span class="p">]</span>&quot;
+  *<span class="o">)</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Syntax Error: release [start|stop|force-stop|reload|restart]&quot;</span>
     <span class="p">;;</span>
-<span class="n">esac</span>
+<span class="k">esac</span>
 </pre></div>
 
 
 <p>permissionを設定し、スタートしておく。</p>
-<div class="highlight"><pre><span class="c">% sudo chmod 755 /etc/init.d/redmine</span>
-<span class="c">% sudo /etc/init.d/redmine start</span>
+<div class="highlight"><pre>% sudo chmod <span class="m">755</span> /etc/init.d/redmine
+% sudo /etc/init.d/redmine start
 </pre></div>
 
 
 <p>自動起動設定もしておく。</p>
-<div class="highlight"><pre><span class="c">% sudo update-rc.d redmine defaults</span>
+<div class="highlight"><pre>% sudo update-rc.d redmine defaults
 </pre></div>
 
 
 <p>nginxをインストールし、redmineサイト用の設定ファイルを追加する。</p>
-<div class="highlight"><pre><span class="c">% sudo apt-get install nginx</span>
-<span class="c">% sudo vi /etc/nginx/sites-available/redmine</span>
-<span class="n">upstream</span> <span class="n">redmine</span> <span class="p">{</span>
-  <span class="n">server</span> <span class="mf">127.0</span><span class="p">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">8079</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight"><pre>% sudo apt-get install nginx
+% sudo vi /etc/nginx/sites-available/redmine
+</pre></div>
 
-<span class="n">server</span> <span class="p">{</span>
-  <span class="n">listen</span> <span class="mi">80</span><span class="p">;</span>
-  <span class="n">server_name</span> <span class="n">redmine</span><span class="p">.</span><span class="n">hogehoge</span><span class="p">.</span><span class="n">com</span><span class="p">;</span> ← ★ここは自分のものにあわせて変更する
-  <span class="n">server_tokens</span> <span class="n">off</span><span class="p">;</span>
-  <span class="n">root</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">redmine</span><span class="o">/</span><span class="n">redmine</span><span class="p">;</span>
 
-  <span class="n">client_max_body_size</span> <span class="mi">20</span><span class="n">m</span><span class="p">;</span>
+<div class="highlight"><pre>upstream redmine {
+  server 127.0.0.1:8079;
+}
 
-  # <span class="n">individual</span> <span class="n">nginx</span> <span class="n">logs</span> <span class="k">for</span> <span class="n">this</span> <span class="n">gitlab</span> <span class="n">vhost</span>
-  <span class="n">access_log</span>  <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">redmine_access</span><span class="p">.</span><span class="nb">log</span><span class="p">;</span>
-  <span class="n">error_log</span>   <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">redmine_error</span><span class="p">.</span><span class="nb">log</span><span class="p">;</span>
+server {
+  listen 80;
+  server_name redmine.hogehoge.com; ← ★ここは自分のものにあわせて変更する
+  server_tokens off;
+  root /home/redmine/redmine;
 
-  <span class="n">location</span> <span class="o">/</span> <span class="p">{</span>
-    <span class="n">try_files</span> $<span class="n">uri</span> $<span class="n">uri</span><span class="o">/</span><span class="n">index</span><span class="p">.</span><span class="n">html</span> $<span class="n">uri</span><span class="p">.</span><span class="n">html</span> <span class="p">@</span><span class="n">redmine</span><span class="p">;</span>
-  <span class="p">}</span>
+  client_max_body_size 20m;
 
-  <span class="n">location</span> <span class="p">@</span><span class="n">redmine</span> <span class="p">{</span>
-    <span class="n">proxy_redirect</span>     <span class="n">off</span><span class="p">;</span>
-    <span class="n">proxy_set_header</span>   <span class="n">X</span><span class="o">-</span><span class="n">FORWARDED_PROTO</span> $<span class="n">http_x_forwarded_proto</span><span class="p">;</span>
-    <span class="n">proxy_set_header</span>   <span class="n">Host</span>              $<span class="n">http_host</span><span class="p">;</span>
-    <span class="n">proxy_set_header</span>   <span class="n">X</span><span class="o">-</span><span class="n">Real</span><span class="o">-</span><span class="n">IP</span>         $<span class="n">http_x_forwarded_for</span><span class="p">;</span>
-    <span class="n">proxy_set_header</span>   <span class="n">X</span><span class="o">-</span><span class="n">Forwarded</span><span class="o">-</span><span class="n">For</span>   $<span class="n">http_x_forwarded_for</span><span class="p">;</span>
-    <span class="n">proxy_pass</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">redmine</span><span class="p">;</span>
-    <span class="n">proxy_intercept_errors</span> <span class="n">on</span><span class="p">;</span>
-    <span class="n">error_page</span> <span class="mi">404</span> <span class="o">/</span><span class="mf">404.</span><span class="n">html</span><span class="p">;</span>
-    <span class="n">error_page</span> <span class="mi">422</span> <span class="o">/</span><span class="mf">422.</span><span class="n">html</span><span class="p">;</span>
-    <span class="n">error_page</span> <span class="mi">500</span> <span class="mi">502</span> <span class="mi">503</span> <span class="mi">504</span> <span class="o">/</span><span class="mf">500.</span><span class="n">html</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+  # individual nginx logs for this gitlab vhost
+  access_log  /var/log/nginx/redmine_access.log;
+  error_log   /var/log/nginx/redmine_error.log;
+
+  location / {
+    try_files $uri $uri/index.html $uri.html @redmine;
+  }
+
+  location @redmine {
+    proxy_redirect     off;
+    proxy_set_header   X-FORWARDED_PROTO $http_x_forwarded_proto;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-Real-IP         $http_x_forwarded_for;
+    proxy_set_header   X-Forwarded-For   $http_x_forwarded_for;
+    proxy_pass http://redmine;
+    proxy_intercept_errors on;
+    error_page 404 /404.html;
+    error_page 422 /422.html;
+    error_page 500 502 503 504 /500.html;
+  }
+}
 </pre></div>
 
 
 <p>サイトを有効化してnginxを起動する。</p>
-<div class="highlight"><pre><span class="c">% cd /etc/nginx/sites-enabled</span>
-<span class="c">% sudo ln -s ../sites-available/redmine</span>
-<span class="c">% sudo /etc/init.d/nginx restart</span>
+<div class="highlight"><pre>% <span class="nb">cd</span> /etc/nginx/sites-enabled
+% sudo ln -s ../sites-available/redmine
+% sudo /etc/init.d/nginx restart
 </pre></div>
 
 
@@ -462,49 +480,49 @@ Ctrl-Cでサーバを停止できる。</p>
 <p>全部のトラッカーに関してステータスを相互に変更できるように設定する。使い方にもよるが、基本的には非メンバや匿名ユーザは変更できないようにしてしまって問題ない。</p>
 <h2>Backlogsの組込み</h2>
 <p>最新版を取得してくる。</p>
-<div class="highlight"><pre><span class="c">% alias sr=&quot;sudo -u redmine&quot;</span>
-<span class="c">% cd /home/redmine/redmine/plugins</span>
-<span class="c">% sr git clone git://github.com/backlogs/redmine_backlogs.git</span>
+<div class="highlight"><pre>% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s2">&quot;sudo -u redmine&quot;</span>
+% <span class="nb">cd</span> /home/redmine/redmine/plugins
+% sr git clone git://github.com/backlogs/redmine_backlogs.git
 </pre></div>
 
 
 <p>redmineに導入する。</p>
-<div class="highlight"><pre><span class="c">% cd redmine_backlogs</span>
-<span class="c">% sr RAILS_ENV=production bundle install --without development test</span>
-<span class="c">% cd ../..</span>
-<span class="c">% sr RAILS_ENV=production bundle install --without development test</span>
-<span class="c">% sr RAILS_ENV=production bundle exec rake db:migrate</span>
-<span class="c">% sr RAILS_ENV=production bundle exec rake tmp:cache:clear</span>
-<span class="c">% sr RAILS_ENV=production bundle exec rake tmp:sessions:clear</span>
-<span class="c">% sr RAILS_ENV=production bundle exec rake redmine:backlogs:install</span>
-<span class="n">Which</span> <span class="n">trackers</span> <span class="n">do</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">use</span> <span class="k">for</span> <span class="n">your</span> <span class="n">stories</span>?
-  <span class="mf">1.</span> タスク
-  <span class="mf">2.</span> ストーリー
-  <span class="mf">3.</span> バグ
-  <span class="mf">4.</span> 課題
-<span class="n">Separate</span> <span class="n">values</span> <span class="n">with</span> <span class="n">a</span> <span class="n">space</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">g</span><span class="p">.</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">2</span> ← ★先ほど作った「ストーリー」を選択
-<span class="n">Which</span> <span class="n">tracker</span> <span class="n">do</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">use</span> <span class="k">for</span> <span class="n">your</span> <span class="n">tasks</span>?
-  <span class="mf">1.</span> タスク
-  <span class="mf">2.</span> バグ
-  <span class="mf">3.</span> 課題
-<span class="n">Choose</span> <span class="n">one</span> <span class="n">from</span> <span class="n">above</span> <span class="p">(</span><span class="n">or</span> <span class="n">choose</span> <span class="n">none</span> <span class="n">to</span> <span class="n">create</span> <span class="n">a</span> <span class="n">new</span> <span class="n">tracker</span><span class="p">):</span> <span class="mi">1</span> ← ★先ほど作った「タスク」を選択
+<div class="highlight"><pre>% <span class="nb">cd </span>redmine_backlogs
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle install --without development <span class="nb">test</span>
+% <span class="nb">cd</span> ../..
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle install --without development <span class="nb">test</span>
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake db:migrate
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake tmp:cache:clear
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake tmp:sessions:clear
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake redmine:backlogs:install
+Which trackers <span class="k">do</span> you want to use <span class="k">for</span> your stories?
+  1. タスク
+  2. ストーリー
+  3. バグ
+  4. 課題
+Separate values with a space <span class="o">(</span>e.g. <span class="m">1</span> 3<span class="o">)</span>: <span class="m">2</span> ← ★先ほど作った「ストーリー」を選択
+Which tracker <span class="k">do</span> you want to use <span class="k">for</span> your tasks?
+  1. タスク
+  2. バグ
+  3. 課題
+Choose one from above <span class="o">(</span>or choose none to create a new tracker<span class="o">)</span>: <span class="m">1</span> ← ★先ほど作った「タスク」を選択
 </pre></div>
 
 
 <p>これでBacklogsが使えるようになっているはず。</p>
 <p>最終的に「管理＞情報」では以下のように表示された。</p>
-<div class="highlight"><pre><span class="n">Environment</span><span class="o">:</span>
-  <span class="n">Redmine</span> <span class="n">version</span>                <span class="mf">2.6</span><span class="o">.</span><span class="mi">5</span><span class="o">.</span><span class="na">stable</span>
-  <span class="n">Ruby</span> <span class="n">version</span>                   <span class="mf">2.1</span><span class="o">.</span><span class="mi">5</span><span class="o">-</span><span class="n">p273</span> <span class="o">(</span><span class="mi">2014</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">13</span><span class="o">)</span> <span class="o">[</span><span class="n">x86_64</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">gnu</span><span class="o">]</span>
-  <span class="n">Rails</span> <span class="n">version</span>                  <span class="mf">3.2</span><span class="o">.</span><span class="mi">21</span>
-  <span class="n">Environment</span>                    <span class="n">production</span>
-  <span class="n">Database</span> <span class="n">adapter</span>               <span class="n">PostgreSQL</span>
-<span class="n">SCM</span><span class="o">:</span>
-  <span class="n">Subversion</span>                     <span class="mf">1.8</span><span class="o">.</span><span class="mi">10</span>
-  <span class="n">Git</span>                            <span class="mf">2.1</span><span class="o">.</span><span class="mi">4</span>
-  <span class="n">Filesystem</span>                     
-<span class="n">Redmine</span> <span class="n">plugins</span><span class="o">:</span>
-  <span class="n">redmine_backlogs</span>               <span class="n">v1</span><span class="o">.</span><span class="mf">0.6</span>
+<div class="highlight"><pre><span class="l-Scalar-Plain">Environment</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">Redmine version                2.6.5.stable</span>
+  <span class="l-Scalar-Plain">Ruby version                   2.1.5-p273 (2014-11-13) [x86_64-linux-gnu]</span>
+  <span class="l-Scalar-Plain">Rails version                  3.2.21</span>
+  <span class="l-Scalar-Plain">Environment                    production</span>
+  <span class="l-Scalar-Plain">Database adapter               PostgreSQL</span>
+<span class="l-Scalar-Plain">SCM</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">Subversion                     1.8.10</span>
+  <span class="l-Scalar-Plain">Git                            2.1.4</span>
+  <span class="l-Scalar-Plain">Filesystem</span>                     
+<span class="l-Scalar-Plain">Redmine plugins</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">redmine_backlogs               v1.0.6</span>
 </pre></div>
             </div>
             <!-- /.entry-content -->
@@ -565,13 +583,13 @@ Ctrl-Cでサーバを停止できる。</p>
             <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
-                            redmine
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -580,18 +598,8 @@ Ctrl-Cでサーバを停止できる。</p>
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/info.html">
-                            info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
-                            pelican
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -605,18 +613,28 @@ Ctrl-Cでサーバを停止できる。</p>
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/blog.html">
                             blog
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/efi.html">
                             efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
                         </a>
                     </li>
                 </ul>

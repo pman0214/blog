@@ -7,27 +7,27 @@
 &lt;h1&gt;Redmineへのweb-hookプラグインの導入&lt;/h1&gt;
 &lt;p&gt;&lt;code&gt;git&lt;/code&gt;が入っていなかったら&lt;code&gt;sudo apt-get install git-core&lt;/code&gt;で導入しておく。&lt;/p&gt;
 &lt;p&gt;GitHubからのweb-hookを使うためにはjsonを処理する必要があるため、json用のgemを導入しておく。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% alias sr=&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
-&lt;span class="c"&gt;% cd /home/redmine/redmine&lt;/span&gt;
-&lt;span class="c"&gt;% sr vi Gemfile.local&lt;/span&gt;
-&lt;span class="n"&gt;gem&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;json&lt;/span&gt;&amp;quot; ← ★追加する
-&lt;span class="c"&gt;% sr bundle install --without development test&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;alias &lt;/span&gt;&lt;span class="nv"&gt;sr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
+% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/redmine/redmine
+% sr vi Gemfile.local
+gem &lt;span class="s2"&gt;&amp;quot;json&amp;quot;&lt;/span&gt; ← ★追加する
+% sr bundle install --without development &lt;span class="nb"&gt;test&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;自分の環境では&lt;code&gt;json&lt;/code&gt;が2回以上あると怒られたので、すでにどこかで書いてあったようだ。実害はないのでいいが。&lt;/p&gt;
 &lt;p&gt;GitHub hookプラグインを導入する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% cd /home/redmine/redmine/plugins&lt;/span&gt;
-&lt;span class="c"&gt;% sr git clone https://github.com/koppen/redmine_github_hook.git&lt;/span&gt;
-&lt;span class="c"&gt;% cd redmine_github_hook&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle install --without development test&lt;/span&gt;
-&lt;span class="c"&gt;% cd ../..&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle install --without development test&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/redmine/redmine/plugins
+% sr git clone https://github.com/koppen/redmine_github_hook.git
+% &lt;span class="nb"&gt;cd &lt;/span&gt;redmine_github_hook
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle install --without development &lt;span class="nb"&gt;test&lt;/span&gt;
+% &lt;span class="nb"&gt;cd&lt;/span&gt; ../..
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle install --without development &lt;span class="nb"&gt;test&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Redmineを再起動する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo /etc/init.d/redmine restart&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/redmine restart
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -38,19 +38,19 @@
 &lt;p&gt;まずはssh鍵を作成。nginx+unicornでredmineを起動しているので、redmineを実行しているユーザは&lt;code&gt;redmine&lt;/code&gt;である。
 このユーザ用のssh鍵を作成し、デプロイキーとして登録する。
 ssh鍵の作成ではパスフレーズを設定してはいけない。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% cd /home/redmine&lt;/span&gt;
-&lt;span class="c"&gt;% alias sr=&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
-&lt;span class="c"&gt;% sr mkdir .ssh&lt;/span&gt;
-&lt;span class="c"&gt;% sr chmod 700 .ssh&lt;/span&gt;
-&lt;span class="c"&gt;% sr ssh-keygen -t ecdsa&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/redmine
+% &lt;span class="nb"&gt;alias &lt;/span&gt;&lt;span class="nv"&gt;sr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
+% sr mkdir .ssh
+% sr chmod &lt;span class="m"&gt;700&lt;/span&gt; .ssh
+% sr ssh-keygen -t ecdsa
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;できあがった公開鍵&lt;code&gt;/home/redmine/.ssh/id_ecdsa.pub&lt;/code&gt;をGitHubの当該レポジトリにデプロイキーとして登録する。&lt;/p&gt;
 &lt;p&gt;レポジトリ用のディレクトリを作成してcloneしておく。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sr mkdir repos&lt;/span&gt;
-&lt;span class="c"&gt;% cd repos&lt;/span&gt;
-&lt;span class="c"&gt;% sr git clone --bare git@github.com/xxxxxx/hoge.git&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sr mkdir repos
+% &lt;span class="nb"&gt;cd &lt;/span&gt;repos
+% sr git clone --bare git@github.com/xxxxxx/hoge.git
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -71,81 +71,87 @@ URLは&lt;code&gt;http(s)://debianサーバ/github_hook?project_id=[プロジェ
 &lt;h1&gt;手順&lt;/h1&gt;
 &lt;h2&gt;redmine本体&lt;/h2&gt;
 &lt;p&gt;必要なツール類をインストールする。MySQLを使うことが多いのだが、個人的な好みによりPostgreSQLを使用することにする。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev \&lt;/span&gt;
-  &lt;span class="n"&gt;make&lt;/span&gt; &lt;span class="n"&gt;build&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;essential&lt;/span&gt; &lt;span class="n"&gt;gcc&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;
-  &lt;span class="n"&gt;imagemagick&lt;/span&gt; &lt;span class="n"&gt;libmagickwand&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt; &lt;span class="n"&gt;git&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;core&lt;/span&gt; &lt;span class="n"&gt;subversion&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev &lt;span class="se"&gt;\&lt;/span&gt;
+  make build-essential gcc &lt;span class="se"&gt;\&lt;/span&gt;
+  imagemagick libmagickwand-dev git-core subversion
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;PostgreSQLに接続してユーザやDBの作成を行う。&lt;code&gt;password&lt;/code&gt;の部分はもちろん変更すべし。パスワードに記号が入っているとredmineで接続できない場合があるので、英数に限定する方がいいかも。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo -u postgres psql&lt;/span&gt;
-&lt;span class="n"&gt;postgres&lt;/span&gt;# &lt;span class="n"&gt;CREATE&lt;/span&gt; &lt;span class="n"&gt;ROLE&lt;/span&gt; &lt;span class="n"&gt;redmine&lt;/span&gt; &lt;span class="n"&gt;LOGIN&lt;/span&gt; &lt;span class="n"&gt;ENCRYPTED&lt;/span&gt; &lt;span class="n"&gt;PASSWORD&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;password&amp;#39;&lt;/span&gt; &lt;span class="n"&gt;NOINHERIT&lt;/span&gt; &lt;span class="n"&gt;VALID&lt;/span&gt; &lt;span class="n"&gt;UNTIL&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;infinity&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="n"&gt;postgres&lt;/span&gt;# &lt;span class="n"&gt;CREATE&lt;/span&gt; &lt;span class="n"&gt;DATABASE&lt;/span&gt; &lt;span class="n"&gt;redmine&lt;/span&gt; &lt;span class="n"&gt;WITH&lt;/span&gt; &lt;span class="n"&gt;ENCODING&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;UTF8&amp;#39;&lt;/span&gt; &lt;span class="n"&gt;OWNER&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="n"&gt;postgres&lt;/span&gt;# &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="n"&gt;q&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u postgres psql
+postgres# CREATE ROLE redmine LOGIN ENCRYPTED PASSWORD &lt;span class="s1"&gt;&amp;#39;password&amp;#39;&lt;/span&gt; NOINHERIT VALID UNTIL &lt;span class="s1"&gt;&amp;#39;infinity&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+postgres# CREATE DATABASE redmine WITH &lt;span class="nv"&gt;ENCODING&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;UTF8&amp;#39;&lt;/span&gt; &lt;span class="nv"&gt;OWNER&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;redmine&lt;span class="p"&gt;;&lt;/span&gt;
+postgres# &lt;span class="se"&gt;\q&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Linuxにユーザ&lt;code&gt;redmine&lt;/code&gt;を追加する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo adduser --disabled-login --gecos &amp;#39;Redmine&amp;#39; redmine&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo adduser --disabled-login --gecos &lt;span class="s1"&gt;&amp;#39;Redmine&amp;#39;&lt;/span&gt; redmine
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;パスワードを設定しておく。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo passwd redmine&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo passwd redmine
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;sudoグループにユーザ&lt;code&gt;redmine&lt;/code&gt;を加えておく。Debianでは&lt;code&gt;visudo&lt;/code&gt;でユーザを追加せず、このグループにユーザを追加するだけでsudoできるように設定されている。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo vi /etc/group&lt;/span&gt;
-&lt;span class="c"&gt;...&lt;/span&gt;
-&lt;span class="n"&gt;sudo&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;27&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt; ← ★&lt;span class="n"&gt;redmine&lt;/span&gt;を追加する
-&lt;span class="c"&gt;...&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/group
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+sudo:x:27:redmine ← ★redmineを追加する
+...
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;a href="http://www.redmine.org/"&gt;Redmineの公式web&lt;/a&gt;からソースをゲットする。Backlogsは2.2.4と2.3.2に対応と書かれているが、今回は執筆時点での最新版2.6.5にBacklogsを導入するという暴挙に出る。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo -u redmine&lt;/code&gt;を多用するのでaliasしておく。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% alias sr=&amp;#39;sudo -u redmine&amp;#39;&lt;/span&gt;
-&lt;span class="c"&gt;% cd /home/redmine&lt;/span&gt;
-&lt;span class="c"&gt;% sr wget http://www.redmine.org/releases/redmine-2.6.5.tar.gz&lt;/span&gt;
-&lt;span class="c"&gt;% sr tar zxvf redmine-2.6.5.tar.gz&lt;/span&gt;
-&lt;span class="c"&gt;% sr ln -s redmine-2.6.5 redmine&lt;/span&gt;
-&lt;span class="c"&gt;% cd redmine&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;alias &lt;/span&gt;&lt;span class="nv"&gt;sr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sudo -u redmine&amp;#39;&lt;/span&gt;
+% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/redmine
+% sr wget http://www.redmine.org/releases/redmine-2.6.5.tar.gz
+% sr tar zxvf redmine-2.6.5.tar.gz
+% sr ln -s redmine-2.6.5 redmine
+% &lt;span class="nb"&gt;cd &lt;/span&gt;redmine
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;database.ymlのテンプレートをコピーし、設定を施す。&lt;/p&gt;
 &lt;p&gt;MySQLの設定をコメントアウトしてPostgreSQLの設定を有効化し、設定を変更する。
 testもコメントアウトしてしまってOK。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sr cp config/database.yml.example config/database.yml&lt;/span&gt;
-&lt;span class="c"&gt;% sr vi config/database.yml&lt;/span&gt;
-&lt;span class="c"&gt;...&lt;/span&gt;
-&lt;span class="n"&gt;production&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-  &lt;span class="n"&gt;adapter&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;postgresql&lt;/span&gt;
-  &lt;span class="n"&gt;database&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;redmine&lt;/span&gt;
-  &lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;localhost&lt;/span&gt;
-  &lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;redmine&lt;/span&gt; ← ★&lt;span class="n"&gt;postgres&lt;/span&gt;になっているので変更する
-  &lt;span class="n"&gt;password&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;password&lt;/span&gt;&amp;quot; ← ★パスワードは最初に&lt;span class="n"&gt;PostgreSQL&lt;/span&gt;に設定したもの。
-&lt;span class="c"&gt;...&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sr cp config/database.yml.example config/database.yml
+% sr vi config/database.yml
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;production&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;adapter&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;postgresql&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;database&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;redmine&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;host&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;localhost&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;username&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;redmine ← ★postgresになっているので変更する&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;password&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;password&amp;quot;&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;← ★パスワードは最初にPostgreSQLに設定したもの。&lt;/span&gt;
+&lt;span class="nn"&gt;...&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;bundlerを導入してbundleする。システムのrubyを使っているのでbundlerはsudoで入れてしまう。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo gem install bundler&lt;/span&gt;
-&lt;span class="c"&gt;% sr bundle install --without development test&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo gem install bundler
+% sr bundle install --without development &lt;span class="nb"&gt;test&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;つづいてrake。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sr rake generate_secret_token&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production rake db:migrate&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production rake redmine:load_default_data&lt;/span&gt;
-&lt;span class="n"&gt;Select&lt;/span&gt; &lt;span class="n"&gt;Language&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;ja&lt;/span&gt; ← ★日本語を指定
+&lt;div class="highlight"&gt;&lt;pre&gt;% sr rake generate_secret_token
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production rake db:migrate
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production rake redmine:load_default_data
+Select Language: ja ← ★日本語を指定
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;試しにサーバを動かしてみる。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sr ruby script/rails server webrick -e production&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sr ruby script/rails server webrick -e production
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -153,225 +159,237 @@ testもコメントアウトしてしまってOK。&lt;/p&gt;
 Ctrl-Cでサーバを停止できる。&lt;/p&gt;
 &lt;h2&gt;ログ消去&lt;/h2&gt;
 &lt;p&gt;ログが永遠に作成されたら嫌なので、logrotateを使って自動的に消去する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo vi /etc/logrotate.d/redmine&lt;/span&gt;
-&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;home&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="o"&gt;/*&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="n"&gt;rotate&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
-    &lt;span class="nb"&gt;size&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;M&lt;/span&gt;
-    &lt;span class="n"&gt;compress&lt;/span&gt;
-    &lt;span class="n"&gt;missingok&lt;/span&gt;
-    &lt;span class="n"&gt;notifempty&lt;/span&gt;
-    &lt;span class="n"&gt;copytruncate&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/logrotate.d/redmine
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;/home/redmine/redmine/log/*.log {
+    rotate 3
+    size 1M
+    compress
+    missingok
+    notifempty
+    copytruncate
+}
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;テストしてみる。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo logrotate -dv /etc/logrotate.conf&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo logrotate -dv /etc/logrotate.conf
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;h1&gt;nginx + unicornにする&lt;/h1&gt;
 &lt;p&gt;WEBrickを使うのはアレなのでnginxに乗っける。&lt;/p&gt;
 &lt;p&gt;まずはunicornをbundleする。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sr vi Gemfile.local&lt;/span&gt;
-&lt;span class="n"&gt;gem&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;unicorn&lt;/span&gt;&amp;quot;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sr vi Gemfile.local
+gem &lt;span class="s2"&gt;&amp;quot;unicorn&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;unicornの設定ファイルを作成する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sr vi config/unicorn.rb&lt;/span&gt;
-&lt;span class="n"&gt;worker_processes&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
-&lt;span class="n"&gt;working_directory&lt;/span&gt; &amp;quot;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;home&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&amp;quot;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sr vi config/unicorn.rb
+&lt;/pre&gt;&lt;/div&gt;
 
-&lt;span class="n"&gt;listen&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&amp;quot;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;unicorn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sock&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
-&lt;span class="n"&gt;listen&lt;/span&gt; &amp;quot;&lt;span class="mf"&gt;127.0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;8079&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;tcp_nopush&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;true&lt;/span&gt;
 
-&lt;span class="n"&gt;pid&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&amp;quot;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;unicorn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;worker_processes&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="n"&gt;working_directory&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/home/redmine/redmine&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;listen&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;tmp/unicorn.sock&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;listen&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;127.0.0.1:8079&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;:tcp_nopush&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="kp"&gt;true&lt;/span&gt;
+
+&lt;span class="n"&gt;pid&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;tmp/unicorn.pid&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="n"&gt;timeout&lt;/span&gt; &lt;span class="mi"&gt;60&lt;/span&gt;
 
-&lt;span class="n"&gt;preload_app&lt;/span&gt; &lt;span class="n"&gt;true&lt;/span&gt;
+&lt;span class="n"&gt;preload_app&lt;/span&gt; &lt;span class="kp"&gt;true&lt;/span&gt;
 
-&lt;span class="n"&gt;stdout_path&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&amp;quot;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;unicorn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stdout&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
-&lt;span class="n"&gt;stderr_path&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&amp;quot;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;unicorn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="n"&gt;stdout_path&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;log/unicorn.stdout.log&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;stderr_path&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;log/unicorn.stderr.log&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;RAILS_ROOT&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
-&lt;span class="n"&gt;GC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;respond_to&lt;/span&gt;?&lt;span class="p"&gt;(:&lt;/span&gt;&lt;span class="n"&gt;copy_on_write_friendly&lt;/span&gt;&lt;span class="p"&gt;=)&lt;/span&gt; &lt;span class="n"&gt;and&lt;/span&gt; &lt;span class="n"&gt;GC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;copy_on_write_friendly&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;true&lt;/span&gt;
+&lt;span class="no"&gt;GC&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;respond_to?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:copy_on_write_friendly&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="no"&gt;GC&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;copy_on_write_friendly&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kp"&gt;true&lt;/span&gt;
 
-&lt;span class="n"&gt;before_fork&lt;/span&gt; &lt;span class="n"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
-  &lt;span class="n"&gt;defined&lt;/span&gt;?&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ActiveRecord&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;and&lt;/span&gt; &lt;span class="n"&gt;ActiveRecord&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;disconnect&lt;/span&gt;!
+&lt;span class="n"&gt;before_fork&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+  &lt;span class="n"&gt;defined?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;ActiveRecord&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="no"&gt;ActiveRecord&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;disconnect!&lt;/span&gt;
 
-  &lt;span class="n"&gt;old_pid&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &amp;quot;#&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="p"&gt;[:&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;]}.&lt;/span&gt;&lt;span class="n"&gt;oldbin&lt;/span&gt;&amp;quot;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;old_pid&lt;/span&gt; !&lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;
-      &lt;span class="n"&gt;begin&lt;/span&gt;
-        &lt;span class="n"&gt;sig&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nr&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;worker_processes&lt;/span&gt; ? &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;QUIT&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;TTOU&lt;/span&gt;
-        &lt;span class="n"&gt;Process&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;kill&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sig&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;old_pid&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="n"&gt;to_i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-      &lt;span class="n"&gt;rescue&lt;/span&gt; &lt;span class="n"&gt;Errno&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;ENOENT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Errno&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;ESRCH&lt;/span&gt;
+  &lt;span class="n"&gt;old_pid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="ss"&gt;:pid&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;.oldbin&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;old_pid&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;
+      &lt;span class="k"&gt;begin&lt;/span&gt;
+        &lt;span class="n"&gt;sig&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;nr&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;worker_processes&lt;/span&gt; &lt;span class="p"&gt;?&lt;/span&gt; &lt;span class="ss"&gt;:QUIT&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="ss"&gt;:TTOU&lt;/span&gt;
+        &lt;span class="no"&gt;Process&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;kill&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sig&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;old_pid&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;rescue&lt;/span&gt; &lt;span class="no"&gt;Errno&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;ENOENT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;Errno&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;ESRCH&lt;/span&gt;
       &lt;span class="k"&gt;end&lt;/span&gt;
     &lt;span class="k"&gt;end&lt;/span&gt;
 
-    &lt;span class="n"&gt;sleep&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+    &lt;span class="nb"&gt;sleep&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
   &lt;span class="k"&gt;end&lt;/span&gt;
 
-&lt;span class="n"&gt;after_fork&lt;/span&gt; &lt;span class="n"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
-  &lt;span class="n"&gt;defined&lt;/span&gt;?&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ActiveRecord&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;and&lt;/span&gt; &lt;span class="n"&gt;ActiveRecord&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;establish_connection&lt;/span&gt;
+&lt;span class="n"&gt;after_fork&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;server&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+  &lt;span class="n"&gt;defined?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;ActiveRecord&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="no"&gt;ActiveRecord&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;establish_connection&lt;/span&gt;
 &lt;span class="k"&gt;end&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;initスクリプトを作成する。上の方の設定は自信無い。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo vi /etc/init.d/redmine&lt;/span&gt;
-#!&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sh&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/init.d/redmine
+&lt;/pre&gt;&lt;/div&gt;
 
-### &lt;span class="n"&gt;BEGIN&lt;/span&gt; &lt;span class="n"&gt;INIT&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt;
-# &lt;span class="n"&gt;Provides&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;          &lt;span class="n"&gt;redmine&lt;/span&gt;
-# &lt;span class="n"&gt;Required&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Start&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;    $&lt;span class="n"&gt;local_fs&lt;/span&gt; $&lt;span class="n"&gt;remote_fs&lt;/span&gt; $&lt;span class="n"&gt;network&lt;/span&gt; $&lt;span class="n"&gt;syslog&lt;/span&gt;
-# &lt;span class="n"&gt;Required&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Stop&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;     $&lt;span class="n"&gt;local_fs&lt;/span&gt; $&lt;span class="n"&gt;remote_fs&lt;/span&gt; $&lt;span class="n"&gt;network&lt;/span&gt; $&lt;span class="n"&gt;syslog&lt;/span&gt;
-# &lt;span class="n"&gt;Default&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Start&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;     &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
-# &lt;span class="n"&gt;Default&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Stop&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;      &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="mi"&gt;6&lt;/span&gt;
-# &lt;span class="n"&gt;Short&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Description&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;redmine&lt;/span&gt; &lt;span class="n"&gt;unicorn&lt;/span&gt;
-# &lt;span class="n"&gt;Description&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;       &lt;span class="n"&gt;redmine&lt;/span&gt; &lt;span class="n"&gt;unicorn&lt;/span&gt;
-# &lt;span class="n"&gt;chkconfig&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;75&lt;/span&gt; &lt;span class="mi"&gt;25&lt;/span&gt;
-### &lt;span class="n"&gt;END&lt;/span&gt; &lt;span class="n"&gt;INIT&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt;
 
-&lt;span class="n"&gt;export&lt;/span&gt; &lt;span class="n"&gt;PATH&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sbin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sbin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/sh&lt;/span&gt;
 
-# &lt;span class="n"&gt;move&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;project&lt;/span&gt; &lt;span class="n"&gt;root&lt;/span&gt; &lt;span class="n"&gt;directory&lt;/span&gt;
-&lt;span class="n"&gt;NAME&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;
-&lt;span class="n"&gt;ENVIROMENT&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="n"&gt;production&lt;/span&gt;
-&lt;span class="n"&gt;APP_USER&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&amp;quot;&lt;span class="n"&gt;redmine&lt;/span&gt;&amp;quot;
+&lt;span class="c"&gt;### BEGIN INIT INFO&lt;/span&gt;
+&lt;span class="c"&gt;# Provides:          redmine&lt;/span&gt;
+&lt;span class="c"&gt;# Required-Start:    $local_fs $remote_fs $network $syslog&lt;/span&gt;
+&lt;span class="c"&gt;# Required-Stop:     $local_fs $remote_fs $network $syslog&lt;/span&gt;
+&lt;span class="c"&gt;# Default-Start:     2 3 4 5&lt;/span&gt;
+&lt;span class="c"&gt;# Default-Stop:      0 1 6&lt;/span&gt;
+&lt;span class="c"&gt;# Short-Description: redmine unicorn&lt;/span&gt;
+&lt;span class="c"&gt;# Description:       redmine unicorn&lt;/span&gt;
+&lt;span class="c"&gt;# chkconfig: - 75 25&lt;/span&gt;
+&lt;span class="c"&gt;### END INIT INFO&lt;/span&gt;
 
-&lt;span class="n"&gt;ROOT_DIR&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&amp;quot;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;home&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&amp;quot;
+&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
 
-&lt;span class="n"&gt;PID&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&amp;quot;$&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;ROOT_DIR&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;unicorn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&amp;quot;
-&lt;span class="n"&gt;CONF&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&amp;quot;$&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;ROOT_DIR&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;unicorn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rb&lt;/span&gt;&amp;quot;
+&lt;span class="c"&gt;# move to project root directory&lt;/span&gt;
+&lt;span class="nv"&gt;NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;redmine
+&lt;span class="nv"&gt;ENVIROMENT&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production
+&lt;span class="nv"&gt;APP_USER&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;redmine&amp;quot;&lt;/span&gt;
 
-&lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt; $&lt;span class="n"&gt;PID&lt;/span&gt; &lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="n"&gt;then&lt;/span&gt;
-    &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;$&lt;span class="n"&gt;NAME&lt;/span&gt; &lt;span class="n"&gt;already&lt;/span&gt; &lt;span class="n"&gt;started&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;fi&lt;/span&gt;
-  &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;start&lt;/span&gt; $&lt;span class="n"&gt;NAME&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;cd&lt;/span&gt; $&lt;span class="n"&gt;ROOT_DIR&lt;/span&gt;
-  &lt;span class="n"&gt;sudo&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;u&lt;/span&gt; $&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;APP_USER&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="n"&gt;bundle&lt;/span&gt; &lt;span class="n"&gt;exec&lt;/span&gt; &lt;span class="n"&gt;unicorn_rails&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; $&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;CONF&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;E&lt;/span&gt; $&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;ENVIROMENT&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;D&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;ROOT_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/redmine/redmine&amp;quot;&lt;/span&gt;
 
-&lt;span class="n"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; ! &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt; $&lt;span class="n"&gt;PID&lt;/span&gt; &lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="n"&gt;then&lt;/span&gt;
-    &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;$&lt;span class="n"&gt;NAME&lt;/span&gt; &lt;span class="n"&gt;not&lt;/span&gt; &lt;span class="n"&gt;started&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;fi&lt;/span&gt;
-  &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;stop&lt;/span&gt; $&lt;span class="n"&gt;NAME&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;kill&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;QUIT&lt;/span&gt; `&lt;span class="nb"&gt;cat&lt;/span&gt; $&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;PID&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;`
-  &lt;span class="n"&gt;rm&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt; $&lt;span class="n"&gt;PID&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;PID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;ROOT_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;/tmp/unicorn.pid&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;CONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;ROOT_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;/config/unicorn.rb&amp;quot;&lt;/span&gt;
 
-&lt;span class="n"&gt;force_stop&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; ! &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt; $&lt;span class="n"&gt;PID&lt;/span&gt; &lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="n"&gt;then&lt;/span&gt;
-    &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;$&lt;span class="n"&gt;NAME&lt;/span&gt; &lt;span class="n"&gt;not&lt;/span&gt; &lt;span class="n"&gt;started&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;fi&lt;/span&gt;
-  &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;stop&lt;/span&gt; $&lt;span class="n"&gt;NAME&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;kill&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;TERM&lt;/span&gt; `&lt;span class="nb"&gt;cat&lt;/span&gt; $&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;PID&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;`
-  &lt;span class="n"&gt;rm&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt; $&lt;span class="n"&gt;PID&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+start&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -e &lt;span class="nv"&gt;$PID&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt; already started&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="k"&gt;fi&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;start &lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="nv"&gt;$ROOT_DIR&lt;/span&gt;
+  sudo -u &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;APP_USER&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; -H bundle &lt;span class="nb"&gt;exec &lt;/span&gt;unicorn_rails -c &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CONF&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; -E &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;ENVIROMENT&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; -D
+&lt;span class="o"&gt;}&lt;/span&gt;
 
-&lt;span class="n"&gt;reload&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; ! &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt; $&lt;span class="n"&gt;PID&lt;/span&gt; &lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="n"&gt;then&lt;/span&gt;
-    &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;$&lt;span class="n"&gt;NAME&lt;/span&gt; &lt;span class="n"&gt;not&lt;/span&gt; &lt;span class="n"&gt;started&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;start&lt;/span&gt;
-    &lt;span class="n"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;fi&lt;/span&gt;
-  &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;reload&lt;/span&gt; $&lt;span class="n"&gt;NAME&lt;/span&gt;&amp;quot;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;kill&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;HUP&lt;/span&gt; `&lt;span class="nb"&gt;cat&lt;/span&gt; $&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;PID&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;`
-&lt;span class="p"&gt;}&lt;/span&gt;
+stop&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! -e &lt;span class="nv"&gt;$PID&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt; not started&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="k"&gt;fi&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;stop &lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nb"&gt;kill&lt;/span&gt; -QUIT &lt;span class="sb"&gt;`&lt;/span&gt;cat &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;PID&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+  rm -f &lt;span class="nv"&gt;$PID&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
 
-&lt;span class="n"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="n"&gt;stop&lt;/span&gt;
-    &lt;span class="n"&gt;start&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+force_stop&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! -e &lt;span class="nv"&gt;$PID&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt; not started&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="k"&gt;fi&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;stop &lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nb"&gt;kill&lt;/span&gt; -TERM &lt;span class="sb"&gt;`&lt;/span&gt;cat &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;PID&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+  rm -f &lt;span class="nv"&gt;$PID&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
 
-&lt;span class="k"&gt;case&lt;/span&gt; &amp;quot;$&lt;span class="mi"&gt;1&lt;/span&gt;&amp;quot; &lt;span class="n"&gt;in&lt;/span&gt;
-  &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;start&lt;/span&gt;
+reload&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! -e &lt;span class="nv"&gt;$PID&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt; not started&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    start
+    &lt;span class="nb"&gt;exit &lt;/span&gt;0&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="k"&gt;fi&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;reload &lt;/span&gt;&lt;span class="nv"&gt;$NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nb"&gt;kill&lt;/span&gt; -HUP &lt;span class="sb"&gt;`&lt;/span&gt;cat &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;PID&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+restart&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+    stop
+    start
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; in
+  start&lt;span class="o"&gt;)&lt;/span&gt;
+    start
     &lt;span class="p"&gt;;;&lt;/span&gt;
-  &lt;span class="n"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;stop&lt;/span&gt;
+  stop&lt;span class="o"&gt;)&lt;/span&gt;
+    stop
     &lt;span class="p"&gt;;;&lt;/span&gt;
-  &lt;span class="n"&gt;force&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;force_stop&lt;/span&gt;
+  force-stop&lt;span class="o"&gt;)&lt;/span&gt;
+    force_stop
     &lt;span class="p"&gt;;;&lt;/span&gt;
-  &lt;span class="n"&gt;reload&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;reload&lt;/span&gt;
+  reload&lt;span class="o"&gt;)&lt;/span&gt;
+    reload
     &lt;span class="p"&gt;;;&lt;/span&gt;
-  &lt;span class="n"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;restart&lt;/span&gt;
+  restart&lt;span class="o"&gt;)&lt;/span&gt;
+    restart
     &lt;span class="p"&gt;;;&lt;/span&gt;
-  &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="n"&gt;echo&lt;/span&gt; &amp;quot;&lt;span class="n"&gt;Syntax&lt;/span&gt; &lt;span class="n"&gt;Error&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;release&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;stop&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;force&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;stop&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;reload&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&amp;quot;
+  *&lt;span class="o"&gt;)&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Syntax Error: release [start|stop|force-stop|reload|restart]&amp;quot;&lt;/span&gt;
     &lt;span class="p"&gt;;;&lt;/span&gt;
-&lt;span class="n"&gt;esac&lt;/span&gt;
+&lt;span class="k"&gt;esac&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;permissionを設定し、スタートしておく。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo chmod 755 /etc/init.d/redmine&lt;/span&gt;
-&lt;span class="c"&gt;% sudo /etc/init.d/redmine start&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo chmod &lt;span class="m"&gt;755&lt;/span&gt; /etc/init.d/redmine
+% sudo /etc/init.d/redmine start
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;自動起動設定もしておく。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo update-rc.d redmine defaults&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo update-rc.d redmine defaults
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;nginxをインストールし、redmineサイト用の設定ファイルを追加する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% sudo apt-get install nginx&lt;/span&gt;
-&lt;span class="c"&gt;% sudo vi /etc/nginx/sites-available/redmine&lt;/span&gt;
-&lt;span class="n"&gt;upstream&lt;/span&gt; &lt;span class="n"&gt;redmine&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="n"&gt;server&lt;/span&gt; &lt;span class="mf"&gt;127.0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;8079&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install nginx
+% sudo vi /etc/nginx/sites-available/redmine
+&lt;/pre&gt;&lt;/div&gt;
 
-&lt;span class="n"&gt;server&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="n"&gt;listen&lt;/span&gt; &lt;span class="mi"&gt;80&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;server_name&lt;/span&gt; &lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;hogehoge&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; ← ★ここは自分のものにあわせて変更する
-  &lt;span class="n"&gt;server_tokens&lt;/span&gt; &lt;span class="n"&gt;off&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;root&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;home&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-  &lt;span class="n"&gt;client_max_body_size&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;upstream redmine {
+  server 127.0.0.1:8079;
+}
 
-  # &lt;span class="n"&gt;individual&lt;/span&gt; &lt;span class="n"&gt;nginx&lt;/span&gt; &lt;span class="n"&gt;logs&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;this&lt;/span&gt; &lt;span class="n"&gt;gitlab&lt;/span&gt; &lt;span class="n"&gt;vhost&lt;/span&gt;
-  &lt;span class="n"&gt;access_log&lt;/span&gt;  &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;nginx&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine_access&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="n"&gt;error_log&lt;/span&gt;   &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;nginx&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;redmine_error&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;log&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+server {
+  listen 80;
+  server_name redmine.hogehoge.com; ← ★ここは自分のものにあわせて変更する
+  server_tokens off;
+  root /home/redmine/redmine;
 
-  &lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="n"&gt;try_files&lt;/span&gt; $&lt;span class="n"&gt;uri&lt;/span&gt; $&lt;span class="n"&gt;uri&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt; $&lt;span class="n"&gt;uri&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt; &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="p"&gt;}&lt;/span&gt;
+  client_max_body_size 20m;
 
-  &lt;span class="n"&gt;location&lt;/span&gt; &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="n"&gt;proxy_redirect&lt;/span&gt;     &lt;span class="n"&gt;off&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;proxy_set_header&lt;/span&gt;   &lt;span class="n"&gt;X&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;FORWARDED_PROTO&lt;/span&gt; $&lt;span class="n"&gt;http_x_forwarded_proto&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;proxy_set_header&lt;/span&gt;   &lt;span class="n"&gt;Host&lt;/span&gt;              $&lt;span class="n"&gt;http_host&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;proxy_set_header&lt;/span&gt;   &lt;span class="n"&gt;X&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Real&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;IP&lt;/span&gt;         $&lt;span class="n"&gt;http_x_forwarded_for&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;proxy_set_header&lt;/span&gt;   &lt;span class="n"&gt;X&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Forwarded&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;For&lt;/span&gt;   $&lt;span class="n"&gt;http_x_forwarded_for&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;proxy_pass&lt;/span&gt; &lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;redmine&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;proxy_intercept_errors&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;error_page&lt;/span&gt; &lt;span class="mi"&gt;404&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mf"&gt;404.&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;error_page&lt;/span&gt; &lt;span class="mi"&gt;422&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mf"&gt;422.&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="n"&gt;error_page&lt;/span&gt; &lt;span class="mi"&gt;500&lt;/span&gt; &lt;span class="mi"&gt;502&lt;/span&gt; &lt;span class="mi"&gt;503&lt;/span&gt; &lt;span class="mi"&gt;504&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mf"&gt;500.&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-  &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+  # individual nginx logs for this gitlab vhost
+  access_log  /var/log/nginx/redmine_access.log;
+  error_log   /var/log/nginx/redmine_error.log;
+
+  location / {
+    try_files $uri $uri/index.html $uri.html @redmine;
+  }
+
+  location @redmine {
+    proxy_redirect     off;
+    proxy_set_header   X-FORWARDED_PROTO $http_x_forwarded_proto;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-Real-IP         $http_x_forwarded_for;
+    proxy_set_header   X-Forwarded-For   $http_x_forwarded_for;
+    proxy_pass http://redmine;
+    proxy_intercept_errors on;
+    error_page 404 /404.html;
+    error_page 422 /422.html;
+    error_page 500 502 503 504 /500.html;
+  }
+}
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;サイトを有効化してnginxを起動する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% cd /etc/nginx/sites-enabled&lt;/span&gt;
-&lt;span class="c"&gt;% sudo ln -s ../sites-available/redmine&lt;/span&gt;
-&lt;span class="c"&gt;% sudo /etc/init.d/nginx restart&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /etc/nginx/sites-enabled
+% sudo ln -s ../sites-available/redmine
+% sudo /etc/init.d/nginx restart
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -408,66 +426,61 @@ Ctrl-Cでサーバを停止できる。&lt;/p&gt;
 &lt;p&gt;全部のトラッカーに関してステータスを相互に変更できるように設定する。使い方にもよるが、基本的には非メンバや匿名ユーザは変更できないようにしてしまって問題ない。&lt;/p&gt;
 &lt;h2&gt;Backlogsの組込み&lt;/h2&gt;
 &lt;p&gt;最新版を取得してくる。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% alias sr=&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
-&lt;span class="c"&gt;% cd /home/redmine/redmine/plugins&lt;/span&gt;
-&lt;span class="c"&gt;% sr git clone git://github.com/backlogs/redmine_backlogs.git&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;alias &lt;/span&gt;&lt;span class="nv"&gt;sr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
+% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/redmine/redmine/plugins
+% sr git clone git://github.com/backlogs/redmine_backlogs.git
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;redmineに導入する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;% cd redmine_backlogs&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle install --without development test&lt;/span&gt;
-&lt;span class="c"&gt;% cd ../..&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle install --without development test&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle exec rake db:migrate&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle exec rake tmp:cache:clear&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle exec rake tmp:sessions:clear&lt;/span&gt;
-&lt;span class="c"&gt;% sr RAILS_ENV=production bundle exec rake redmine:backlogs:install&lt;/span&gt;
-&lt;span class="n"&gt;Which&lt;/span&gt; &lt;span class="n"&gt;trackers&lt;/span&gt; &lt;span class="n"&gt;do&lt;/span&gt; &lt;span class="n"&gt;you&lt;/span&gt; &lt;span class="n"&gt;want&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;use&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;your&lt;/span&gt; &lt;span class="n"&gt;stories&lt;/span&gt;?
-  &lt;span class="mf"&gt;1.&lt;/span&gt; タスク
-  &lt;span class="mf"&gt;2.&lt;/span&gt; ストーリー
-  &lt;span class="mf"&gt;3.&lt;/span&gt; バグ
-  &lt;span class="mf"&gt;4.&lt;/span&gt; 課題
-&lt;span class="n"&gt;Separate&lt;/span&gt; &lt;span class="n"&gt;values&lt;/span&gt; &lt;span class="n"&gt;with&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="n"&gt;space&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; ← ★先ほど作った「ストーリー」を選択
-&lt;span class="n"&gt;Which&lt;/span&gt; &lt;span class="n"&gt;tracker&lt;/span&gt; &lt;span class="n"&gt;do&lt;/span&gt; &lt;span class="n"&gt;you&lt;/span&gt; &lt;span class="n"&gt;want&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;use&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;your&lt;/span&gt; &lt;span class="n"&gt;tasks&lt;/span&gt;?
-  &lt;span class="mf"&gt;1.&lt;/span&gt; タスク
-  &lt;span class="mf"&gt;2.&lt;/span&gt; バグ
-  &lt;span class="mf"&gt;3.&lt;/span&gt; 課題
-&lt;span class="n"&gt;Choose&lt;/span&gt; &lt;span class="n"&gt;one&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;above&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;or&lt;/span&gt; &lt;span class="n"&gt;choose&lt;/span&gt; &lt;span class="n"&gt;none&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;create&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="n"&gt;new&lt;/span&gt; &lt;span class="n"&gt;tracker&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; ← ★先ほど作った「タスク」を選択
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd &lt;/span&gt;redmine_backlogs
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle install --without development &lt;span class="nb"&gt;test&lt;/span&gt;
+% &lt;span class="nb"&gt;cd&lt;/span&gt; ../..
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle install --without development &lt;span class="nb"&gt;test&lt;/span&gt;
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake db:migrate
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake tmp:cache:clear
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake tmp:sessions:clear
+% sr &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake redmine:backlogs:install
+Which trackers &lt;span class="k"&gt;do&lt;/span&gt; you want to use &lt;span class="k"&gt;for&lt;/span&gt; your stories?
+  1. タスク
+  2. ストーリー
+  3. バグ
+  4. 課題
+Separate values with a space &lt;span class="o"&gt;(&lt;/span&gt;e.g. &lt;span class="m"&gt;1&lt;/span&gt; 3&lt;span class="o"&gt;)&lt;/span&gt;: &lt;span class="m"&gt;2&lt;/span&gt; ← ★先ほど作った「ストーリー」を選択
+Which tracker &lt;span class="k"&gt;do&lt;/span&gt; you want to use &lt;span class="k"&gt;for&lt;/span&gt; your tasks?
+  1. タスク
+  2. バグ
+  3. 課題
+Choose one from above &lt;span class="o"&gt;(&lt;/span&gt;or choose none to create a new tracker&lt;span class="o"&gt;)&lt;/span&gt;: &lt;span class="m"&gt;1&lt;/span&gt; ← ★先ほど作った「タスク」を選択
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;これでBacklogsが使えるようになっているはず。&lt;/p&gt;
 &lt;p&gt;最終的に「管理＞情報」では以下のように表示された。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;Environment&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-  &lt;span class="n"&gt;Redmine&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt;                &lt;span class="mf"&gt;2.6&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;stable&lt;/span&gt;
-  &lt;span class="n"&gt;Ruby&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt;                   &lt;span class="mf"&gt;2.1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;p273&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2014&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;11&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;13&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;x86_64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;linux&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;gnu&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;
-  &lt;span class="n"&gt;Rails&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt;                  &lt;span class="mf"&gt;3.2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;21&lt;/span&gt;
-  &lt;span class="n"&gt;Environment&lt;/span&gt;                    &lt;span class="n"&gt;production&lt;/span&gt;
-  &lt;span class="n"&gt;Database&lt;/span&gt; &lt;span class="n"&gt;adapter&lt;/span&gt;               &lt;span class="n"&gt;PostgreSQL&lt;/span&gt;
-&lt;span class="n"&gt;SCM&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-  &lt;span class="n"&gt;Subversion&lt;/span&gt;                     &lt;span class="mf"&gt;1.8&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;
-  &lt;span class="n"&gt;Git&lt;/span&gt;                            &lt;span class="mf"&gt;2.1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;
-  &lt;span class="n"&gt;Filesystem&lt;/span&gt;                     
-&lt;span class="n"&gt;Redmine&lt;/span&gt; &lt;span class="n"&gt;plugins&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-  &lt;span class="n"&gt;redmine_backlogs&lt;/span&gt;               &lt;span class="n"&gt;v1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mf"&gt;0.6&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="l-Scalar-Plain"&gt;Environment&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Redmine version                2.6.5.stable&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Ruby version                   2.1.5-p273 (2014-11-13) [x86_64-linux-gnu]&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Rails version                  3.2.21&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Environment                    production&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Database adapter               PostgreSQL&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;SCM&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Subversion                     1.8.10&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Git                            2.1.4&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;Filesystem&lt;/span&gt;                     
+&lt;span class="l-Scalar-Plain"&gt;Redmine plugins&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;redmine_backlogs               v1.0.6&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Sat, 16 May 2015 15:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-16:blog/redmine-install.html</guid><category>redmine</category><category>debian</category><category>backlogs</category></item><item><title>virtualenv環境のpythonをcronで呼ぶ</title><link>http://pman0214.github.io/blog/cron-python-virtualenv.html</link><description>&lt;h1&gt;概要&lt;/h1&gt;
 &lt;p&gt;virtualenv環境で開発したPythonスクリプトをcronで呼び出したいとき、ライブラリとかをどうやって指定するのか分からなかったので考えてみた。&lt;/p&gt;
 &lt;h1&gt;結論&lt;/h1&gt;
 &lt;p&gt;以下のようなスクリプトを作っておき、これを呼び出せばOK。&lt;/p&gt;
-&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1
-2
-3
-4
-5
-6&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/sh&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/sh&lt;/span&gt;
 
 &lt;span class="nv"&gt;PROG_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/local/hoge
 &lt;span class="nb"&gt;source&lt;/span&gt; &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/bin/activate
 
 python &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/hoge.pyc
 &lt;/pre&gt;&lt;/div&gt;
-&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
 
 &lt;h1&gt;解説というほどでもないけど&lt;/h1&gt;
 &lt;p&gt;要するに、普段やっている&lt;code&gt;source bin/activate&lt;/code&gt;を呼んでおけばいいという話。&lt;/p&gt;
@@ -510,7 +523,7 @@ python &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/hoge.pyc
 
 &lt;p&gt;あとはよしなに。FAT32にするのが良い。どんなマシンでもFAT32なら読めるみたいなので（確証なし）。partition IDをbにするとWin95 FAT32になる。&lt;/p&gt;
 &lt;p&gt;FAT32でフォーマット。&lt;code&gt;-v&lt;/code&gt;は詳細表示、&lt;code&gt;-c&lt;/code&gt;は不良ブロック精査、&lt;code&gt;-F&lt;/code&gt;は形式。16にすればFAT16になる。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;sudo mkfs.vfat -v -c -F 32 /dev/sdb1
+&lt;div class="highlight"&gt;&lt;pre&gt;sudo mkfs.vfat -v -c -F &lt;span class="m"&gt;32&lt;/span&gt; /dev/sdb1
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -524,7 +537,7 @@ python &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/hoge.pyc
 &lt;/ul&gt;
 &lt;p&gt;USBメモリをマウントし、EFIのディレクトリを指定してgrubをUSBメモリに書き込む。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;sudo mount /dev/sdb1 /mnt
-sudo grub-install —target=x86_64-efi —efi-directory=/mnt —boot-directory=/mnt/boot —no-floppy
+sudo grub-install —target&lt;span class="o"&gt;=&lt;/span&gt;x86_64-efi —efi-directory&lt;span class="o"&gt;=&lt;/span&gt;/mnt —boot-directory&lt;span class="o"&gt;=&lt;/span&gt;/mnt/boot —no-floppy
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -550,7 +563,7 @@ insmod font
 
 # Setup GFXTERM along with loading unifont.pf2 font file
 
-if loadfont &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;/fonts/unifont.pf2
+if loadfont ${prefix}/fonts/unifont.pf2
 then
    insmod gfxterm
    set gfxmode=&amp;quot;auto&amp;quot;
@@ -641,7 +654,7 @@ menuentry &amp;quot;Debian Install&amp;quot; {
 &lt;li&gt;
 &lt;p&gt;適当なディレクトリを作成。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;mkdir ~/blog
-cd !$
+&lt;span class="nb"&gt;cd&lt;/span&gt; !&lt;span class="err"&gt;$&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -649,7 +662,7 @@ cd !$
 &lt;li&gt;
 &lt;p&gt;virtualenv環境でpelicanを導入。Markdownを使いたいので、Markdownも導入しておく。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;virtualenv --system-site-packages ./
-source bin/activate
+&lt;span class="nb"&gt;source &lt;/span&gt;bin/activate
 pip install pelican
 pip install Markdown
 &lt;/pre&gt;&lt;/div&gt;
@@ -658,16 +671,16 @@ pip install Markdown
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;.gitignore&lt;/code&gt;ファイルを作成しておく。なお、&lt;code&gt;.DS_Store&lt;/code&gt;などはグローバルに無視する設定をしているので除外してある。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="na"&gt;.Python&lt;/span&gt;
-&lt;span class="nf"&gt;bin&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
-&lt;span class="nf"&gt;include&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
-&lt;span class="nf"&gt;lib&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
-&lt;span class="nf"&gt;man&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
-&lt;span class="nf"&gt;local&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
-&lt;span class="nf"&gt;output&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
-&lt;span class="nf"&gt;pip-selfcheck.json&lt;/span&gt;
-&lt;span class="nf"&gt;cache&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;
-&lt;span class="err"&gt;*&lt;/span&gt;&lt;span class="na"&gt;.pyc&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;.Python
+bin/
+include/
+lib/
+man/
+local/
+output/
+pip-selfcheck.json
+cache/
+*.pyc
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -682,7 +695,7 @@ pip install Markdown
 &lt;li&gt;gitレポジトリを作成。&lt;code&gt;git status&lt;/code&gt;して出てきたファイルを追加してcommit。&lt;div class="highlight"&gt;&lt;pre&gt;git init .
 git status
 git add Makefile .gitignore develop_server.sh ...
-git commit -m &amp;quot;Initial commit with pelican files.&amp;quot;
+git commit -m &lt;span class="s2"&gt;&amp;quot;Initial commit with pelican files.&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -747,7 +760,7 @@ pip install mdx_del_ins
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;pelicanconf.py&lt;/code&gt;に以下を追加する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;MD_EXTENSIONS = [&amp;#39;del_ins&amp;#39;, &amp;#39;fenced_code&amp;#39;, &amp;#39;codehilite(css_class=highlight)&amp;#39;, &amp;#39;tables&amp;#39;]
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;MD_EXTENSIONS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;del_ins&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;fenced_code&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;codehilite(css_class=highlight)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;tables&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -762,21 +775,21 @@ pip install mdx_del_ins
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;管理を単純にするため、投稿日をファイル名とすることにした。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;touch content `date +%Y%m%d`.md
-open !$
+&lt;div class="highlight"&gt;&lt;pre&gt;touch content &lt;span class="sb"&gt;`&lt;/span&gt;date +%Y%m%d&lt;span class="sb"&gt;`&lt;/span&gt;.md
+open !&lt;span class="err"&gt;$&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;先頭に各種情報を書いておく。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;Title&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Pelican&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;GitHub&lt;/span&gt; &lt;span class="n"&gt;Pages&lt;/span&gt;&lt;span class="err"&gt;でブログ引っ越し&lt;/span&gt;
-&lt;span class="n"&gt;Date&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2015&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;04&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;26&lt;/span&gt; &lt;span class="mi"&gt;18&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;
-&lt;span class="n"&gt;Category&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="err"&gt;カテゴリ&lt;/span&gt;
-&lt;span class="n"&gt;Tags&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;blog&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;python&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pelican&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;github&lt;/span&gt;
-&lt;span class="n"&gt;Slug&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pelican&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;blog&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;github&lt;/span&gt;  &lt;span class="err"&gt;←&lt;/span&gt;&lt;span class="n"&gt;permanent&lt;/span&gt; &lt;span class="n"&gt;link&lt;/span&gt;&lt;span class="err"&gt;。「この名前&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="err"&gt;」ファイルが生成される。&lt;/span&gt;
-&lt;span class="n"&gt;Author&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pman0214&lt;/span&gt;
-&lt;span class="n"&gt;Summary&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="err"&gt;この記事の要約。&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;Title: Pelican+GitHub Pagesでブログ引っ越し
+Date: 2015-04-26 18:00
+Category: カテゴリ
+Tags: info, blog, python, pelican, github
+Slug: pelican-blog-github  ←permanent link。「この名前+html」ファイルが生成される。
+Author: pman0214
+Summary: この記事の要約。
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -822,7 +835,7 @@ open !$
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;先ほどのテーマのディレクトリがsubmoduleであれば、それを取得する。この記事執筆時点では&lt;a href="https://github.com/jody-frankowski/blue-penguin/"&gt;blue-penguin&lt;/a&gt;を選択した。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;cd themes
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nb"&gt;cd &lt;/span&gt;themes
 git submodule init blue-penguin
 git submodule update blue-penguin
 &lt;/pre&gt;&lt;/div&gt;
@@ -833,12 +846,12 @@ git submodule update blue-penguin
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;pelicanconf.py&lt;/code&gt;に以下のように設定する。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;THEME = &amp;quot;pelican-themes/blue-penguin&amp;quot;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;THEME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pelican-themes/blue-penguin&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;2015/04/27追記:&lt;/strong&gt; 間違ってます。正しくはこうです。&lt;div class="highlight"&gt;&lt;pre&gt;THEME = &amp;quot;themes/blue-penguin&amp;quot;
+&lt;li&gt;&lt;strong&gt;2015/04/27追記:&lt;/strong&gt; 間違ってます。正しくはこうです。&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;THEME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;themes/blue-penguin&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -854,7 +867,7 @@ git submodule update blue-penguin
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;output&lt;/code&gt;ディレクトリをgitレポジトリにする。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;cd output
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nb"&gt;cd &lt;/span&gt;output
 git init ./
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -870,7 +883,7 @@ git init ./
 &lt;li&gt;
 &lt;p&gt;全ファイルをadd、そしてcommit。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;git add *
-git commit -m &amp;quot;Article `date +%Y%m%d`.&amp;quot;
+git commit -m &lt;span class="s2"&gt;&amp;quot;Article `date +%Y%m%d`.&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 

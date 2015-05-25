@@ -118,27 +118,27 @@ pLog            </a>
 <h1>Redmineへのweb-hookプラグインの導入</h1>
 <p><code>git</code>が入っていなかったら<code>sudo apt-get install git-core</code>で導入しておく。</p>
 <p>GitHubからのweb-hookを使うためにはjsonを処理する必要があるため、json用のgemを導入しておく。</p>
-<div class="highlight"><pre><span class="c">% alias sr=&quot;sudo -u redmine&quot;</span>
-<span class="c">% cd /home/redmine/redmine</span>
-<span class="c">% sr vi Gemfile.local</span>
-<span class="n">gem</span> &quot;<span class="n">json</span>&quot; ← ★追加する
-<span class="c">% sr bundle install --without development test</span>
+<div class="highlight"><pre>% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s2">&quot;sudo -u redmine&quot;</span>
+% <span class="nb">cd</span> /home/redmine/redmine
+% sr vi Gemfile.local
+gem <span class="s2">&quot;json&quot;</span> ← ★追加する
+% sr bundle install --without development <span class="nb">test</span>
 </pre></div>
 
 
 <p>自分の環境では<code>json</code>が2回以上あると怒られたので、すでにどこかで書いてあったようだ。実害はないのでいいが。</p>
 <p>GitHub hookプラグインを導入する。</p>
-<div class="highlight"><pre><span class="c">% cd /home/redmine/redmine/plugins</span>
-<span class="c">% sr git clone https://github.com/koppen/redmine_github_hook.git</span>
-<span class="c">% cd redmine_github_hook</span>
-<span class="c">% sr RAILS_ENV=production bundle install --without development test</span>
-<span class="c">% cd ../..</span>
-<span class="c">% sr RAILS_ENV=production bundle install --without development test</span>
+<div class="highlight"><pre>% <span class="nb">cd</span> /home/redmine/redmine/plugins
+% sr git clone https://github.com/koppen/redmine_github_hook.git
+% <span class="nb">cd </span>redmine_github_hook
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle install --without development <span class="nb">test</span>
+% <span class="nb">cd</span> ../..
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle install --without development <span class="nb">test</span>
 </pre></div>
 
 
 <p>Redmineを再起動する。</p>
-<div class="highlight"><pre><span class="c">% sudo /etc/init.d/redmine restart</span>
+<div class="highlight"><pre>% sudo /etc/init.d/redmine restart
 </pre></div>
 
 
@@ -149,19 +149,19 @@ pLog            </a>
 <p>まずはssh鍵を作成。nginx+unicornでredmineを起動しているので、redmineを実行しているユーザは<code>redmine</code>である。
 このユーザ用のssh鍵を作成し、デプロイキーとして登録する。
 ssh鍵の作成ではパスフレーズを設定してはいけない。</p>
-<div class="highlight"><pre><span class="c">% cd /home/redmine</span>
-<span class="c">% alias sr=&quot;sudo -u redmine&quot;</span>
-<span class="c">% sr mkdir .ssh</span>
-<span class="c">% sr chmod 700 .ssh</span>
-<span class="c">% sr ssh-keygen -t ecdsa</span>
+<div class="highlight"><pre>% <span class="nb">cd</span> /home/redmine
+% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s2">&quot;sudo -u redmine&quot;</span>
+% sr mkdir .ssh
+% sr chmod <span class="m">700</span> .ssh
+% sr ssh-keygen -t ecdsa
 </pre></div>
 
 
 <p>できあがった公開鍵<code>/home/redmine/.ssh/id_ecdsa.pub</code>をGitHubの当該レポジトリにデプロイキーとして登録する。</p>
 <p>レポジトリ用のディレクトリを作成してcloneしておく。</p>
-<div class="highlight"><pre><span class="c">% sr mkdir repos</span>
-<span class="c">% cd repos</span>
-<span class="c">% sr git clone --bare git@github.com/xxxxxx/hoge.git</span>
+<div class="highlight"><pre>% sr mkdir repos
+% <span class="nb">cd </span>repos
+% sr git clone --bare git@github.com/xxxxxx/hoge.git
 </pre></div>
 
 
@@ -230,13 +230,13 @@ URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクト
             <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
-                            redmine
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -245,18 +245,8 @@ URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクト
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/info.html">
-                            info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
-                            pelican
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -270,18 +260,28 @@ URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクト
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/blog.html">
                             blog
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/efi.html">
                             efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
                         </a>
                     </li>
                 </ul>

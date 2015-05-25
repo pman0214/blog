@@ -144,7 +144,7 @@ pLog            </a>
 
 <p>あとはよしなに。FAT32にするのが良い。どんなマシンでもFAT32なら読めるみたいなので（確証なし）。partition IDをbにするとWin95 FAT32になる。</p>
 <p>FAT32でフォーマット。<code>-v</code>は詳細表示、<code>-c</code>は不良ブロック精査、<code>-F</code>は形式。16にすればFAT16になる。</p>
-<div class="highlight"><pre>sudo mkfs.vfat -v -c -F 32 /dev/sdb1
+<div class="highlight"><pre>sudo mkfs.vfat -v -c -F <span class="m">32</span> /dev/sdb1
 </pre></div>
 
 
@@ -158,7 +158,7 @@ pLog            </a>
 </ul>
 <p>USBメモリをマウントし、EFIのディレクトリを指定してgrubをUSBメモリに書き込む。</p>
 <div class="highlight"><pre>sudo mount /dev/sdb1 /mnt
-sudo grub-install —target=x86_64-efi —efi-directory=/mnt —boot-directory=/mnt/boot —no-floppy
+sudo grub-install —target<span class="o">=</span>x86_64-efi —efi-directory<span class="o">=</span>/mnt —boot-directory<span class="o">=</span>/mnt/boot —no-floppy
 </pre></div>
 
 
@@ -184,7 +184,7 @@ insmod font
 
 # Setup GFXTERM along with loading unifont.pf2 font file
 
-if loadfont <span class="cp">${</span><span class="n">prefix</span><span class="cp">}</span>/fonts/unifont.pf2
+if loadfont ${prefix}/fonts/unifont.pf2
 then
    insmod gfxterm
    set gfxmode=&quot;auto&quot;
@@ -312,13 +312,13 @@ menuentry &quot;Debian Install&quot; {
             <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
-                            redmine
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -327,18 +327,8 @@ menuentry &quot;Debian Install&quot; {
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/info.html">
-                            info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
-                            pelican
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -352,18 +342,28 @@ menuentry &quot;Debian Install&quot; {
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/blog.html">
                             blog
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/efi.html">
                             efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
                         </a>
                     </li>
                 </ul>
