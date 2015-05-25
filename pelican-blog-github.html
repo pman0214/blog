@@ -127,14 +127,14 @@ pLog            </a>
 <p>などの理由からGitHub Pagesを使うことにした。
 あんまり書かないかもしれないけど・・・。</p>
 <p>ともあれ、Pelicanを使ってこのブログを構築したので、そのときのメモ。</p>
-<h1>Pelicanを使ったブログ構築作業</h1>
-<h2>概要</h2>
+<h2>Pelicanを使ったブログ構築作業</h2>
+<h3>概要</h3>
 <p>このブログはPelicanを使って静的ページを構成している。
 生成に使用したソースを公開するのは気が引けるので、生成したhtmlファイル群だけを公開することとした。
 このためにちょっと特殊な使い方をしている。</p>
-<h2>前提</h2>
+<h3>前提</h3>
 <p>pythonやvirtualenv、makeなどは導入されているものとする。</p>
-<h2>構築</h2>
+<h3>構築</h3>
 <ol>
 <li>
 <p>ローカルマシンにpelican用の環境を構築。</p>
@@ -256,7 +256,7 @@ pip install mdx_del_ins
 </ul>
 </li>
 </ol>
-<h2>試しに記事を書いてみる</h2>
+<h3>試しに記事を書いてみる</h3>
 <ol>
 <li>
 <p>記事は<code>content</code>の下に配置する。</p>
@@ -307,7 +307,7 @@ Summary: この記事の要約。
 </ul>
 </li>
 </ol>
-<h2>テーマの変更</h2>
+<h3>テーマの変更</h3>
 <p>デフォルトはブログっぽくないので変更する。</p>
 <ol>
 <li>テーマを検討する。<a href="http://pelicanthemes.com/">Pelican Themes</a>で確認できる。</li>
@@ -347,7 +347,7 @@ git submodule update blue-penguin
 </ul>
 </li>
 </ol>
-<h2>公開用レポジトリの設定</h2>
+<h3>公開用レポジトリの設定</h3>
 <ol>
 <li>GitHubに<code>blog</code>という名前のレポジトリを作成。ここに公開用のhtmlファイル群をpushする。自分は<a href="https://github.com/pman0214/blog">https://github.com/pman0214/blog</a>を作成した。</li>
 <li>
@@ -394,7 +394,7 @@ git push origin gh-pages
 </ul>
 </li>
 </ol>
-<h1>参考ページ</h1>
+<h2>参考ページ</h2>
 <ul>
 <li><a href="http://blog.sotm.jp/2014/01/04/Pelican-Markdown-GithubPages-install-guide/">Human as a Serviceな日々 - Pelican + Markdown + GitHub Pagesで管理するブログの作り方</a></li>
 <li><a href="http://mathamy.com/migrating-to-github-pages-using-pelican.html">Amy Hanlon - Migrating to GitHub Pages using Pelican</a></li>
@@ -464,8 +464,8 @@ git push origin gh-pages
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -474,8 +474,18 @@ git push origin gh-pages
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -489,18 +499,8 @@ git push origin gh-pages
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/blog.html">
-                            blog
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/info.html">
                             info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/efi.html">
-                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -509,8 +509,8 @@ git push origin gh-pages
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
+                        <a href="http://pman0214.github.io/blog/tag/blog.html">
+                            blog
                         </a>
                     </li>
                 </ul>

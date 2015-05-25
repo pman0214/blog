@@ -113,7 +113,7 @@ pLog            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <h1>環境</h1>
+                <h2>環境</h2>
 <ul>
 <li>debian jessie 8.0<ul>
 <li>debianマシンはすでに用意してあるものとする。</li>
@@ -122,8 +122,8 @@ pLog            </a>
 <li>redmine 2.6.5</li>
 <li>backlogs 1.0.6</li>
 </ul>
-<h1>手順</h1>
-<h2>redmine本体</h2>
+<h2>手順</h2>
+<h3>redmine本体</h3>
 <p>必要なツール類をインストールする。MySQLを使うことが多いのだが、個人的な好みによりPostgreSQLを使用することにする。</p>
 <div class="highlight"><pre>% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev <span class="se">\</span>
   make build-essential gcc <span class="se">\</span>
@@ -211,7 +211,7 @@ Select Language: ja ← ★日本語を指定
 
 <p>この状態で<code>http://debianサーバ:3000/</code>に接続して、redmineが見られればOK。
 Ctrl-Cでサーバを停止できる。</p>
-<h2>ログ消去</h2>
+<h3>ログ消去</h3>
 <p>ログが永遠に作成されたら嫌なので、logrotateを使って自動的に消去する。</p>
 <div class="highlight"><pre>% sudo vi /etc/logrotate.d/redmine
 </pre></div>
@@ -233,7 +233,7 @@ Ctrl-Cでサーバを停止できる。</p>
 </pre></div>
 
 
-<h1>nginx + unicornにする</h1>
+<h2>nginx + unicornにする</h2>
 <p>WEBrickを使うのはアレなのでnginxに乗っける。</p>
 <p>まずはunicornをbundleする。</p>
 <div class="highlight"><pre>% sr vi Gemfile.local
@@ -448,8 +448,8 @@ server {
 
 
 <p>この状態で<code>http://debianサーバ/</code>でredmineにアクセスできるはず。</p>
-<h1>Backlogsプラグイン</h1>
-<h2>Redminの設定</h2>
+<h2>Backlogsプラグイン</h2>
+<h3>Redmineの設定</h3>
 <p>Backlogsの導入時にはBacklogs用のトラッカーを設定する必要があるので、Redmineの設定をしておく。</p>
 <p>まずはRedmineにログインする。管理者の初期設定は、ユーザ・パスワードともに<code>admin</code>となっている。
 <strong>「管理＞ユーザー」からユーザ<code>admin</code>のパスワードを必ず変更する。</strong></p>
@@ -478,7 +478,7 @@ server {
 </ul>
 <h4>ワークフロー</h4>
 <p>全部のトラッカーに関してステータスを相互に変更できるように設定する。使い方にもよるが、基本的には非メンバや匿名ユーザは変更できないようにしてしまって問題ない。</p>
-<h2>Backlogsの組込み</h2>
+<h3>Backlogsの組込み</h3>
 <p>最新版を取得してくる。</p>
 <div class="highlight"><pre>% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s2">&quot;sudo -u redmine&quot;</span>
 % <span class="nb">cd</span> /home/redmine/redmine/plugins
@@ -588,8 +588,8 @@ Choose one from above <span class="o">(</span>or choose none to create a new tra
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -598,8 +598,18 @@ Choose one from above <span class="o">(</span>or choose none to create a new tra
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -613,18 +623,8 @@ Choose one from above <span class="o">(</span>or choose none to create a new tra
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/blog.html">
-                            blog
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/info.html">
                             info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/efi.html">
-                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -633,8 +633,8 @@ Choose one from above <span class="o">(</span>or choose none to create a new tra
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
+                        <a href="http://pman0214.github.io/blog/tag/blog.html">
+                            blog
                         </a>
                     </li>
                 </ul>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 21 May 2015 12:18:00 +0900</lastBuildDate><item><title>RedmineをGitHubと連携させる</title><link>http://pman0214.github.io/blog/redmine-github.html</link><description>&lt;h1&gt;概要&lt;/h1&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 21 May 2015 12:18:00 +0900</lastBuildDate><item><title>RedmineをGitHubと連携させる</title><link>http://pman0214.github.io/blog/redmine-github.html</link><description>&lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;&lt;a href="/blog/redmine-install.html"&gt;先日インストールしたRedmine&lt;/a&gt;だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。&lt;/p&gt;
 &lt;p&gt;svnレポジトリの場合はユーザ名・パスワードを使って自動的にcheckoutできるようなのだが、gitレポジトリではそれができないようだ。
 具体的には、gitの場合にはシステム上、すなわちサーバ上に存在するレポジトリのみを登録できるようになっている。いまだ開発途上ということだろう。&lt;/p&gt;
 &lt;p&gt;このため、GitHubと連携させるためには一手間が必要となる。&lt;/p&gt;
-&lt;h1&gt;Redmineへのweb-hookプラグインの導入&lt;/h1&gt;
+&lt;h2&gt;Redmineへのweb-hookプラグインの導入&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;git&lt;/code&gt;が入っていなかったら&lt;code&gt;sudo apt-get install git-core&lt;/code&gt;で導入しておく。&lt;/p&gt;
 &lt;p&gt;GitHubからのweb-hookを使うためにはjsonを処理する必要があるため、json用のgemを導入しておく。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;alias &lt;/span&gt;&lt;span class="nv"&gt;sr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
@@ -32,7 +32,7 @@ gem &lt;span class="s2"&gt;&amp;quot;json&amp;quot;&lt;/span&gt; ← ★追加�
 
 
 &lt;p&gt;Redmineに管理者アカウントでログインすれば、管理＞プラグインで&lt;code&gt;Redmine Github Hook plugin&lt;/code&gt;が見えるはず。&lt;/p&gt;
-&lt;h1&gt;RedmineでのGitHubレポジトリの追加&lt;/h1&gt;
+&lt;h2&gt;RedmineでのGitHubレポジトリの追加&lt;/h2&gt;
 &lt;p&gt;GitHubのレポジトリを直接持ってくることはできないため、サーバ上でcloneしておく必要がある。
 ここでは非公開レポジトリを想定してデプロイキーを使ってcloneすることにする。&lt;/p&gt;
 &lt;p&gt;まずはssh鍵を作成。nginx+unicornでredmineを起動しているので、redmineを実行しているユーザは&lt;code&gt;redmine&lt;/code&gt;である。
@@ -59,7 +59,7 @@ ssh鍵の作成ではパスフレーズを設定してはいけない。&lt;/p&g
 この時点でレポジトリが表示できるはず。&lt;/p&gt;
 &lt;p&gt;あとはGitHubにweb-hookを登録すればOK。ここから未テスト。
 URLは&lt;code&gt;http(s)://debianサーバ/github_hook?project_id=[プロジェクトの識別子]&lt;/code&gt;とする。
-当然ながらdebianサーバは外部からアクセスできるように設定しておく。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Thu, 21 May 2015 12:18:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-21:blog/redmine-github.html</guid><category>redmine</category><category>github</category></item><item><title>Debian jessieにRedmineをインストールする</title><link>http://pman0214.github.io/blog/redmine-install.html</link><description>&lt;h1&gt;環境&lt;/h1&gt;
+当然ながらdebianサーバは外部からアクセスできるように設定しておく。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Thu, 21 May 2015 12:18:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-21:blog/redmine-github.html</guid><category>redmine</category><category>github</category></item><item><title>Debian jessieにRedmineをインストールする</title><link>http://pman0214.github.io/blog/redmine-install.html</link><description>&lt;h2&gt;環境&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;debian jessie 8.0&lt;ul&gt;
 &lt;li&gt;debianマシンはすでに用意してあるものとする。&lt;/li&gt;
@@ -68,8 +68,8 @@ URLは&lt;code&gt;http(s)://debianサーバ/github_hook?project_id=[プロジェ
 &lt;li&gt;redmine 2.6.5&lt;/li&gt;
 &lt;li&gt;backlogs 1.0.6&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h1&gt;手順&lt;/h1&gt;
-&lt;h2&gt;redmine本体&lt;/h2&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;h3&gt;redmine本体&lt;/h3&gt;
 &lt;p&gt;必要なツール類をインストールする。MySQLを使うことが多いのだが、個人的な好みによりPostgreSQLを使用することにする。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev &lt;span class="se"&gt;\&lt;/span&gt;
   make build-essential gcc &lt;span class="se"&gt;\&lt;/span&gt;
@@ -157,7 +157,7 @@ Select Language: ja ← ★日本語を指定
 
 &lt;p&gt;この状態で&lt;code&gt;http://debianサーバ:3000/&lt;/code&gt;に接続して、redmineが見られればOK。
 Ctrl-Cでサーバを停止できる。&lt;/p&gt;
-&lt;h2&gt;ログ消去&lt;/h2&gt;
+&lt;h3&gt;ログ消去&lt;/h3&gt;
 &lt;p&gt;ログが永遠に作成されたら嫌なので、logrotateを使って自動的に消去する。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/logrotate.d/redmine
 &lt;/pre&gt;&lt;/div&gt;
@@ -179,7 +179,7 @@ Ctrl-Cでサーバを停止できる。&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;h1&gt;nginx + unicornにする&lt;/h1&gt;
+&lt;h2&gt;nginx + unicornにする&lt;/h2&gt;
 &lt;p&gt;WEBrickを使うのはアレなのでnginxに乗っける。&lt;/p&gt;
 &lt;p&gt;まずはunicornをbundleする。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% sr vi Gemfile.local
@@ -394,8 +394,8 @@ server {
 
 
 &lt;p&gt;この状態で&lt;code&gt;http://debianサーバ/&lt;/code&gt;でredmineにアクセスできるはず。&lt;/p&gt;
-&lt;h1&gt;Backlogsプラグイン&lt;/h1&gt;
-&lt;h2&gt;Redminの設定&lt;/h2&gt;
+&lt;h2&gt;Backlogsプラグイン&lt;/h2&gt;
+&lt;h3&gt;Redmineの設定&lt;/h3&gt;
 &lt;p&gt;Backlogsの導入時にはBacklogs用のトラッカーを設定する必要があるので、Redmineの設定をしておく。&lt;/p&gt;
 &lt;p&gt;まずはRedmineにログインする。管理者の初期設定は、ユーザ・パスワードともに&lt;code&gt;admin&lt;/code&gt;となっている。
 &lt;strong&gt;「管理＞ユーザー」からユーザ&lt;code&gt;admin&lt;/code&gt;のパスワードを必ず変更する。&lt;/strong&gt;&lt;/p&gt;
@@ -424,7 +424,7 @@ server {
 &lt;/ul&gt;
 &lt;h4&gt;ワークフロー&lt;/h4&gt;
 &lt;p&gt;全部のトラッカーに関してステータスを相互に変更できるように設定する。使い方にもよるが、基本的には非メンバや匿名ユーザは変更できないようにしてしまって問題ない。&lt;/p&gt;
-&lt;h2&gt;Backlogsの組込み&lt;/h2&gt;
+&lt;h3&gt;Backlogsの組込み&lt;/h3&gt;
 &lt;p&gt;最新版を取得してくる。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;alias &lt;/span&gt;&lt;span class="nv"&gt;sr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sudo -u redmine&amp;quot;&lt;/span&gt;
 % &lt;span class="nb"&gt;cd&lt;/span&gt; /home/redmine/redmine/plugins
@@ -469,9 +469,9 @@ Choose one from above &lt;span class="o"&gt;(&lt;/span&gt;or choose none to crea
   &lt;span class="l-Scalar-Plain"&gt;Filesystem&lt;/span&gt;                     
 &lt;span class="l-Scalar-Plain"&gt;Redmine plugins&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
   &lt;span class="l-Scalar-Plain"&gt;redmine_backlogs               v1.0.6&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Sat, 16 May 2015 15:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-16:blog/redmine-install.html</guid><category>redmine</category><category>debian</category><category>backlogs</category></item><item><title>virtualenv環境のpythonをcronで呼ぶ</title><link>http://pman0214.github.io/blog/cron-python-virtualenv.html</link><description>&lt;h1&gt;概要&lt;/h1&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Sat, 16 May 2015 15:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-16:blog/redmine-install.html</guid><category>redmine</category><category>debian</category><category>backlogs</category></item><item><title>virtualenv環境のpythonをcronで呼ぶ</title><link>http://pman0214.github.io/blog/cron-python-virtualenv.html</link><description>&lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;virtualenv環境で開発したPythonスクリプトをcronで呼び出したいとき、ライブラリとかをどうやって指定するのか分からなかったので考えてみた。&lt;/p&gt;
-&lt;h1&gt;結論&lt;/h1&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
 &lt;p&gt;以下のようなスクリプトを作っておき、これを呼び出せばOK。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/sh&lt;/span&gt;
 
@@ -482,14 +482,14 @@ python &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/hoge.pyc
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;h1&gt;解説というほどでもないけど&lt;/h1&gt;
+&lt;h2&gt;解説というほどでもないけど&lt;/h2&gt;
 &lt;p&gt;要するに、普段やっている&lt;code&gt;source bin/activate&lt;/code&gt;を呼んでおけばいいという話。&lt;/p&gt;
 &lt;p&gt;なので上記のようなスクリプトを書いておけば対応できる。
 引数がある場合にはスクリプトに引数を付ければOK。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;crontab -e&lt;/code&gt;で上記スクリプトの呼び出しを追加すれば試合終了。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;# m h dom mon dow       command
 10 4 * * *              /usr/local/bin/hoge
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 06 May 2015 18:58:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-06:blog/cron-python-virtualenv.html</guid><category>python</category><category>cron</category><category>virtualenv</category></item><item><title>EFIブートするUSBメモリでdebianをインストール</title><link>http://pman0214.github.io/blog/debian-install-efi.html</link><description>&lt;h1&gt;概要&lt;/h1&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 06 May 2015 18:58:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-05-06:blog/cron-python-virtualenv.html</guid><category>python</category><category>cron</category><category>virtualenv</category></item><item><title>EFIブートするUSBメモリでdebianをインストール</title><link>http://pman0214.github.io/blog/debian-install-efi.html</link><description>&lt;h2&gt;概要&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;EFIブートするUSBメモリを作成し、これを使ってdebianをインストールする。&lt;/li&gt;
 &lt;li&gt;古いXserveをdebian化しようとした中での例。&lt;ul&gt;
@@ -498,7 +498,7 @@ python &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/hoge.pyc
 &lt;/li&gt;
 &lt;li&gt;grubを導入したUSBメモリを用意してしまえば、カーネルや初期RAMディスク、ISOイメージを書き換えるだけでよくなる。この作業はUSBメモリのファイルを書き換えるだけなので、debian機は不要。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h1&gt;必要なもの&lt;/h1&gt;
+&lt;h2&gt;必要なもの&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;2GBくらいのUSBメモリ&lt;ul&gt;
 &lt;li&gt;中身は完全に消える。&lt;/li&gt;
@@ -509,8 +509,8 @@ python &lt;span class="nv"&gt;$PROG_DIR&lt;/span&gt;/hoge.pyc
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;h1&gt;手順&lt;/h1&gt;
-&lt;h2&gt;grubの準備&lt;/h2&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;h3&gt;grubの準備&lt;/h3&gt;
 &lt;p&gt;まずは母艦となるdebianでEFI対応のgrubを用意する。インストールしたいアーキテクチャに合わせたものを用意する。今回はx86の64bit版で。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;sudo apt-get install grub-efi-x86_64-bin
 &lt;/pre&gt;&lt;/div&gt;
@@ -599,7 +599,7 @@ menuentry &amp;quot;Debian Install&amp;quot; {
 
 
 &lt;p&gt;これでgrubの準備は完了。&lt;/p&gt;
-&lt;h2&gt;debianインストーラの導入&lt;/h2&gt;
+&lt;h3&gt;debianインストーラの導入&lt;/h3&gt;
 &lt;p&gt;自分はいつも&lt;a href="https://www.debian.org/devel/debian-installer/"&gt;debian開発者ページ（？）&lt;/a&gt;からインストーラを取得している。
 ここで手に入るのはtesting版。だと思う。日次スナップショットはうまく起動しない場合もあるので注意。&lt;/p&gt;
 &lt;p&gt;「その他のイメージ＞インストール先アーキテクチャ＞hd-media」とたどる。&lt;/p&gt;
@@ -628,7 +628,7 @@ menuentry &amp;quot;Debian Install&amp;quot; {
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h1&gt;インストールはどうやるの？&lt;/h1&gt;
+&lt;h2&gt;インストールはどうやるの？&lt;/h2&gt;
 &lt;p&gt;普通にUSBメモリからEFIで起動させればOK。&lt;/p&gt;
 &lt;p&gt;インストーラでパーティションを切るときに、EFI用のディレクトリを作成しないとダメ。100MBくらいで十分なはずだけど、200MBくらいを確保している。&lt;/p&gt;
 &lt;p&gt;Windowsが入っているマシンとかに後からdebianを追加するときは、すでにあるEFIシステムパーティションが利用できる。もちろん、WindowsがEFIブートでインストールされていれば、の話だが。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Thu, 30 Apr 2015 12:55:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-04-30:blog/debian-install-efi.html</guid><category>debian</category><category>efi</category></item><item><title>Pelican+GitHub Pagesでブログ引っ越し</title><link>http://pman0214.github.io/blog/pelican-blog-github.html</link><description>&lt;p&gt;これまで&lt;a href="http://pman0214.blog37.fc2.com/"&gt;FC2ブログ&lt;/a&gt;にお世話になってきたが、&lt;/p&gt;
@@ -639,14 +639,14 @@ menuentry &amp;quot;Debian Install&amp;quot; {
 &lt;p&gt;などの理由からGitHub Pagesを使うことにした。
 あんまり書かないかもしれないけど・・・。&lt;/p&gt;
 &lt;p&gt;ともあれ、Pelicanを使ってこのブログを構築したので、そのときのメモ。&lt;/p&gt;
-&lt;h1&gt;Pelicanを使ったブログ構築作業&lt;/h1&gt;
-&lt;h2&gt;概要&lt;/h2&gt;
+&lt;h2&gt;Pelicanを使ったブログ構築作業&lt;/h2&gt;
+&lt;h3&gt;概要&lt;/h3&gt;
 &lt;p&gt;このブログはPelicanを使って静的ページを構成している。
 生成に使用したソースを公開するのは気が引けるので、生成したhtmlファイル群だけを公開することとした。
 このためにちょっと特殊な使い方をしている。&lt;/p&gt;
-&lt;h2&gt;前提&lt;/h2&gt;
+&lt;h3&gt;前提&lt;/h3&gt;
 &lt;p&gt;pythonやvirtualenv、makeなどは導入されているものとする。&lt;/p&gt;
-&lt;h2&gt;構築&lt;/h2&gt;
+&lt;h3&gt;構築&lt;/h3&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;ローカルマシンにpelican用の環境を構築。&lt;/p&gt;
@@ -768,7 +768,7 @@ pip install mdx_del_ins
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2&gt;試しに記事を書いてみる&lt;/h2&gt;
+&lt;h3&gt;試しに記事を書いてみる&lt;/h3&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;記事は&lt;code&gt;content&lt;/code&gt;の下に配置する。&lt;/p&gt;
@@ -819,7 +819,7 @@ Summary: この記事の要約。
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2&gt;テーマの変更&lt;/h2&gt;
+&lt;h3&gt;テーマの変更&lt;/h3&gt;
 &lt;p&gt;デフォルトはブログっぽくないので変更する。&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;テーマを検討する。&lt;a href="http://pelicanthemes.com/"&gt;Pelican Themes&lt;/a&gt;で確認できる。&lt;/li&gt;
@@ -859,7 +859,7 @@ git submodule update blue-penguin
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2&gt;公開用レポジトリの設定&lt;/h2&gt;
+&lt;h3&gt;公開用レポジトリの設定&lt;/h3&gt;
 &lt;ol&gt;
 &lt;li&gt;GitHubに&lt;code&gt;blog&lt;/code&gt;という名前のレポジトリを作成。ここに公開用のhtmlファイル群をpushする。自分は&lt;a href="https://github.com/pman0214/blog"&gt;https://github.com/pman0214/blog&lt;/a&gt;を作成した。&lt;/li&gt;
 &lt;li&gt;
@@ -906,7 +906,7 @@ git push origin gh-pages
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h1&gt;参考ページ&lt;/h1&gt;
+&lt;h2&gt;参考ページ&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://blog.sotm.jp/2014/01/04/Pelican-Markdown-GithubPages-install-guide/"&gt;Human as a Serviceな日々 - Pelican + Markdown + GitHub Pagesで管理するブログの作り方&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://mathamy.com/migrating-to-github-pages-using-pelican.html"&gt;Amy Hanlon - Migrating to GitHub Pages using Pelican&lt;/a&gt;&lt;/li&gt;

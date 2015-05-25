@@ -110,12 +110,12 @@ pLog            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <h1>概要</h1>
+                <h2>概要</h2>
 <p><a href="/blog/redmine-install.html">先日インストールしたRedmine</a>だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。</p>
 <p>svnレポジトリの場合はユーザ名・パスワードを使って自動的にcheckoutできるようなのだが、gitレポジトリではそれができないようだ。
 具体的には、gitの場合にはシステム上、すなわちサーバ上に存在するレポジトリのみを登録できるようになっている。いまだ開発途上ということだろう。</p>
 <p>このため、GitHubと連携させるためには一手間が必要となる。</p>
-<h1>Redmineへのweb-hookプラグインの導入</h1>
+<h2>Redmineへのweb-hookプラグインの導入</h2>
 <p><code>git</code>が入っていなかったら<code>sudo apt-get install git-core</code>で導入しておく。</p>
 <p>GitHubからのweb-hookを使うためにはjsonを処理する必要があるため、json用のgemを導入しておく。</p>
 <div class="highlight"><pre>% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s2">&quot;sudo -u redmine&quot;</span>
@@ -143,7 +143,7 @@ gem <span class="s2">&quot;json&quot;</span> ← ★追加する
 
 
 <p>Redmineに管理者アカウントでログインすれば、管理＞プラグインで<code>Redmine Github Hook plugin</code>が見えるはず。</p>
-<h1>RedmineでのGitHubレポジトリの追加</h1>
+<h2>RedmineでのGitHubレポジトリの追加</h2>
 <p>GitHubのレポジトリを直接持ってくることはできないため、サーバ上でcloneしておく必要がある。
 ここでは非公開レポジトリを想定してデプロイキーを使ってcloneすることにする。</p>
 <p>まずはssh鍵を作成。nginx+unicornでredmineを起動しているので、redmineを実行しているユーザは<code>redmine</code>である。
@@ -235,8 +235,8 @@ URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクト
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -245,8 +245,18 @@ URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクト
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -260,18 +270,8 @@ URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクト
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/blog.html">
-                            blog
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/info.html">
                             info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/efi.html">
-                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -280,8 +280,8 @@ URLは<code>http(s)://debianサーバ/github_hook?project_id=[プロジェクト
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
+                        <a href="http://pman0214.github.io/blog/tag/blog.html">
+                            blog
                         </a>
                     </li>
                 </ul>
