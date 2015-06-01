@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ja" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>EFIなマシンにソフトRAID1でDebianをインストール - pLog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://pman0214.github.io/blog/debian-efi-raid.html">
+
+        <meta name="author" content="pman0214" />
+        <meta name="keywords" content="debian,linux,efi,raid" />
+        <meta name="description" content="EFI起動のマシンにソフトウェアRAID1を組みつつDebianをインストールする手順。" />
+
+        <meta property="og:site_name" content="pLog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="EFIなマシンにソフトRAID1でDebianをインストール"/>
+        <meta property="og:url" content="http://pman0214.github.io/blog/debian-efi-raid.html"/>
+        <meta property="og:description" content="EFI起動のマシンにソフトウェアRAID1を組みつつDebianをインストールする手順。"/>
+        <meta property="article:published_time" content="2015-06-01" />
+            <meta property="article:section" content="技術" />
+            <meta property="article:tag" content="debian" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="efi" />
+            <meta property="article:tag" content="raid" />
+            <meta property="article:author" content="pman0214" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://pman0214.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://pman0214.github.io/blog/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css" type="text/css"/>
+
+        <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="pLog ATOM Feed"/>
+
+        <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate"
+              title="pLog RSS Feed"/>
+
+
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://pman0214.github.io/blog/" class="navbar-brand">
+pLog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="http://pman0214.github.io/blog/category/ji-shu.html">技術</a>
+                        </li>
+                        <li >
+                            <a href="http://pman0214.github.io/blog/category/ozhi-rase.html">お知らせ</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://pman0214.github.io/blog/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://pman0214.github.io/blog/debian-efi-raid.html"
+                       rel="bookmark"
+                       title="Permalink to EFIなマシンにソフトRAID1でDebianをインストール">
+                        EFIなマシンにソフトRAID1でDebianをインストール
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2015-06-01T17:30:00+09:00"> 月 01 6月 2015</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+        /
+	<a href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+        /
+	<a href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+        /
+	<a href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id1">
+<h2>概要</h2>
+<p>(U)EFIなマシンがよく分かっていない。
+が、時代の流れ的に(U)EFIなマシンにLinuxをインストールする必要が出てきた。
+この記事では、よく分かっていない(U)EFIなマシンにソフトRAIDを組みながらインストールするという無謀なことをやる。
+最近のソフトRAIDはRAID0,1くらいなら十分に実用になると聞いたので、ハードウェアのRAIDコントローラは導入せずにソフトウェアでRAID1を組むことにした。</p>
+<p>ちなみに、この記事はインストール完了後から書いているので、この通りにやって動くかどうかは分からん。
+トラブル発生時に自分で何とかできそうな人だけにオススメする。</p>
+</div>
+<div class="section" id="id2">
+<h2>ディスクの準備</h2>
+<p>当然ながら同じ容量（同じ型番が良いらしい。理由は知らん）のディスクを2台用意しないことには始まらない。</p>
+<p>今回は以下のように4台のディスクを用意した。</p>
+<ul class="simple">
+<li>500GB x 2台: システムのメインとして使用する</li>
+<li>3TB x 2台: ユーザデータ格納用として使用する</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h2>インストール</h2>
+<p>全ディスクをマシンに刺して、ディスクのパーティション設定時以外は普通にインストールすればいい。
+各ディスクは同じパーティション構成にしておく。
+自分の場合はこんな感じにした。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="21%" />
+<col width="25%" />
+<col width="24%" />
+<col width="16%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">ディスク</th>
+<th class="head">パーティション</th>
+<th class="head">サイズ</th>
+<th class="head">マウントポイント</th>
+<th class="head">タイプ</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td rowspan="4">500GB (1)</td>
+<td>/dev/sda1</td>
+<td>100M</td>
+<td>&nbsp;</td>
+<td>EFI system</td>
+</tr>
+<tr><td>/dev/sda2</td>
+<td>200M</td>
+<td>/boot</td>
+<td>ext4</td>
+</tr>
+<tr><td>/dev/sda5</td>
+<td>メモリと同じだけ</td>
+<td>&nbsp;</td>
+<td>swap</td>
+</tr>
+<tr><td>/dev/sda6</td>
+<td>残り全部</td>
+<td>/</td>
+<td>ext4</td>
+</tr>
+<tr><td rowspan="4">500GB (2)</td>
+<td>/dev/sdb1</td>
+<td>100M</td>
+<td>&nbsp;</td>
+<td>EFI system</td>
+</tr>
+<tr><td>/dev/sdb2</td>
+<td>200M</td>
+<td>/boot2</td>
+<td>ext4</td>
+</tr>
+<tr><td>/dev/sdb5</td>
+<td>メモリと同じだけ</td>
+<td>&nbsp;</td>
+<td>swap</td>
+</tr>
+<tr><td>/dev/sdb6</td>
+<td>残り全部</td>
+<td>&nbsp;</td>
+<td>ext4</td>
+</tr>
+<tr><td>3TB (1)</td>
+<td>/dev/sdc1</td>
+<td>全部</td>
+<td>&nbsp;</td>
+<td>ext4</td>
+</tr>
+<tr><td>3TB (2)</td>
+<td>/dev/sdd1</td>
+<td>全部</td>
+<td>&nbsp;</td>
+<td>ext4</td>
+</tr>
+</tbody>
+</table>
+<p>パーティション設定画面にRAIDを設定する部分があるので、ここでRAIDを設定する。
+EFIをRAIDに設定することはできないし、 <code>/boot</code> に関しては <code>grub-install</code> のときに悲惨な目に遭うとのことなので、自分で冗長化しておくことにした。</p>
+<p><code>/dev/sda6</code> と <code>/dev/sdb6</code> で <code>/dev/md0</code> を、<code>/dev/sdc1</code> と <code>/dev/sdd1</code> で <code>/dev/md1</code> をRAID1として設定する。</p>
+<p>スワップに関しては、別々のディスクにパーティションを設けていればRAID0とほぼ同じ効果を出すことができるのでRAIDの設定をしなくて良い。</p>
+<p>あとは <code>/dev/md0</code> を <code>/</code> に、 <code>/dev/md1</code> を <code>/home</code> などにマウントしてインストールを続行すればOK。</p>
+</div>
+<div class="section" id="id4">
+<h2>スワップを平等に使う</h2>
+<p>デフォルトの設定ではスワップが平等に使われないかもしれない。
+スワップの状態は <code>/proc/swaps</code> で確認できる。
+以下のように優先度（ <code>Priority</code> ）が同じであれば平等に使われることとなる。</p>
+<div class="highlight"><pre>% cat /proc/swaps
+Filename                                Type            Size    Used    Priority
+/dev/sdb5                               partition       <span class="m">15624188</span>        <span class="m">0</span>       1
+/dev/sda5                               partition       <span class="m">15624188</span>        <span class="m">0</span>       1
+</pre></div>
+<p>もしPriorityが異なる場合には、 <code>/etc/fstab</code> で <code>pri</code> オプションを使って優先度を指定する。</p>
+<div class="highlight"><pre>UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx none           swap      sw,pri=1      0   0
+UUID=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy none           swap      sw,pri=1      0   0
+</pre></div>
+</div>
+<div class="section" id="bootefi">
+<h2>/bootとEFIシステムパーティションの冗長化</h2>
+<p>まずは <code>/boot</code> を冗長化する。
+冗長化と言っても、壊れたときにデータを復元できるようにバックアップを取っているだけなので、故障時には復旧作業が必要になる。</p>
+<p>冗長化用のパーティションは <code>/boot2</code> としてマウントしてあるはずなので、ここに丸ごとコピーすればOK。
+ただし、 <code>/boot/efi</code> は別のパーティションなので除外する。
+マウントするためにディレクトリは作成しておく。</p>
+<div class="highlight"><pre>% sudo rsync --exclude <span class="s2">&quot;efi/&quot;</span> -avrz -e cp /boot/ /boot2/
+% sudo mkdir /boot2/efi
+</pre></div>
+<p>EFIシステムパーティションに関してはgrubをインストールすることで同じ内容のパーティションを作成できるが、念のためまったく同じ状態にしておく。
+後でgrubを使って上書きするので、この作業は必要ないかもしれない。</p>
+<div class="highlight"><pre>% sudo dd <span class="k">if</span><span class="o">=</span>/dev/sda1 <span class="nv">of</span><span class="o">=</span>/dev/sdb1
+</pre></div>
+<p>このままではUUIDまで同じになってしまうので、UUIDを書き換える。
+EFIシステムパーティションはvfatでフォーマットされているのだが、vfatのUUIDを書き換える方法が分からんのでddで無理矢理書き換える。</p>
+<p>バイナリエディタが必要になるのでbviを導入する。</p>
+<div class="highlight"><pre>% sudo apt-get install bvi
+</pre></div>
+<p>パーティションの先頭部分を書き出して、UUIDを変更してから書き戻す。
+0x43から4 byteがUUID。リトルエンディアン。
+他のディスクとUUIDが異なればいいので、普通は1 byte書き換えれば十分。
+各パーティションのUUIDは <code>ls -l /dev/disk/by-uuid</code> で確認できるので、これを見ると参考になるかも。
+ただし <code>dd</code> コマンド使用後は <code>/dev/sda1</code> と <code>/dev/sdb1</code> のUUIDが同じものになっていまっているため、この部分だけはうまく表示できない場合がある。</p>
+<div class="highlight"><pre>% sudo dd <span class="k">if</span><span class="o">=</span>/dev/sdb1 <span class="nv">of</span><span class="o">=</span>/tmp/blk <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span>1
+% sudo bvi /tmp/blk
+</pre></div>
+<p>これをディスクに書き戻す。</p>
+<div class="highlight"><pre>% sudo dd <span class="k">if</span><span class="o">=</span>/tmp/blk <span class="nv">of</span><span class="o">=</span>/dev/sdb1 <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span>1
+</pre></div>
+<p><code>/etc/fstab</code> も変更しておく。
+<code>/dev/sdb1</code> はマウントされてないと思われるので、 <code>dev/sda1</code> の行をコピーしてUUIDとマウント先を書き換えればOK。</p>
+<div class="highlight"><pre>UUID=xxxx-xxxx  /boot2/efi       vfat    umask=0077      0       1
+</pre></div>
+<p>UUIDを書き換えたので、念のため再起動しておく。
+<code>/etc/fstab</code> を書き換えたので <code>/boot2/efi</code> がマウントされるはず。</p>
+<p>あとはrootになって以下のような感じでgrubをインストールすればOK。
+<code>efivars</code> モジュールがロードされていればEFIブートマネージャ（？）にも登録される。
+すなわち、BIOSでブート順を指定するところに現れるようになる。</p>
+<div class="highlight"><pre>% sudo grub-install --target<span class="o">=</span>x86_64-efi --efi-directory<span class="o">=</span>/boot2/efi --bootloader-id<span class="o">=</span><span class="s2">&quot;debian (sub)&quot;</span> --recheck
+</pre></div>
+<p>EFIブートマネージャへの登録状況は、オプションなしで <code>efibootmgr</code> を実行すれば確認できる。</p>
+<div class="highlight"><pre>% sudo efibootmgr
+BootCurrent: 0000
+Timeout: <span class="m">1</span> seconds
+BootOrder: 0001,0000,0003,0006,000B
+Boot0000* debian
+Boot0001* debian <span class="o">(</span>sub<span class="o">)</span>
+Boot0003* UEFI: Built-in EFI Shell
+Boot0006* CD/DVD Drive
+Boot000B* Hard Drive
+</pre></div>
+<p><code>efivars</code> モジュールがロードされていなければ、以下のようにしてEFIブートマネージャに登録する。
+オプション類はmanを参照のこと。</p>
+<div class="highlight"><pre>% sudo efibootmgr -c -g -d /dev/sdb -p <span class="m">1</span> -L <span class="s2">&quot;debian (sub)&quot;</span> -l <span class="s1">&#39;\EFI\debian\grubx64.efi&#39;</span>
+</pre></div>
+</div>
+
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'pman0214-plog'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'debian-efi-raid';
+                var disqus_url = 'http://pman0214.github.io/blog/debian-efi-raid.html';
+
+            var disqus_config = function () {
+                this.language = "ja";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<div id="aboutme">
+    <p>
+        <strong>About pman0214</strong><br/>
+        ハードからソフトまで分かる研究者。そういうものに私はなりたい。
+    </p>
+</div>
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="https://www.facebook.com/pman0214"><i class="fa fa-facebook-square fa-lg"></i> facebook</a></li>
+                <li class="list-group-item"><a href="https://twitter.com/pman0214"><i class="fa fa-twitter-square fa-lg"></i> twitter</a></li>
+                <li class="list-group-item"><a href="https://github.com/pman0214"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+              </ul>
+            </li>
+
+
+
+            <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/python.html">
+                            python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/blog.html">
+                            blog
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/cron.html">
+                            cron
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/linux.html">
+                            linux
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/raid.html">
+                            raid
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
+                            virtualenv
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+      <ul class="list-group" id="links">
+        <li class="list-group-item">
+            <a href="http://www.f.ait.kyushu-u.ac.jp/~ishida/" target="_blank">
+                Research
+            </a>
+        </li>
+      </ul>
+    </li>
+    </ul>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2015 pman0214
+            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://pman0214.github.io/blog/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://pman0214.github.io/blog/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://pman0214.github.io/blog/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'pman0214-plog'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+
+</body>
+</html>

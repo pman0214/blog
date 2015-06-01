@@ -1,5 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 21 May 2015 12:18:00 +0900</lastBuildDate><item><title>RedmineをGitHubと連携させる</title><link>http://pman0214.github.io/blog/redmine-github.html</link><description>&lt;h2&gt;概要&lt;/h2&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 01 Jun 2015 00:00:00 +0900</lastBuildDate><item><title>EFIなマシンにソフトRAID1でDebianをインストール</title><link>http://pman0214.github.io/blog/debian-efi-raid.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;(U)EFIなマシンがよく分かっていない。
+が、時代の流れ的に(U)EFIなマシンにLinuxをインストールする必要が出てきた。
+この記事では、よく分かっていない(U)EFIなマシンにソフトRAIDを組みながらインストールするという無謀なことをやる。
+最近のソフトRAIDはRAID0,1くらいなら十分に実用になると聞いたので、ハードウェアのRAIDコントローラは導入せずにソフトウェアでRAID1を組むことにした。&lt;/p&gt;
+&lt;p&gt;ちなみに、この記事はインストール完了後から書いているので、この通りにやって動くかどうかは分からん。
+トラブル発生時に自分で何とかできそうな人だけにオススメする。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;ディスクの準備&lt;/h2&gt;
+&lt;p&gt;当然ながら同じ容量（同じ型番が良いらしい。理由は知らん）のディスクを2台用意しないことには始まらない。&lt;/p&gt;
+&lt;p&gt;今回は以下のように4台のディスクを用意した。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;500GB x 2台: システムのメインとして使用する&lt;/li&gt;
+&lt;li&gt;3TB x 2台: ユーザデータ格納用として使用する&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;インストール&lt;/h2&gt;
+&lt;p&gt;全ディスクをマシンに刺して、ディスクのパーティション設定時以外は普通にインストールすればいい。
+各ディスクは同じパーティション構成にしておく。
+自分の場合はこんな感じにした。&lt;/p&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="14%" /&gt;
+&lt;col width="21%" /&gt;
+&lt;col width="25%" /&gt;
+&lt;col width="24%" /&gt;
+&lt;col width="16%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head"&gt;ディスク&lt;/th&gt;
+&lt;th class="head"&gt;パーティション&lt;/th&gt;
+&lt;th class="head"&gt;サイズ&lt;/th&gt;
+&lt;th class="head"&gt;マウントポイント&lt;/th&gt;
+&lt;th class="head"&gt;タイプ&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td rowspan="4"&gt;500GB (1)&lt;/td&gt;
+&lt;td&gt;/dev/sda1&lt;/td&gt;
+&lt;td&gt;100M&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;EFI system&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;/dev/sda2&lt;/td&gt;
+&lt;td&gt;200M&lt;/td&gt;
+&lt;td&gt;/boot&lt;/td&gt;
+&lt;td&gt;ext4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;/dev/sda5&lt;/td&gt;
+&lt;td&gt;メモリと同じだけ&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;swap&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;/dev/sda6&lt;/td&gt;
+&lt;td&gt;残り全部&lt;/td&gt;
+&lt;td&gt;/&lt;/td&gt;
+&lt;td&gt;ext4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td rowspan="4"&gt;500GB (2)&lt;/td&gt;
+&lt;td&gt;/dev/sdb1&lt;/td&gt;
+&lt;td&gt;100M&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;EFI system&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;/dev/sdb2&lt;/td&gt;
+&lt;td&gt;200M&lt;/td&gt;
+&lt;td&gt;/boot2&lt;/td&gt;
+&lt;td&gt;ext4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;/dev/sdb5&lt;/td&gt;
+&lt;td&gt;メモリと同じだけ&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;swap&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;/dev/sdb6&lt;/td&gt;
+&lt;td&gt;残り全部&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;ext4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;3TB (1)&lt;/td&gt;
+&lt;td&gt;/dev/sdc1&lt;/td&gt;
+&lt;td&gt;全部&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;ext4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;3TB (2)&lt;/td&gt;
+&lt;td&gt;/dev/sdd1&lt;/td&gt;
+&lt;td&gt;全部&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;ext4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;パーティション設定画面にRAIDを設定する部分があるので、ここでRAIDを設定する。
+EFIをRAIDに設定することはできないし、 &lt;code&gt;/boot&lt;/code&gt; に関しては &lt;code&gt;grub-install&lt;/code&gt; のときに悲惨な目に遭うとのことなので、自分で冗長化しておくことにした。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/dev/sda6&lt;/code&gt; と &lt;code&gt;/dev/sdb6&lt;/code&gt; で &lt;code&gt;/dev/md0&lt;/code&gt; を、&lt;code&gt;/dev/sdc1&lt;/code&gt; と &lt;code&gt;/dev/sdd1&lt;/code&gt; で &lt;code&gt;/dev/md1&lt;/code&gt; をRAID1として設定する。&lt;/p&gt;
+&lt;p&gt;スワップに関しては、別々のディスクにパーティションを設けていればRAID0とほぼ同じ効果を出すことができるのでRAIDの設定をしなくて良い。&lt;/p&gt;
+&lt;p&gt;あとは &lt;code&gt;/dev/md0&lt;/code&gt; を &lt;code&gt;/&lt;/code&gt; に、 &lt;code&gt;/dev/md1&lt;/code&gt; を &lt;code&gt;/home&lt;/code&gt; などにマウントしてインストールを続行すればOK。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;スワップを平等に使う&lt;/h2&gt;
+&lt;p&gt;デフォルトの設定ではスワップが平等に使われないかもしれない。
+スワップの状態は &lt;code&gt;/proc/swaps&lt;/code&gt; で確認できる。
+以下のように優先度（ &lt;code&gt;Priority&lt;/code&gt; ）が同じであれば平等に使われることとなる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% cat /proc/swaps
+Filename                                Type            Size    Used    Priority
+/dev/sdb5                               partition       &lt;span class="m"&gt;15624188&lt;/span&gt;        &lt;span class="m"&gt;0&lt;/span&gt;       1
+/dev/sda5                               partition       &lt;span class="m"&gt;15624188&lt;/span&gt;        &lt;span class="m"&gt;0&lt;/span&gt;       1
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;もしPriorityが異なる場合には、 &lt;code&gt;/etc/fstab&lt;/code&gt; で &lt;code&gt;pri&lt;/code&gt; オプションを使って優先度を指定する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx none           swap      sw,pri=1      0   0
+UUID=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy none           swap      sw,pri=1      0   0
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bootefi"&gt;
+&lt;h2&gt;/bootとEFIシステムパーティションの冗長化&lt;/h2&gt;
+&lt;p&gt;まずは &lt;code&gt;/boot&lt;/code&gt; を冗長化する。
+冗長化と言っても、壊れたときにデータを復元できるようにバックアップを取っているだけなので、故障時には復旧作業が必要になる。&lt;/p&gt;
+&lt;p&gt;冗長化用のパーティションは &lt;code&gt;/boot2&lt;/code&gt; としてマウントしてあるはずなので、ここに丸ごとコピーすればOK。
+ただし、 &lt;code&gt;/boot/efi&lt;/code&gt; は別のパーティションなので除外する。
+マウントするためにディレクトリは作成しておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo rsync --exclude &lt;span class="s2"&gt;&amp;quot;efi/&amp;quot;&lt;/span&gt; -avrz -e cp /boot/ /boot2/
+% sudo mkdir /boot2/efi
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;EFIシステムパーティションに関してはgrubをインストールすることで同じ内容のパーティションを作成できるが、念のためまったく同じ状態にしておく。
+後でgrubを使って上書きするので、この作業は必要ないかもしれない。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/sda1 &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/sdb1
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このままではUUIDまで同じになってしまうので、UUIDを書き換える。
+EFIシステムパーティションはvfatでフォーマットされているのだが、vfatのUUIDを書き換える方法が分からんのでddで無理矢理書き換える。&lt;/p&gt;
+&lt;p&gt;バイナリエディタが必要になるのでbviを導入する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install bvi
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;パーティションの先頭部分を書き出して、UUIDを変更してから書き戻す。
+0x43から4 byteがUUID。リトルエンディアン。
+他のディスクとUUIDが異なればいいので、普通は1 byte書き換えれば十分。
+各パーティションのUUIDは &lt;code&gt;ls -l /dev/disk/by-uuid&lt;/code&gt; で確認できるので、これを見ると参考になるかも。
+ただし &lt;code&gt;dd&lt;/code&gt; コマンド使用後は &lt;code&gt;/dev/sda1&lt;/code&gt; と &lt;code&gt;/dev/sdb1&lt;/code&gt; のUUIDが同じものになっていまっているため、この部分だけはうまく表示できない場合がある。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/sdb1 &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/tmp/blk &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;512&lt;/span&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+% sudo bvi /tmp/blk
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これをディスクに書き戻す。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/tmp/blk &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/sdb1 &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;512&lt;/span&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;/etc/fstab&lt;/code&gt; も変更しておく。
+&lt;code&gt;/dev/sdb1&lt;/code&gt; はマウントされてないと思われるので、 &lt;code&gt;dev/sda1&lt;/code&gt; の行をコピーしてUUIDとマウント先を書き換えればOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;UUID=xxxx-xxxx  /boot2/efi       vfat    umask=0077      0       1
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;UUIDを書き換えたので、念のため再起動しておく。
+&lt;code&gt;/etc/fstab&lt;/code&gt; を書き換えたので &lt;code&gt;/boot2/efi&lt;/code&gt; がマウントされるはず。&lt;/p&gt;
+&lt;p&gt;あとはrootになって以下のような感じでgrubをインストールすればOK。
+&lt;code&gt;efivars&lt;/code&gt; モジュールがロードされていればEFIブートマネージャ（？）にも登録される。
+すなわち、BIOSでブート順を指定するところに現れるようになる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo grub-install --target&lt;span class="o"&gt;=&lt;/span&gt;x86_64-efi --efi-directory&lt;span class="o"&gt;=&lt;/span&gt;/boot2/efi --bootloader-id&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;debian (sub)&amp;quot;&lt;/span&gt; --recheck
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;EFIブートマネージャへの登録状況は、オプションなしで &lt;code&gt;efibootmgr&lt;/code&gt; を実行すれば確認できる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo efibootmgr
+BootCurrent: 0000
+Timeout: &lt;span class="m"&gt;1&lt;/span&gt; seconds
+BootOrder: 0001,0000,0003,0006,000B
+Boot0000* debian
+Boot0001* debian &lt;span class="o"&gt;(&lt;/span&gt;sub&lt;span class="o"&gt;)&lt;/span&gt;
+Boot0003* UEFI: Built-in EFI Shell
+Boot0006* CD/DVD Drive
+Boot000B* Hard Drive
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;efivars&lt;/code&gt; モジュールがロードされていなければ、以下のようにしてEFIブートマネージャに登録する。
+オプション類はmanを参照のこと。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo efibootmgr -c -g -d /dev/sdb -p &lt;span class="m"&gt;1&lt;/span&gt; -L &lt;span class="s2"&gt;&amp;quot;debian (sub)&amp;quot;&lt;/span&gt; -l &lt;span class="s1"&gt;&amp;#39;\EFI\debian\grubx64.efi&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 01 Jun 2015 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-01:blog/debian-efi-raid.html</guid><category>debian</category><category>linux</category><category>efi</category><category>raid</category></item><item><title>RedmineをGitHubと連携させる</title><link>http://pman0214.github.io/blog/redmine-github.html</link><description>&lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;&lt;a href="/blog/redmine-install.html"&gt;先日インストールしたRedmine&lt;/a&gt;だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。&lt;/p&gt;
 &lt;p&gt;svnレポジトリの場合はユーザ名・パスワードを使って自動的にcheckoutできるようなのだが、gitレポジトリではそれができないようだ。
 具体的には、gitの場合にはシステム上、すなわちサーバ上に存在するレポジトリのみを登録できるようになっている。いまだ開発途上ということだろう。&lt;/p&gt;
