@@ -265,7 +265,7 @@ EFIシステムパーティションはvfatでフォーマットされている�
 <div class="highlight"><pre>% sudo dd <span class="k">if</span><span class="o">=</span>/tmp/blk <span class="nv">of</span><span class="o">=</span>/dev/sdb1 <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span>1
 </pre></div>
 <p><code>/etc/fstab</code> も変更しておく。
-<code>/dev/sdb1</code> はマウントされてないと思われるので、 <code>dev/sda1</code> の行をコピーしてUUIDとマウント先を書き換えればOK。</p>
+<code>/dev/sdb1</code> はマウントされてないと思われるので、 <code>/dev/sda1</code> の行をコピーしてUUIDとマウント先を書き換えればOK。</p>
 <div class="highlight"><pre>UUID=xxxx-xxxx  /boot2/efi       vfat    umask=0077      0       1
 </pre></div>
 <p>UUIDを書き換えたので、念のため再起動しておく。
@@ -356,13 +356,8 @@ Boot000B* Hard Drive
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/efi.html">
-                            efi
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/python.html">
-                            python
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
@@ -371,13 +366,38 @@ Boot000B* Hard Drive
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/github.html">
-                            github
+                        <a href="http://pman0214.github.io/blog/tag/python.html">
+                            python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
+                            virtualenv
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/backlogs.html">
                             backlogs
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/linux.html">
+                            linux
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -391,28 +411,8 @@ Boot000B* Hard Drive
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/linux.html">
-                            linux
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/raid.html">
                             raid
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
-                            pelican
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/info.html">
-                            info
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
-                            virtualenv
                         </a>
                     </li>
                 </ul>

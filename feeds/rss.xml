@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 01 Jun 2015 00:00:00 +0900</lastBuildDate><item><title>EFIなマシンにソフトRAID1でDebianをインストール</title><link>http://pman0214.github.io/blog/debian-efi-raid.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 02 Jun 2015 11:05:00 +0900</lastBuildDate><item><title>EFIなマシンにソフトRAID1でDebianをインストール</title><link>http://pman0214.github.io/blog/debian-efi-raid.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;(U)EFIなマシンがよく分かっていない。
@@ -148,7 +148,7 @@ EFIシステムパーティションはvfatでフォーマットされている�
 &lt;div class="highlight"&gt;&lt;pre&gt;% sudo dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/tmp/blk &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/sdb1 &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;512&lt;/span&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;&lt;code&gt;/etc/fstab&lt;/code&gt; も変更しておく。
-&lt;code&gt;/dev/sdb1&lt;/code&gt; はマウントされてないと思われるので、 &lt;code&gt;dev/sda1&lt;/code&gt; の行をコピーしてUUIDとマウント先を書き換えればOK。&lt;/p&gt;
+&lt;code&gt;/dev/sdb1&lt;/code&gt; はマウントされてないと思われるので、 &lt;code&gt;/dev/sda1&lt;/code&gt; の行をコピーしてUUIDとマウント先を書き換えればOK。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;UUID=xxxx-xxxx  /boot2/efi       vfat    umask=0077      0       1
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;UUIDを書き換えたので、念のため再起動しておく。
@@ -174,7 +174,7 @@ Boot000B* Hard Drive
 &lt;div class="highlight"&gt;&lt;pre&gt;% sudo efibootmgr -c -g -d /dev/sdb -p &lt;span class="m"&gt;1&lt;/span&gt; -L &lt;span class="s2"&gt;&amp;quot;debian (sub)&amp;quot;&lt;/span&gt; -l &lt;span class="s1"&gt;&amp;#39;\EFI\debian\grubx64.efi&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 01 Jun 2015 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-01:blog/debian-efi-raid.html</guid><category>debian</category><category>linux</category><category>efi</category><category>raid</category></item><item><title>RedmineをGitHubと連携させる</title><link>http://pman0214.github.io/blog/redmine-github.html</link><description>&lt;h2&gt;概要&lt;/h2&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Tue, 02 Jun 2015 11:05:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-01:blog/debian-efi-raid.html</guid><category>debian</category><category>linux</category><category>efi</category><category>raid</category></item><item><title>RedmineをGitHubと連携させる</title><link>http://pman0214.github.io/blog/redmine-github.html</link><description>&lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;&lt;a href="/blog/redmine-install.html"&gt;先日インストールしたRedmine&lt;/a&gt;だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。&lt;/p&gt;
 &lt;p&gt;svnレポジトリの場合はユーザ名・パスワードを使って自動的にcheckoutできるようなのだが、gitレポジトリではそれができないようだ。
 具体的には、gitの場合にはシステム上、すなわちサーバ上に存在するレポジトリのみを登録できるようになっている。いまだ開発途上ということだろう。&lt;/p&gt;

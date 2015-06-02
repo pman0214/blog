@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-06-01T00:00:00+09:00</updated><entry><title>EFIなマシンにソフトRAID1でDebianをインストール</title><link href="http://pman0214.github.io/blog/debian-efi-raid.html" rel="alternate"></link><updated>2015-06-01T00:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-06-01:blog/debian-efi-raid.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-06-02T11:05:00+09:00</updated><entry><title>EFIなマシンにソフトRAID1でDebianをインストール</title><link href="http://pman0214.github.io/blog/debian-efi-raid.html" rel="alternate"></link><updated>2015-06-02T11:05:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-06-01:blog/debian-efi-raid.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;(U)EFIなマシンがよく分かっていない。
@@ -148,7 +148,7 @@ EFIシステムパーティションはvfatでフォーマットされている�
 &lt;div class="highlight"&gt;&lt;pre&gt;% sudo dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/tmp/blk &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/sdb1 &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;512&lt;/span&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;&lt;code&gt;/etc/fstab&lt;/code&gt; も変更しておく。
-&lt;code&gt;/dev/sdb1&lt;/code&gt; はマウントされてないと思われるので、 &lt;code&gt;dev/sda1&lt;/code&gt; の行をコピーしてUUIDとマウント先を書き換えればOK。&lt;/p&gt;
+&lt;code&gt;/dev/sdb1&lt;/code&gt; はマウントされてないと思われるので、 &lt;code&gt;/dev/sda1&lt;/code&gt; の行をコピーしてUUIDとマウント先を書き換えればOK。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;UUID=xxxx-xxxx  /boot2/efi       vfat    umask=0077      0       1
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;UUIDを書き換えたので、念のため再起動しておく。
