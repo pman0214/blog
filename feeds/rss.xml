@@ -1,5 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 02 Jun 2015 11:05:00 +0900</lastBuildDate><item><title>EFIなマシンにソフトRAID1でDebianをインストール</title><link>http://pman0214.github.io/blog/debian-efi-raid.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 03 Jun 2015 10:30:00 +0900</lastBuildDate><item><title>Raspberry Pi用のOpenWrtをビルドする</title><link>http://pman0214.github.io/blog/raspi-openwrt.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;Raspberry Piで動くOpenWrtをDebian 8.0でビルドする手順を概説する。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://openwrt.org/"&gt;OpenWrt&lt;/a&gt; は主にアクセスポイントなどを対象とした組込みLinuxディストリビューション。
+FONのAPなどで使われているらしい。
+Raspberry PiではRaspbianを動かすのが主流みたいだが、重いしSDの容量も大きくないとダメなのでちょっと使いたいときに不便。
+なのでOpenWrtを入れることにした。
+パッケージ類を入れまくらない限り、OpenWrtなら100Mもあれば動作させることが可能。
+あんまり小さい容量のSDカードは入手できない時代なので、自分は2GBのSDカードに書き込んだ。&lt;/p&gt;
+&lt;p&gt;別にビルドしなくてもバイナリは公開されているのだが、自分の欲しいパッケージを組み込んだり、設定をした状態のバイナリが欲しい場合はビルドが必須になるのでメモ。
+ImageBuilderを使えば上記のことは可能なような気もするが、まぁ気にしないことにする。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;前提&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Debian機はすでに用意してあるものとする。
+本記事執筆時点では8.0（jessie）が最新の安定版リリース。&lt;/li&gt;
+&lt;li&gt;ディスクの空き容量は少なくとも50GBくらい用意しておいた方が良い。
+カーネルをビルドすると意外と食う。
+ビルド完了時点でソースディレクトリは33GBを消費していた。
+この他にも必要なツール類を導入しないといけないため、ディスク容量は結構必要となる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h3&gt;ツールのインストール&lt;/h3&gt;
+&lt;p&gt;まず必要ツールをインストールする。
+Debianなので &lt;code&gt;apt-get&lt;/code&gt; すればOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get update
+% sudo apt-get install git-core build-essential libssl-dev &lt;span class="se"&gt;\&lt;/span&gt;
+libncurses5-dev unzip subversion gawk python gettext pkg-config &lt;span class="se"&gt;\&lt;/span&gt;
+zip openjdk-7-jdk openjdk-7-jre libxml-parser-perl mercurial &lt;span class="se"&gt;\&lt;/span&gt;
+zlib1g-dev sdcc bzr
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h3&gt;OpenWrtのビルド&lt;/h3&gt;
+&lt;p&gt;何はともあれソースを取得する。
+今回はこの記事執筆時点での最新版を入れることにする。
+意外と時間がかかるので注意。
+自分が取得したのは&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% git clone git://git.openwrt.org/openwrt.git
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;安定版リリースを使いたい場合には &lt;a class="reference external" href="http://wiki.openwrt.org/doc/howto/buildroot.exigence#downloading_sources"&gt;OpenWrtのドキュメント&lt;/a&gt; を参照のこと。&lt;/p&gt;
+&lt;p&gt;パッケージ類のソースはfeedで管理されているので、これを使って最新のソースを取得してくる。
+&lt;code&gt;feeds.conf&lt;/code&gt; を編集すればfeedを追加できる。
+&lt;code&gt;feeds.conf&lt;/code&gt; は最初は存在しないので、 &lt;code&gt;feeds.conf.default&lt;/code&gt; をコピーして使う。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd &lt;/span&gt;openwrt
+% ./scripts/feeds update -a
+% ./scripts/feeds install -a
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Raspberry Pi用のconfigを取得する。
+この記事執筆時点では14.07のものが最新なので、これを取得して足りない設定は自分で施す。
+元から &lt;code&gt;.config&lt;/code&gt; がある場合にも上書きしてしまう。
+gitから取ってきているので、復活させたければ &lt;code&gt;git checkout&lt;/code&gt; すればいい。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% wget http://downloads.openwrt.org/barrier_breaker/14.07/brcm2708/generic/config.brcm2708_generic
+% cp config.brcm2708_generic .config
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;必要となるパッケージのチェック。
+足りないパッケージがあったら適宜インストールすること。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make prereq
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;カーネルコンフィグを変更する。
+特に、Raspberry Pi2を使っている場合は &lt;code&gt;Subtarget&lt;/code&gt; を &lt;code&gt;BCM2709&lt;/code&gt; に変更しないと動かない（手元にRaspberry Pi2がないから未検証）。
+コンフィグを変更したら保存して終了すること。
+自分の好きなように変更して良い。
+当然のことだが、パッケージを減らせばビルドが速くなる。
+イメージサイズは組み込むパッケージ数に依存するので、ビルドしたから必ず大きくなるとは限らない。
+ImageBuilderをビルドしておくと単一のパッケージをビルドしたり組み込むパッケージや設定を変更してイメージを作成したりできるので便利。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make menuconfig
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;あとはmakeするだけなのだが、configファイルを配置したイメージをビルドしたい場合には &lt;code&gt;package/base-files/files/&lt;/code&gt; に配置しておく。
+個人的には、設定ファイルを配置したイメージはImageBuilderをビルドしてから作る方が良いように思う。&lt;/p&gt;
+&lt;p&gt;makeする。
+CPU数が分かっている場合は &lt;code&gt;-j&lt;/code&gt; オプションで指定するとmakeが速くなるかも。
+エラーが出た場合は &lt;code&gt;make -j1 V=s&lt;/code&gt; とするとエラーを見ることができる。
+もちろん最初から指定しておいてもOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make -j5
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;初めてmakeするときは色々なソースコードを取得してくるのでとてつもなく時間がかかる。
+ネットワーク（特に相手側）の速度に依存するため、マシンが速くても速くはならない。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;make -j5&lt;/code&gt; などとしているとビルドに失敗するときがある。
+&lt;code&gt;make -j1 V=s&lt;/code&gt; で試せばエラーが分かる、と表示されるので実行してみると今度はエラーが起きなくなる。
+謎だ。&lt;/p&gt;
+&lt;p&gt;ソースコードの取得に失敗してエラー終了した場合には、時間を空けてトライするとmakeに成功するかも。
+時間を空けてトライしてもダメなら当該パッケージを除外するのが楽な解決方法だ。
+自分の場合は依存関係が間違っている場合も何度かあった。
+その場合は当該パッケージのMakefileを修正してしまった。
+ビルドするパッケージによって他にもツールが必要となる場合があるので、エラーメッセージをよく見て足りないものを導入しながらmakeしていく。&lt;/p&gt;
+&lt;p&gt;この記事を書いている時点では、新しいリリースに向けてパッケージ類も変更中なのかたくさんのエラーに遭遇した。
+というわけで、現時点ではややハードルが高いかもしれない。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 03 Jun 2015 10:30:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-03:blog/raspi-openwrt.html</guid><category>linux</category><category>raspberry pi</category></item><item><title>EFIなマシンにソフトRAID1でDebianをインストール</title><link>http://pman0214.github.io/blog/debian-efi-raid.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;(U)EFIなマシンがよく分かっていない。
