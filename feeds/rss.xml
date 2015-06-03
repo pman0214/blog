@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 03 Jun 2015 10:30:00 +0900</lastBuildDate><item><title>Raspberry Pi用のOpenWrtをビルドする</title><link>http://pman0214.github.io/blog/raspi-openwrt.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 03 Jun 2015 19:00:00 +0900</lastBuildDate><item><title>カテゴリを整理しました</title><link>http://pman0214.github.io/blog/category-change.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;p&gt;ごちゃごちゃしてきたのでカテゴリを整理しました。&lt;/p&gt;
+&lt;p&gt;ついでに、このブログを生成するのに使っているツールPelicanは日本語のカテゴリをうまく処理してくれないので英語表記に変更しました。&lt;/p&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 03 Jun 2015 19:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-03:blog/category-change.html</guid><category>info</category><category>category</category></item><item><title>Raspberry Pi用のOpenWrtをビルドする</title><link>http://pman0214.github.io/blog/raspi-openwrt.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;Raspberry Piで動くOpenWrtをDebian 8.0でビルドする手順を概説する。&lt;/p&gt;
