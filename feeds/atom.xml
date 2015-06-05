@@ -715,7 +715,7 @@ Boot000B* Hard Drive
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 </summary><category term="debian"></category><category term="linux"></category><category term="efi"></category><category term="raid"></category></entry><entry><title>RedmineをGitHubと連携させる</title><link href="http://pman0214.github.io/blog/redmine-github.html" rel="alternate"></link><updated>2015-05-21T12:18:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-05-21:blog/redmine-github.html</id><summary type="html">&lt;h2&gt;概要&lt;/h2&gt;
-&lt;p&gt;&lt;a href="/blog/redmine-install.html"&gt;先日インストールしたRedmine&lt;/a&gt;だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://pman0214.github.io/blog/redmine-install.html"&gt;先日インストールしたRedmine&lt;/a&gt;だが、gitレポジトリの登録はできるものの、その機能は十分とは言えない状況だ。&lt;/p&gt;
 &lt;p&gt;svnレポジトリの場合はユーザ名・パスワードを使って自動的にcheckoutできるようなのだが、gitレポジトリではそれができないようだ。
 具体的には、gitの場合にはシステム上、すなわちサーバ上に存在するレポジトリのみを登録できるようになっている。いまだ開発途上ということだろう。&lt;/p&gt;
 &lt;p&gt;このため、GitHubと連携させるためには一手間が必要となる。&lt;/p&gt;
