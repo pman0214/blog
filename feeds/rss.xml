@@ -1,5 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 03 Jun 2015 19:00:00 +0900</lastBuildDate><item><title>カテゴリを整理しました</title><link>http://pman0214.github.io/blog/category-change.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 05 Jun 2015 17:00:00 +0900</lastBuildDate><item><title>Debian jessieでGitLabをRedmineと共存させる</title><link>http://pman0214.github.io/blog/debian-gitlab.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;環境&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;debian jessie 8.0&lt;ul&gt;
+&lt;li&gt;debianマシンはすでに用意してあるものとする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;gitlab 7.11&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;p&gt;GitLabのインストールは &lt;a class="reference external" href="https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/install/installation.md"&gt;公式の手順&lt;/a&gt; に従えばいい。
+ただし、Redmineと衝突してしまうので、nginxの設定によりサブドメインでGitLabを動かすこととする。&lt;/p&gt;
+&lt;p&gt;以下の手順では公式に書かれているパッケージを導入しているので、すでに入っていてインストールが不要なものも多数あるかもしれない。&lt;/p&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h3&gt;準備&lt;/h3&gt;
+&lt;p&gt;まずは必要ツールをインストールする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install build-essential zlib1g-dev libyaml-dev libssl-dev &lt;span class="se"&gt;\&lt;/span&gt;
+libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server &lt;span class="se"&gt;\&lt;/span&gt;
+redis-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev &lt;span class="se"&gt;\&lt;/span&gt;
+libicu-dev logrotate python-docutils pkg-config cmake nodejs git-core ruby
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Kerberosを使う場合にはこれもいるらしい。自分は不要なので無視した。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install libkrb5-dev
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;gitlabユーザを設定する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo adduser --disabled-login --gecos &lt;span class="s1"&gt;&amp;#39;GitLab&amp;#39;&lt;/span&gt; git
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="postgresql"&gt;
+&lt;h3&gt;PostgreSQLの設定&lt;/h3&gt;
+&lt;p&gt;ユーザとDBの作成。
+&lt;code&gt;password&lt;/code&gt; の部分は変更すること。
+記号を含むとうまく動かない場合があるので、記号を含まないパスワードの方がいいかもしれない。
+セキュリティ的にはアレだが。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install postgresql postgresql-client libpq-dev
+% sudo -u postgres psql
+postgres# CREATE ROLE gitlab WITH CREATEDB LOGIN ENCRYPTED PASSWORD &lt;span class="s1"&gt;&amp;#39;password&amp;#39;&lt;/span&gt; NOINHERIT VALID UNTIL &lt;span class="s1"&gt;&amp;#39;infinity&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+postgres# CREATE DATABASE gitlabhq_production OWNER gitlab&lt;span class="p"&gt;;&lt;/span&gt;
+postgres# &lt;span class="se"&gt;\q&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;試しにつないでみる。
+先ほど設定したパスワードで接続できればOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% psql -h localhost -d gitlabhq_production -U gitlab -W
+&lt;span class="nv"&gt;gitlabhq_production&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&amp;gt; &lt;span class="se"&gt;\q&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="redis"&gt;
+&lt;h3&gt;Redisサーバの導入&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;apt-get&lt;/code&gt; すればよろし。
+設定はそのままでOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install redis-server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;gitをredisグループに追加する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/group
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+redis:x:113:git   ← ★gitを追加する
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="gitlab"&gt;
+&lt;h3&gt;GitLabの導入&lt;/h3&gt;
+&lt;p&gt;まずはソースを落としてくる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/git
+% sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-ce.git -b 7-11-stable gitlab
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;設定する。 &lt;code&gt;host&lt;/code&gt; や &lt;code&gt;port&lt;/code&gt; 、 &lt;code&gt;email&lt;/code&gt; 関連を変更するだけでとりあえずはOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/git/gitlab
+% sudo -u git -H cp config/gitlab.yml.example config/gitlab.yml
+% sudo -u git -H vi config/gitlab.yml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;パーミッションをきちんと設定しろとか。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo chown -R git log/
+% sudo chown -R git tmp/
+% sudo chmod -R u+rwX,go-w log/
+% sudo chmod -R u+rwX tmp/
+% sudo chmod -R u+rwX tmp/pids/
+% sudo chmod -R u+rwX tmp/sockets/
+% sudo chmod -R u+rwX public/uploads
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Satelliteとかいうのが必要らしい。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git -H mkdir /home/git/gitlab-satellites
+% sudo chmod &lt;span class="m"&gt;750&lt;/span&gt; /home/git/gitlab-satellites
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;つづいてUnicorn。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git -H cp config/unicorn.rb.example config/unicorn.rb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Rack attack。よく分からん。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git -H cp config/initializers/rack_attack.rb.example config/initializers/rack_attack.rb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Redisの接続設定。
+設定の整合性が取れてないので、設定変更が必要。
+port 6379を使うように修正する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git -H cp config/resque.yml.example config/resque.yml
+% sudo vi config/resque.yml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="l-Scalar-Plain"&gt;production&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;redis://localhost:6379  ← ★port 6379を使うように修正する。&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="gitlabdb"&gt;
+&lt;h3&gt;GitLabのDB設定&lt;/h3&gt;
+&lt;p&gt;DBを設定する。
+production以外はコメントアウトしてしまってOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git cp config/database.yml.postgresql config/database.yml
+% sudo -u git -H chmod o-rwx config/database.yml
+% sudo vi config/database.yml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;production&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+&lt;span class="nn"&gt;...&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;username&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;gitlab&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;password&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;★自分で設定したもの&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;host&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;localhost&lt;/span&gt;
+&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Gemを導入してGitLab Shellをインストールする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git -H bundle install --deployment --without development &lt;span class="nb"&gt;test &lt;/span&gt;mysql aws kerberos
+% sudo -u git -H bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake gitlab:shell:install&lt;span class="o"&gt;[&lt;/span&gt;v2.6.3&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;REDIS_URL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;unix:/var/run/redis/redis.sock &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;必要があれば設定を変更する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /home/git/gitlab-shell/config.yml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;いよいよbundle。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git -H bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake gitlab:setup &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;最後にデフォルトの管理者アカウントが表示されるのでメモしておく。
+後で必ず変更すること。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="init"&gt;
+&lt;h3&gt;initスクリプトの配置&lt;/h3&gt;
+&lt;p&gt;テンプレートをコピーして使えばいいらしい。
+特殊な設定にしていない限りはそのままでOK。
+&lt;code&gt;update-rc.d&lt;/code&gt; で自動実行登録する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo cp lib/support/init.d/gitlab /etc/init.d/gitlab
+% sudo update-rc.d gitlab defaults 21
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;logrotateの設定も提供してくれているらしい。
+Redmineとはエラい違いだ。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo cp lib/support/logrotate/gitlab /etc/logrotate.d/gitlab
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;最終チェック。
+そしてコンパイル。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git -H bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake gitlab:env:info &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production
+
+System information
+System:         Debian 8.0
+Current User:   git
+Using RVM:      no
+Ruby Version:   2.1.5p273
+Gem Version:    2.2.2
+Bundler Version:1.10.3
+Rake Version:   10.4.2
+Sidekiq Version:3.3.0
+
+GitLab information
+Version:        7.11.4
+Revision:       b725318
+Directory:      /home/git/gitlab
+DB Adapter:     postgresql
+URL:            http://vegeta.f.ait.kyushu-u.ac.jp
+HTTP Clone URL: http://vegeta.f.ait.kyushu-u.ac.jp/some-project.git
+SSH Clone URL:  git@vegeta.f.ait.kyushu-u.ac.jp:some-project.git
+Using LDAP:     no
+Using Omniauth: no
+
+GitLab Shell
+Version:        2.6.3
+Repositories:   /home/git/repositories/
+Hooks:          /home/git/gitlab-shell/hooks/
+Git:            /usr/bin/git
+% sudo -u git -H bundle &lt;span class="nb"&gt;exec &lt;/span&gt;rake assets:precompile &lt;span class="nv"&gt;RAILS_ENV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;production
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;試しに起動してみる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/gitlab start
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;デフォルトでは &lt;code&gt;127.0.0.1:8080&lt;/code&gt; で起動しているので、サーバ上でブラウザを実行できればアクセスできる。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="nginx"&gt;
+&lt;h3&gt;Nginxに載せる&lt;/h3&gt;
+&lt;p&gt;なにはともあれnginxをインストール。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install nginx
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;nginx用の設定テンプレートも用意してくれている。
+素晴らしい。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo cp lib/support/nginx/gitlab /etc/nginx/sites-available/gitlab
+% sudo vi /etc/nginx/sites-available/gitlab
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Redmineと共存させるため、 &lt;code&gt;server_name&lt;/code&gt; は違うものにしておくことが必須。
+あとはIPv6でlistenしたくないなら &lt;code&gt;listen [::]:80 default_server&lt;/code&gt; はコメントアウトするか削除してしまう。&lt;/p&gt;
+&lt;p&gt;設定を有効化して、テスト。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /etc/nginx/sites-enabled/
+% sudo ln -s ../sites-available/gitlab ./
+% sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf &lt;span class="nb"&gt;test &lt;/span&gt;is successful
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;OKならnginxを再起動する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/nginx restart
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ブラウザからアクセスすれば見えるはず。&lt;/p&gt;
+&lt;p&gt;見えないときは、どこまで接続できているかによって見るログが変わってくる。
+nginxのリバースプロキシでgitlabに接続できないときは、unicorn関連の設定かnginxの設定、gitlabのエラーが見えたときは、gitlabのログを参照してデバッグすると良い。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Fri, 05 Jun 2015 17:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-05:blog/debian-gitlab.html</guid><category>debian</category><category>gitlab</category><category>redmine</category></item><item><title>カテゴリを整理しました</title><link>http://pman0214.github.io/blog/category-change.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;p&gt;ごちゃごちゃしてきたのでカテゴリを整理しました。&lt;/p&gt;
 &lt;p&gt;ついでに、このブログを生成するのに使っているツールPelicanは日本語のカテゴリをうまく処理してくれないので英語表記に変更しました。&lt;/p&gt;
 </description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 03 Jun 2015 19:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-03:blog/category-change.html</guid><category>info</category><category>category</category></item><item><title>Raspberry Pi用のOpenWrtをビルドする</title><link>http://pman0214.github.io/blog/raspi-openwrt.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
