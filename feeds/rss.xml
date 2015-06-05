@@ -151,7 +151,7 @@ include /etc/ldap/schema/samba.schema
 % sudo slaptest -f /etc/ldap/schema/samba.conf -F /tmp/ldap
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;これで &lt;code&gt;/tmp/ldap/cn=config/cn=schema/cn={4}samba.ldif&lt;/code&gt; というファイルができる。
-このままでは登録されてないそうなので、これを編集して手動で登録する。&lt;/p&gt;
+このままでは登録されないそうなので、これを編集して手動で登録する。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% sudo cp /tmp/ldap/cn&lt;span class="o"&gt;=&lt;/span&gt;config/cn&lt;span class="o"&gt;=&lt;/span&gt;schema/cn&lt;span class="o"&gt;={&lt;/span&gt;4&lt;span class="o"&gt;}&lt;/span&gt;samba.ldif /etc/ldap/schema/samba.ldif
 % sudo rm -rf /tmp/ldap
 % sudo vi /etc/ldap/schema/samba.ldif
