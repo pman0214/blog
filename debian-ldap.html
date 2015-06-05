@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ja" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Debian 8.0 (jessie)でLDAPサーバを構築 - pLog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://pman0214.github.io/blog/debian-ldap.html">
+
+        <meta name="author" content="pman0214" />
+        <meta name="keywords" content="linux,ldap" />
+        <meta name="description" content="Debian 8.0 (jessie)でLDAPサーバを構築する手順。" />
+
+        <meta property="og:site_name" content="pLog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Debian 8.0 (jessie)でLDAPサーバを構築"/>
+        <meta property="og:url" content="http://pman0214.github.io/blog/debian-ldap.html"/>
+        <meta property="og:description" content="Debian 8.0 (jessie)でLDAPサーバを構築する手順。"/>
+        <meta property="article:published_time" content="2015-06-05" />
+            <meta property="article:section" content="linux" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="ldap" />
+            <meta property="article:author" content="pman0214" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://pman0214.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://pman0214.github.io/blog/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css" type="text/css"/>
+
+        <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="pLog ATOM Feed"/>
+
+        <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate"
+              title="pLog RSS Feed"/>
+
+
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://pman0214.github.io/blog/" class="navbar-brand">
+pLog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                        <li >
+                            <a href="http://pman0214.github.io/blog/category/devel.html">Devel</a>
+                        </li>
+                        <li >
+                            <a href="http://pman0214.github.io/blog/category/info.html">Info</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://pman0214.github.io/blog/category/linux.html">Linux</a>
+                        </li>
+                        <li >
+                            <a href="http://pman0214.github.io/blog/category/python.html">Python</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://pman0214.github.io/blog/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://pman0214.github.io/blog/debian-ldap.html"
+                       rel="bookmark"
+                       title="Permalink to Debian 8.0 (jessie)でLDAPサーバを構築">
+                        Debian 8.0 (jessie)でLDAPサーバを構築
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2015-06-05T19:30:00+09:00"> 金 05 6月 2015</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+        /
+	<a href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id1">
+<h2>概要</h2>
+<p>Debian 8.0 (jessie)のslapdは2.4.40で、設定の仕方が今までとは異なるようなのでメモ。
+と言っても、昔の設定方法を知っているわけではないのだが。</p>
+<p>環境は以下の通り。</p>
+<div class="highlight"><pre>% cat /etc/debian_version
+8.0
+% uname -a
+Linux hoge 3.16.0-4-amd64 <span class="c">#1 SMP Debian 3.16.7-ckt9-3~deb8u1 (2015-04-24) x86_64 GNU/Linux</span>
+% /usr/sbin/slapd -V
+@<span class="o">(</span><span class="c">#) $OpenLDAP: slapd  (Apr 12 2015 14:28:03) $</span>
+        root@chimera:/tmp/buildd/openldap-2.4.40+dfsg/debian/build/servers/slapd
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h2>インストール</h2>
+<p>Debianなので <code>apt-get</code> するがよろし。
+管理者パスワードを聞かれるので設定する。
+<code>ldap-utils</code> はクライアントプログラムだけど、LDAPサーバにアクセスすることは多々あるため一緒に導入しておく。</p>
+<div class="highlight"><pre>% sudo apt-get install slapd ldap-utils
+</pre></div>
+<p>これで設定ファイルのひな形が <code>/etc/ldap</code> の下にできる。</p>
+<div class="highlight"><pre>% <span class="nb">cd</span> /etc/ldap
+% ls
+ldap.conf  sasl2/  schema/  slapd.d/
+</pre></div>
+<p>以前の <code>slapd</code> であれば <code>slapd.conf</code> というファイルを編集して設定していたらしいが、今のバージョンは設定もデータベース上に作成されるとのこと。
+これにより、設定を変更しても <code>slapd</code> を再起動させる必要がなくなるとかいう噂。</p>
+<p><code>ldap.conf</code> はクライアント（ <code>ldap-utils</code> ）の設定なので、先にいじっておく。
+この記事ではベースDNが <code>dc=hoge,dc=com</code> として作成したものとして説明する。</p>
+<div class="highlight"><pre>% sudo vi ldap.conf
+</pre></div>
+<div class="highlight"><pre>...
+BASE    dc=hoge,dc=com    ← ★追加する
+URI     ldap://localhost  ← ★追加する
+...
+</pre></div>
+<p>そしてdebianらしく <code>dpkg-reconfigure</code> で初期設定をしよう。
+インストール時の設定とぶつかることがあるので、データを全消去した状態から設定をスタートする。</p>
+<div class="highlight"><pre>% sudo /etc/init.d/slapd stop
+% sudo rm -rf /var/lib/ldap
+% sudo dpkg-reconfigure slapd
+</pre></div>
+<p>設定は以下のような感じだ。</p>
+<dl class="docutils">
+<dt>OpenLDAPサーバの設定を省略しますか？</dt>
+<dd>いいえ</dd>
+<dt>DNSドメイン名:</dt>
+<dd>自分の使っているドメイン名。これを元にしてベースDNが作成されるとのことだ。
+デフォルトはマシンのドメインを元に設定されているので、普通は変更する必要はない。</dd>
+<dt>組織名</dt>
+<dd>ベースDNの属性 <code>o</code> に入る組織名。</dd>
+<dt>管理者のパスワード</dt>
+<dd>LDAP管理者のパスワード。インストール時にも聞かれたと思うけど、再設定をしているのでもう1回入力しないとダメ。</dd>
+<dt>利用するデータベースバックエンド</dt>
+<dd>好きなやつでいいけど、とりあえず <code>MDB</code> で。</dd>
+<dt>slapdをパージしたときにデータベースを削除しますか？</dt>
+<dd>はい（slapdを消したらデータベースも不要だよね・・・）</dd>
+<dt>古いデータベースを移動しますか？</dt>
+<dd>新しくインストールしたのであれば「いいえ」でOK。
+古いマシンを再設定しているのであれば「はい」にしてバックアップをとるべし。</dd>
+<dt>LDAPv2プロトコルを許可しますか？</dt>
+<dd>イマドキなら「いいえ」にしたいのだが、古いシステムが生きててLDAPv2が必要なら「はい」にする。</dd>
+</dl>
+<p>とりあえず設定を見てみる。
+設定は <code>cn=config</code> に格納されている。
+<code>-Y EXTERNAL</code> と <code>-H ldapi:///</code> を指定することでシステムの認証を使ってアクセスできる。
+エラーなくずらずらっと表示されればOK。</p>
+<div class="highlight"><pre>% sudo ldapsearch -Y EXTERNAL -H ldapi:/// -LLL -b <span class="nv">cn</span><span class="o">=</span>config <span class="p">|</span> less
+</pre></div>
+</div>
+<div class="section" id="id3">
+<h2>初期設定</h2>
+<p>設定には <code>ldapvi</code> を使うことにするので、まずはこれをインストール。</p>
+<div class="highlight"><pre>% sudo apt-get install ldapvi
+</pre></div>
+<p>インストール時にベースDNとかを入力したので、データベースは作成されている。
+自分の場合は古いマシンから移行する目的でLDAPサーバを構築しているので、ルートDNを変更する。
+なぜインストール時に指定できないのか謎だ。</p>
+<div class="highlight"><pre>% sudo ldapvi -Y EXTERNAL -h ldapi:/// -b <span class="s1">&#39;olcDatabase={1}mdb,cn=config&#39;</span>
+</pre></div>
+<div class="highlight"><pre>...
+olcRootDN: cn=xxxxx,dc=hoge,dc=com
+...
+</pre></div>
+<div class="highlight"><pre>% ldapvi -D <span class="s2">&quot;cn=xxxxx,dc=hoge,dc=com&quot;</span> -b <span class="s2">&quot;dc=hoge,dc=com&quot;</span>
+★パスワード入力を求められたらパスワードを入力する
+</pre></div>
+<div class="highlight"><pre>1 cn=xxxxx,dc=hoge,dc=com ← ★ここを修正
+...
+cn: xxxxx ← ★ここも変更
+</pre></div>
+<p><code>olcDatabase={1}mdb,cn=config</code> の部分はインストールの最後で実行した確認コマンドの結果から探し出せば分かる。</p>
+</div>
+<div class="section" id="id4">
+<h2>設定</h2>
+<p>ここまで来ればインストール時に設定したパスワードを使ってデータベースを参照できるはず。
+パスワードなしで見える範囲も確認する。</p>
+<div class="highlight"><pre>% ldapsearch -x -LLL -D <span class="s2">&quot;cn=xxxxx,dc=hoge,dc=com&quot;</span> -W -b <span class="s2">&quot;dc=hoge,dc=com&quot;</span>
+Enter LDAP Password:  ← ★ここでインストール時に設定したパスワードを入力
+dn: <span class="nv">dc</span><span class="o">=</span>hoge,dc<span class="o">=</span>com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: yyyyyy
+dc: hoge
+
+dn: <span class="nv">cn</span><span class="o">=</span>xxxxx,dc<span class="o">=</span>hoge,dc<span class="o">=</span>com
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+description: LDAP administrator
+userPassword:: zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+cn: xxxxx
+
+% ldapsearch -x -LLL -b <span class="s2">&quot;dc=hoge,dc=com&quot;</span>  ★パスワードなしでアクセスしてみる
+dn: <span class="nv">dc</span><span class="o">=</span>hoge,dc<span class="o">=</span>com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: yyyyyy
+dc: hoge
+
+dn: <span class="nv">cn</span><span class="o">=</span>xxxxx,dc<span class="o">=</span>hoge,dc<span class="o">=</span>com
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+description: LDAP administrator
+cn: xxxxx
+</pre></div>
+<p>不要なものは <code>ldapvi</code> で消せばいい。
+自分の場合は <code>dn: cn=xxxxx,dc=hoge,dc=com</code> は不要なので消してしまった。
+configの方に設定してあればアクセスできるので十分だ。</p>
+</div>
+<div class="section" id="schema">
+<h2>schemaの追加</h2>
+<p>旧マシンの <code>/etc/ldap/schema</code> に対象のschemaファイルが存在する。
+使っているschemaを新マシンに持ってくる。
+自分の場合は <code>samba.schema</code> のschemaを使っていたので、これを <code>/etc/ldap/schema</code> に持ってきた。</p>
+<p>必要となるschemaファイルを記載したconfigファイルを作成し、 <code>slaptest</code> コマンドを使ってldifに変換する。
+configには依存関係にある全てのschemaを記載する。</p>
+<div class="highlight"><pre>% sudo vi /etc/ldap/schema/samba.conf
+</pre></div>
+<div class="highlight"><pre>include /etc/ldap/schema/core.schema
+include /etc/ldap/schema/cosine.schema
+include /etc/ldap/schema/nis.schema
+include /etc/ldap/schema/inetorgperson.schema
+include /etc/ldap/schema/samba.schema
+</pre></div>
+<div class="highlight"><pre>% sudo mkdir /tmp/ldap
+% sudo slaptest -f /etc/ldap/schema/samba.conf -F /tmp/ldap
+</pre></div>
+<p>これで <code>/tmp/ldap/cn=config/cn=schema/cn={4}samba.ldif</code> というファイルができる。
+このままでは登録されてないそうなので、これを編集して手動で登録する。</p>
+<div class="highlight"><pre>% sudo cp /tmp/ldap/cn<span class="o">=</span>config/cn<span class="o">=</span>schema/cn<span class="o">={</span>4<span class="o">}</span>samba.ldif /etc/ldap/schema/samba.ldif
+% sudo rm -rf /tmp/ldap
+% sudo vi /etc/ldap/schema/samba.ldif
+</pre></div>
+<div class="highlight"><pre># AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.  ★この2行は不要なので消してしまう
+# CRC32 xxxxxxxx
+dn: cn=samba,cn=schema,cn=config ← ★dnは変更する
+objectClass: olcSchemaConfig
+cn: samba                        ← ★cnも変更する
+...
+structuralObjectClass: olcSchemaConfig     ← ★これ以降の行は削除する
+entryUUID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+creatorsName: cn=config
+createTimestamp: YYYYmmddHHMMSSZ
+entryCSN: YYYYmmddHHMMSS.uuuuuuZ#000000#000#000000
+modifiersName: cn=config
+modifyTimestamp: YYYYmmddHHMMSSZ
+</pre></div>
+<p><code>ldapadd</code> で登録する。</p>
+<div class="highlight"><pre>% sudo ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/samba.ldif
+SASL/EXTERNAL authentication started
+SASL username: <span class="nv">gidNumber</span><span class="o">=</span>0+uidNumber<span class="o">=</span>0,cn<span class="o">=</span>peercred,cn<span class="o">=</span>external,cn<span class="o">=</span>auth
+SASL SSF: 0
+adding new entry <span class="s2">&quot;cn=samba,cn=schema,cn=config&quot;</span>
+</pre></div>
+<p>きちんと登録されているかを確認してみよう。</p>
+<div class="highlight"><pre>% sudo ldapsearch -Y EXTERNAL -H ldapi:/// -LLL -b <span class="s2">&quot;cn=schema,cn=config&quot;</span> dn
+SASL/EXTERNAL authentication started
+SASL username: <span class="nv">gidNumber</span><span class="o">=</span>0+uidNumber<span class="o">=</span>0,cn<span class="o">=</span>peercred,cn<span class="o">=</span>external,cn<span class="o">=</span>auth
+SASL SSF: 0
+dn: <span class="nv">cn</span><span class="o">=</span>schema,cn<span class="o">=</span>config
+
+dn: <span class="nv">cn</span><span class="o">={</span>0<span class="o">}</span>core,cn<span class="o">=</span>schema,cn<span class="o">=</span>config
+
+dn: <span class="nv">cn</span><span class="o">={</span>1<span class="o">}</span>cosine,cn<span class="o">=</span>schema,cn<span class="o">=</span>config
+
+dn: <span class="nv">cn</span><span class="o">={</span>2<span class="o">}</span>nis,cn<span class="o">=</span>schema,cn<span class="o">=</span>config
+
+dn: <span class="nv">cn</span><span class="o">={</span>3<span class="o">}</span>inetorgperson,cn<span class="o">=</span>schema,cn<span class="o">=</span>config
+
+dn: <span class="nv">cn</span><span class="o">={</span>4<span class="o">}</span>samba,cn<span class="o">=</span>schema,cn<span class="o">=</span>config
+</pre></div>
+<p>これでschemaが登録された。</p>
+</div>
+<div class="section" id="id5">
+<h2>アクセス権の設定</h2>
+<p>schemaを追加したところで、アクセス権を適切に設定する。
+旧マシンでは <code>/etc/ldap/slapd.conf</code> に書かれていた以下のような文を参考にして設定していく。</p>
+<div class="highlight"><pre>...
+access to dn.base=&quot;&quot;
+     by * read
+...
+</pre></div>
+<p>使用するデータベースのアクセス権（ <code>olcAccess</code> ）を変更する。
+旧マシンの <code>/etc/ldap/slapd.conf</code> に書かれている <code>access</code> 文のto以降を番号を付けながら順番に書いていけばいい。</p>
+<div class="highlight"><pre>% sudo ldapvi -Y EXTERNAL -h ldapi:/// -b <span class="s1">&#39;olcDatabase={1}mdb,cn=config&#39;</span>
+</pre></div>
+<div class="highlight"><pre>...
+olcAccess: {0}to attrs=hoge,fuga by self write by * auth
+olcAccess: {1}to dn.base=&quot;&quot; by * read
+olcAccess: {2}to * by * read
+...
+</pre></div>
+</div>
+<div class="section" id="id6">
+<h2>データの移行</h2>
+<p>ここまでできればデータの移行は簡単だ。
+旧マシンにおいて <code>slapcat</code> でデータをldifに吐き出し、これを追加すればいい。</p>
+<p>まずは旧マシンでldifを吐き出す。</p>
+<div class="highlight"><pre>% sudo slapcat -l dat.ldif
+</pre></div>
+<p><code>slapcat</code> が見つからない場合は <code>/usr/sbin/</code> などにあると思われるのでフルパス指定すればいい。</p>
+<p>次に <code>dat.ldif</code> を <code>scp</code> などで新マシンに持ってきて、以下のような感じで追加する。</p>
+<div class="highlight"><pre>% sudo slapadd -l dat.ldif
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h2>確認</h2>
+<p>最後に、きちんとデータを参照できるかを確認して完了だ。</p>
+<div class="highlight"><pre>% ldapsearch -h &lt;新マシン&gt; -x -b <span class="s2">&quot;dc=hoge,dc=com&quot;</span> <span class="p">|</span> wc -l
+% ldapsearch -h &lt;新マシン&gt; -x -W -D <span class="s2">&quot;cn=xxxxx,dc=hoge,dc=com&quot;</span> -b <span class="s2">&quot;dc=hoge,dc=com&quot;</span>
+</pre></div>
+</div>
+
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'pman0214-plog'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'debian-ldap';
+                var disqus_url = 'http://pman0214.github.io/blog/debian-ldap.html';
+
+            var disqus_config = function () {
+                this.language = "ja";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<div id="aboutme">
+    <p>
+        <strong>About pman0214</strong><br/>
+        ハードからソフトまで分かる研究者。そういうものに私はなりたい。
+    </p>
+</div>
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="https://www.facebook.com/pman0214"><i class="fa fa-facebook-square fa-lg"></i> facebook</a></li>
+                <li class="list-group-item"><a href="https://twitter.com/pman0214"><i class="fa fa-twitter-square fa-lg"></i> twitter</a></li>
+                <li class="list-group-item"><a href="https://github.com/pman0214"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+              </ul>
+            </li>
+
+
+
+            <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/linux.html">
+                            linux
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/python.html">
+                            python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/github.html">
+                            github
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/raspberry-pi.html">
+                            raspberry pi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
+                            ldap
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/gitlab.html">
+                            gitlab
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/blog.html">
+                            blog
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/category.html">
+                            category
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/raid.html">
+                            raid
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
+                            virtualenv
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/cron.html">
+                            cron
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+      <ul class="list-group" id="links">
+        <li class="list-group-item">
+            <a href="http://www.f.ait.kyushu-u.ac.jp/~ishida/" target="_blank">
+                Research
+            </a>
+        </li>
+      </ul>
+    </li>
+    </ul>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2015 pman0214
+            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://pman0214.github.io/blog/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://pman0214.github.io/blog/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://pman0214.github.io/blog/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'pman0214-plog'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+
+</body>
+</html>

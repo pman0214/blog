@@ -1,5 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 05 Jun 2015 18:00:00 +0900</lastBuildDate><item><title>Debian jessieでGitLabをRedmineと共存させる</title><link>http://pman0214.github.io/blog/debian-gitlab.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 05 Jun 2015 19:30:00 +0900</lastBuildDate><item><title>Debian 8.0 (jessie)でLDAPサーバを構築</title><link>http://pman0214.github.io/blog/debian-ldap.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;Debian 8.0 (jessie)のslapdは2.4.40で、設定の仕方が今までとは異なるようなのでメモ。
+と言っても、昔の設定方法を知っているわけではないのだが。&lt;/p&gt;
+&lt;p&gt;環境は以下の通り。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% cat /etc/debian_version
+8.0
+% uname -a
+Linux hoge 3.16.0-4-amd64 &lt;span class="c"&gt;#1 SMP Debian 3.16.7-ckt9-3~deb8u1 (2015-04-24) x86_64 GNU/Linux&lt;/span&gt;
+% /usr/sbin/slapd -V
+@&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="c"&gt;#) $OpenLDAP: slapd  (Apr 12 2015 14:28:03) $&lt;/span&gt;
+        root@chimera:/tmp/buildd/openldap-2.4.40+dfsg/debian/build/servers/slapd
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;インストール&lt;/h2&gt;
+&lt;p&gt;Debianなので &lt;code&gt;apt-get&lt;/code&gt; するがよろし。
+管理者パスワードを聞かれるので設定する。
+&lt;code&gt;ldap-utils&lt;/code&gt; はクライアントプログラムだけど、LDAPサーバにアクセスすることは多々あるため一緒に導入しておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install slapd ldap-utils
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで設定ファイルのひな形が &lt;code&gt;/etc/ldap&lt;/code&gt; の下にできる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /etc/ldap
+% ls
+ldap.conf  sasl2/  schema/  slapd.d/
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;以前の &lt;code&gt;slapd&lt;/code&gt; であれば &lt;code&gt;slapd.conf&lt;/code&gt; というファイルを編集して設定していたらしいが、今のバージョンは設定もデータベース上に作成されるとのこと。
+これにより、設定を変更しても &lt;code&gt;slapd&lt;/code&gt; を再起動させる必要がなくなるとかいう噂。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ldap.conf&lt;/code&gt; はクライアント（ &lt;code&gt;ldap-utils&lt;/code&gt; ）の設定なので、先にいじっておく。
+この記事ではベースDNが &lt;code&gt;dc=hoge,dc=com&lt;/code&gt; として作成したものとして説明する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi ldap.conf
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+BASE    dc=hoge,dc=com    ← ★追加する
+URI     ldap://localhost  ← ★追加する
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;そしてdebianらしく &lt;code&gt;dpkg-reconfigure&lt;/code&gt; で初期設定をしよう。
+インストール時の設定とぶつかることがあるので、データを全消去した状態から設定をスタートする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/slapd stop
+% sudo rm -rf /var/lib/ldap
+% sudo dpkg-reconfigure slapd
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;設定は以下のような感じだ。&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;OpenLDAPサーバの設定を省略しますか？&lt;/dt&gt;
+&lt;dd&gt;いいえ&lt;/dd&gt;
+&lt;dt&gt;DNSドメイン名:&lt;/dt&gt;
+&lt;dd&gt;自分の使っているドメイン名。これを元にしてベースDNが作成されるとのことだ。
+デフォルトはマシンのドメインを元に設定されているので、普通は変更する必要はない。&lt;/dd&gt;
+&lt;dt&gt;組織名&lt;/dt&gt;
+&lt;dd&gt;ベースDNの属性 &lt;code&gt;o&lt;/code&gt; に入る組織名。&lt;/dd&gt;
+&lt;dt&gt;管理者のパスワード&lt;/dt&gt;
+&lt;dd&gt;LDAP管理者のパスワード。インストール時にも聞かれたと思うけど、再設定をしているのでもう1回入力しないとダメ。&lt;/dd&gt;
+&lt;dt&gt;利用するデータベースバックエンド&lt;/dt&gt;
+&lt;dd&gt;好きなやつでいいけど、とりあえず &lt;code&gt;MDB&lt;/code&gt; で。&lt;/dd&gt;
+&lt;dt&gt;slapdをパージしたときにデータベースを削除しますか？&lt;/dt&gt;
+&lt;dd&gt;はい（slapdを消したらデータベースも不要だよね・・・）&lt;/dd&gt;
+&lt;dt&gt;古いデータベースを移動しますか？&lt;/dt&gt;
+&lt;dd&gt;新しくインストールしたのであれば「いいえ」でOK。
+古いマシンを再設定しているのであれば「はい」にしてバックアップをとるべし。&lt;/dd&gt;
+&lt;dt&gt;LDAPv2プロトコルを許可しますか？&lt;/dt&gt;
+&lt;dd&gt;イマドキなら「いいえ」にしたいのだが、古いシステムが生きててLDAPv2が必要なら「はい」にする。&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;とりあえず設定を見てみる。
+設定は &lt;code&gt;cn=config&lt;/code&gt; に格納されている。
+&lt;code&gt;-Y EXTERNAL&lt;/code&gt; と &lt;code&gt;-H ldapi:///&lt;/code&gt; を指定することでシステムの認証を使ってアクセスできる。
+エラーなくずらずらっと表示されればOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo ldapsearch -Y EXTERNAL -H ldapi:/// -LLL -b &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;config &lt;span class="p"&gt;|&lt;/span&gt; less
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;初期設定&lt;/h2&gt;
+&lt;p&gt;設定には &lt;code&gt;ldapvi&lt;/code&gt; を使うことにするので、まずはこれをインストール。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install ldapvi
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;インストール時にベースDNとかを入力したので、データベースは作成されている。
+自分の場合は古いマシンから移行する目的でLDAPサーバを構築しているので、ルートDNを変更する。
+なぜインストール時に指定できないのか謎だ。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo ldapvi -Y EXTERNAL -h ldapi:/// -b &lt;span class="s1"&gt;&amp;#39;olcDatabase={1}mdb,cn=config&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+olcRootDN: cn=xxxxx,dc=hoge,dc=com
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% ldapvi -D &lt;span class="s2"&gt;&amp;quot;cn=xxxxx,dc=hoge,dc=com&amp;quot;&lt;/span&gt; -b &lt;span class="s2"&gt;&amp;quot;dc=hoge,dc=com&amp;quot;&lt;/span&gt;
+★パスワード入力を求められたらパスワードを入力する
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;1 cn=xxxxx,dc=hoge,dc=com ← ★ここを修正
+...
+cn: xxxxx ← ★ここも変更
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;olcDatabase={1}mdb,cn=config&lt;/code&gt; の部分はインストールの最後で実行した確認コマンドの結果から探し出せば分かる。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;設定&lt;/h2&gt;
+&lt;p&gt;ここまで来ればインストール時に設定したパスワードを使ってデータベースを参照できるはず。
+パスワードなしで見える範囲も確認する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% ldapsearch -x -LLL -D &lt;span class="s2"&gt;&amp;quot;cn=xxxxx,dc=hoge,dc=com&amp;quot;&lt;/span&gt; -W -b &lt;span class="s2"&gt;&amp;quot;dc=hoge,dc=com&amp;quot;&lt;/span&gt;
+Enter LDAP Password:  ← ★ここでインストール時に設定したパスワードを入力
+dn: &lt;span class="nv"&gt;dc&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;hoge,dc&lt;span class="o"&gt;=&lt;/span&gt;com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: yyyyyy
+dc: hoge
+
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;xxxxx,dc&lt;span class="o"&gt;=&lt;/span&gt;hoge,dc&lt;span class="o"&gt;=&lt;/span&gt;com
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+description: LDAP administrator
+userPassword:: zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+cn: xxxxx
+
+% ldapsearch -x -LLL -b &lt;span class="s2"&gt;&amp;quot;dc=hoge,dc=com&amp;quot;&lt;/span&gt;  ★パスワードなしでアクセスしてみる
+dn: &lt;span class="nv"&gt;dc&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;hoge,dc&lt;span class="o"&gt;=&lt;/span&gt;com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: yyyyyy
+dc: hoge
+
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;xxxxx,dc&lt;span class="o"&gt;=&lt;/span&gt;hoge,dc&lt;span class="o"&gt;=&lt;/span&gt;com
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+description: LDAP administrator
+cn: xxxxx
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;不要なものは &lt;code&gt;ldapvi&lt;/code&gt; で消せばいい。
+自分の場合は &lt;code&gt;dn: cn=xxxxx,dc=hoge,dc=com&lt;/code&gt; は不要なので消してしまった。
+configの方に設定してあればアクセスできるので十分だ。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="schema"&gt;
+&lt;h2&gt;schemaの追加&lt;/h2&gt;
+&lt;p&gt;旧マシンの &lt;code&gt;/etc/ldap/schema&lt;/code&gt; に対象のschemaファイルが存在する。
+使っているschemaを新マシンに持ってくる。
+自分の場合は &lt;code&gt;samba.schema&lt;/code&gt; のschemaを使っていたので、これを &lt;code&gt;/etc/ldap/schema&lt;/code&gt; に持ってきた。&lt;/p&gt;
+&lt;p&gt;必要となるschemaファイルを記載したconfigファイルを作成し、 &lt;code&gt;slaptest&lt;/code&gt; コマンドを使ってldifに変換する。
+configには依存関係にある全てのschemaを記載する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/ldap/schema/samba.conf
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;include /etc/ldap/schema/core.schema
+include /etc/ldap/schema/cosine.schema
+include /etc/ldap/schema/nis.schema
+include /etc/ldap/schema/inetorgperson.schema
+include /etc/ldap/schema/samba.schema
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo mkdir /tmp/ldap
+% sudo slaptest -f /etc/ldap/schema/samba.conf -F /tmp/ldap
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで &lt;code&gt;/tmp/ldap/cn=config/cn=schema/cn={4}samba.ldif&lt;/code&gt; というファイルができる。
+このままでは登録されてないそうなので、これを編集して手動で登録する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo cp /tmp/ldap/cn&lt;span class="o"&gt;=&lt;/span&gt;config/cn&lt;span class="o"&gt;=&lt;/span&gt;schema/cn&lt;span class="o"&gt;={&lt;/span&gt;4&lt;span class="o"&gt;}&lt;/span&gt;samba.ldif /etc/ldap/schema/samba.ldif
+% sudo rm -rf /tmp/ldap
+% sudo vi /etc/ldap/schema/samba.ldif
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.  ★この2行は不要なので消してしまう
+# CRC32 xxxxxxxx
+dn: cn=samba,cn=schema,cn=config ← ★dnは変更する
+objectClass: olcSchemaConfig
+cn: samba                        ← ★cnも変更する
+...
+structuralObjectClass: olcSchemaConfig     ← ★これ以降の行は削除する
+entryUUID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+creatorsName: cn=config
+createTimestamp: YYYYmmddHHMMSSZ
+entryCSN: YYYYmmddHHMMSS.uuuuuuZ#000000#000#000000
+modifiersName: cn=config
+modifyTimestamp: YYYYmmddHHMMSSZ
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;ldapadd&lt;/code&gt; で登録する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/ldap/schema/samba.ldif
+SASL/EXTERNAL authentication started
+SASL username: &lt;span class="nv"&gt;gidNumber&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0+uidNumber&lt;span class="o"&gt;=&lt;/span&gt;0,cn&lt;span class="o"&gt;=&lt;/span&gt;peercred,cn&lt;span class="o"&gt;=&lt;/span&gt;external,cn&lt;span class="o"&gt;=&lt;/span&gt;auth
+SASL SSF: 0
+adding new entry &lt;span class="s2"&gt;&amp;quot;cn=samba,cn=schema,cn=config&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;きちんと登録されているかを確認してみよう。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo ldapsearch -Y EXTERNAL -H ldapi:/// -LLL -b &lt;span class="s2"&gt;&amp;quot;cn=schema,cn=config&amp;quot;&lt;/span&gt; dn
+SASL/EXTERNAL authentication started
+SASL username: &lt;span class="nv"&gt;gidNumber&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0+uidNumber&lt;span class="o"&gt;=&lt;/span&gt;0,cn&lt;span class="o"&gt;=&lt;/span&gt;peercred,cn&lt;span class="o"&gt;=&lt;/span&gt;external,cn&lt;span class="o"&gt;=&lt;/span&gt;auth
+SASL SSF: 0
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;schema,cn&lt;span class="o"&gt;=&lt;/span&gt;config
+
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;={&lt;/span&gt;0&lt;span class="o"&gt;}&lt;/span&gt;core,cn&lt;span class="o"&gt;=&lt;/span&gt;schema,cn&lt;span class="o"&gt;=&lt;/span&gt;config
+
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;={&lt;/span&gt;1&lt;span class="o"&gt;}&lt;/span&gt;cosine,cn&lt;span class="o"&gt;=&lt;/span&gt;schema,cn&lt;span class="o"&gt;=&lt;/span&gt;config
+
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;={&lt;/span&gt;2&lt;span class="o"&gt;}&lt;/span&gt;nis,cn&lt;span class="o"&gt;=&lt;/span&gt;schema,cn&lt;span class="o"&gt;=&lt;/span&gt;config
+
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;={&lt;/span&gt;3&lt;span class="o"&gt;}&lt;/span&gt;inetorgperson,cn&lt;span class="o"&gt;=&lt;/span&gt;schema,cn&lt;span class="o"&gt;=&lt;/span&gt;config
+
+dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;={&lt;/span&gt;4&lt;span class="o"&gt;}&lt;/span&gt;samba,cn&lt;span class="o"&gt;=&lt;/span&gt;schema,cn&lt;span class="o"&gt;=&lt;/span&gt;config
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これでschemaが登録された。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;アクセス権の設定&lt;/h2&gt;
+&lt;p&gt;schemaを追加したところで、アクセス権を適切に設定する。
+旧マシンでは &lt;code&gt;/etc/ldap/slapd.conf&lt;/code&gt; に書かれていた以下のような文を参考にして設定していく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+access to dn.base=&amp;quot;&amp;quot;
+     by * read
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;使用するデータベースのアクセス権（ &lt;code&gt;olcAccess&lt;/code&gt; ）を変更する。
+旧マシンの &lt;code&gt;/etc/ldap/slapd.conf&lt;/code&gt; に書かれている &lt;code&gt;access&lt;/code&gt; 文のto以降を番号を付けながら順番に書いていけばいい。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo ldapvi -Y EXTERNAL -h ldapi:/// -b &lt;span class="s1"&gt;&amp;#39;olcDatabase={1}mdb,cn=config&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+olcAccess: {0}to attrs=hoge,fuga by self write by * auth
+olcAccess: {1}to dn.base=&amp;quot;&amp;quot; by * read
+olcAccess: {2}to * by * read
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;データの移行&lt;/h2&gt;
+&lt;p&gt;ここまでできればデータの移行は簡単だ。
+旧マシンにおいて &lt;code&gt;slapcat&lt;/code&gt; でデータをldifに吐き出し、これを追加すればいい。&lt;/p&gt;
+&lt;p&gt;まずは旧マシンでldifを吐き出す。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo slapcat -l dat.ldif
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;slapcat&lt;/code&gt; が見つからない場合は &lt;code&gt;/usr/sbin/&lt;/code&gt; などにあると思われるのでフルパス指定すればいい。&lt;/p&gt;
+&lt;p&gt;次に &lt;code&gt;dat.ldif&lt;/code&gt; を &lt;code&gt;scp&lt;/code&gt; などで新マシンに持ってきて、以下のような感じで追加する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo slapadd -l dat.ldif
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;確認&lt;/h2&gt;
+&lt;p&gt;最後に、きちんとデータを参照できるかを確認して完了だ。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% ldapsearch -h &amp;lt;新マシン&amp;gt; -x -b &lt;span class="s2"&gt;&amp;quot;dc=hoge,dc=com&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; wc -l
+% ldapsearch -h &amp;lt;新マシン&amp;gt; -x -W -D &lt;span class="s2"&gt;&amp;quot;cn=xxxxx,dc=hoge,dc=com&amp;quot;&lt;/span&gt; -b &lt;span class="s2"&gt;&amp;quot;dc=hoge,dc=com&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Fri, 05 Jun 2015 19:30:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-05:blog/debian-ldap.html</guid><category>linux</category><category>ldap</category></item><item><title>Debian jessieでGitLabをRedmineと共存させる</title><link>http://pman0214.github.io/blog/debian-gitlab.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;環境&lt;/h2&gt;
 &lt;ul class="simple"&gt;
