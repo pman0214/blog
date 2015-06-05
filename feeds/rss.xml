@@ -156,7 +156,7 @@ include /etc/ldap/schema/samba.schema
 % sudo rm -rf /tmp/ldap
 % sudo vi /etc/ldap/schema/samba.ldif
 &lt;/pre&gt;&lt;/div&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.  ★この2行は不要なので消してしまう
+&lt;div class="highlight"&gt;&lt;pre&gt;# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.  ★最初の2行は不要なので消してしまう
 # CRC32 xxxxxxxx
 dn: cn=samba,cn=schema,cn=config ← ★dnは変更する
 objectClass: olcSchemaConfig
@@ -199,14 +199,14 @@ dn: &lt;span class="nv"&gt;cn&lt;/span&gt;&lt;span class="o"&gt;={&lt;/span&gt;4
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;アクセス権の設定&lt;/h2&gt;
 &lt;p&gt;schemaを追加したところで、アクセス権を適切に設定する。
-旧マシンでは &lt;code&gt;/etc/ldap/slapd.conf&lt;/code&gt; に書かれていた以下のような文を参考にして設定していく。&lt;/p&gt;
+旧マシンで &lt;code&gt;/etc/ldap/slapd.conf&lt;/code&gt; に書かれていた以下のような文を参考にして設定していく。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;...
 access to dn.base=&amp;quot;&amp;quot;
      by * read
 ...
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;使用するデータベースのアクセス権（ &lt;code&gt;olcAccess&lt;/code&gt; ）を変更する。
-旧マシンの &lt;code&gt;/etc/ldap/slapd.conf&lt;/code&gt; に書かれている &lt;code&gt;access&lt;/code&gt; 文のto以降を番号を付けながら順番に書いていけばいい。&lt;/p&gt;
+旧マシンの &lt;code&gt;/etc/ldap/slapd.conf&lt;/code&gt; に書かれている &lt;code&gt;access&lt;/code&gt; 文の &lt;code&gt;to&lt;/code&gt; 以降を番号を付けながら順番に書いていけばいい。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% sudo ldapvi -Y EXTERNAL -h ldapi:/// -b &lt;span class="s1"&gt;&amp;#39;olcDatabase={1}mdb,cn=config&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;...

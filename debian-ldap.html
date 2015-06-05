@@ -273,7 +273,7 @@ include /etc/ldap/schema/samba.schema
 % sudo rm -rf /tmp/ldap
 % sudo vi /etc/ldap/schema/samba.ldif
 </pre></div>
-<div class="highlight"><pre># AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.  ★この2行は不要なので消してしまう
+<div class="highlight"><pre># AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.  ★最初の2行は不要なので消してしまう
 # CRC32 xxxxxxxx
 dn: cn=samba,cn=schema,cn=config ← ★dnは変更する
 objectClass: olcSchemaConfig
@@ -316,14 +316,14 @@ dn: <span class="nv">cn</span><span class="o">={</span>4<span class="o">}</span>
 <div class="section" id="id5">
 <h2>アクセス権の設定</h2>
 <p>schemaを追加したところで、アクセス権を適切に設定する。
-旧マシンでは <code>/etc/ldap/slapd.conf</code> に書かれていた以下のような文を参考にして設定していく。</p>
+旧マシンで <code>/etc/ldap/slapd.conf</code> に書かれていた以下のような文を参考にして設定していく。</p>
 <div class="highlight"><pre>...
 access to dn.base=&quot;&quot;
      by * read
 ...
 </pre></div>
 <p>使用するデータベースのアクセス権（ <code>olcAccess</code> ）を変更する。
-旧マシンの <code>/etc/ldap/slapd.conf</code> に書かれている <code>access</code> 文のto以降を番号を付けながら順番に書いていけばいい。</p>
+旧マシンの <code>/etc/ldap/slapd.conf</code> に書かれている <code>access</code> 文の <code>to</code> 以降を番号を付けながら順番に書いていけばいい。</p>
 <div class="highlight"><pre>% sudo ldapvi -Y EXTERNAL -h ldapi:/// -b <span class="s1">&#39;olcDatabase={1}mdb,cn=config&#39;</span>
 </pre></div>
 <div class="highlight"><pre>...
@@ -412,6 +412,11 @@ olcAccess: {2}to * by * read
             <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/linux.html">
+                            linux
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
                         <a href="http://pman0214.github.io/blog/tag/debian.html">
                             debian
                         </a>
@@ -421,19 +426,9 @@ olcAccess: {2}to * by * read
                             redmine
                         </a>
                     </li>
-                    <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/linux.html">
-                            linux
-                        </a>
-                    </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/python.html">
-                            python
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/info.html">
-                            info
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
@@ -442,18 +437,13 @@ olcAccess: {2}to * by * read
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/efi.html">
-                            efi
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
                         </a>
                     </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/raspberry-pi.html">
-                            raspberry pi
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
-                            ldap
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/python.html">
+                            python
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -462,13 +452,8 @@ olcAccess: {2}to * by * read
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/blog.html">
-                            blog
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/category.html">
-                            category
+                        <a href="http://pman0214.github.io/blog/tag/cron.html">
+                            cron
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -477,13 +462,28 @@ olcAccess: {2}to * by * read
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/raspberry-pi.html">
+                            raspberry pi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/category.html">
+                            category
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
                             virtualenv
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/cron.html">
-                            cron
+                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
+                            ldap
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/blog.html">
+                            blog
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
