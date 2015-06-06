@@ -352,6 +352,71 @@ olcAccess: {2}to * by * read
 % ldapsearch -h &lt;新マシン&gt; -x -W -D <span class="s2">&quot;cn=xxxxx,dc=hoge,dc=com&quot;</span> -b <span class="s2">&quot;dc=hoge,dc=com&quot;</span>
 </pre></div>
 </div>
+<div class="section" id="id8">
+<h2>クライアント側の設定例（2015/06/06 10:30追記）</h2>
+<p>クライアント側の設定をしてみる。
+とりあえず、LDAPサーバ自体のログインもLDAPにしてしまおう。</p>
+<p>Ubuntuでは <code>ldap-auth-client</code> なるパッケージがあるそうなのだが、Debianには存在しない。
+残念。</p>
+<p>というわけで、手動で各種設定を行う。
+まずは必要なパッケージ類の導入。</p>
+<div class="highlight"><pre>% sudo apt-get install libpam-ldap libnss-ldap nscd
+</pre></div>
+<p><code>libnss-ldap</code> の設定は以下の通り。</p>
+<dl class="docutils">
+<dt>LDAPサーバのURI</dt>
+<dd><code>ldap://127.0.0.1/</code>
+もちろん、新マシンのIPアドレスを入力してもOK。
+FQDNは解決が必要になるから使わない方が無難だ。</dd>
+<dt>検索ベースの識別名</dt>
+<dd><code>dc=hoge,dc=com</code>
+要するにBase DNのこと。</dd>
+<dt>利用するLDAPバージョン</dt>
+<dd>3</dd>
+<dt>LDAPデータベースはログインを必要とするか？</dt>
+<dd>いいえ</dd>
+<dt>rootへの特別なLDAP権限？</dt>
+<dd>いいえ</dd>
+<dt>オーナのみ設定ファイルの読み書きができるようにする？</dt>
+<dd>はい</dd>
+</dl>
+<p>つづいて <code>libpam-ldap</code> の設定。</p>
+<dl class="docutils">
+<dt>LDAPサーバのURI</dt>
+<dd><code>ldap://127.0.0.1/</code></dd>
+<dt>検索ベースの識別名</dt>
+<dd><code>dc=hoge,dc=com</code></dd>
+<dt>利用するLDAPバージョン</dt>
+<dd>3</dd>
+<dt>LDAP管理アカウントがローカルのrootのように振る舞うことを許すか？</dt>
+<dd>普通は「はい」でいいけど、注意書きにあるように <code>/etc</code> とかを外に出しているなら「いいえ」にすべき。</dd>
+<dt>LDAPデータベースはログインが必要？</dt>
+<dd>いいえ</dd>
+<dt>パスワードに使うローカル暗号化アルゴリズム</dt>
+<dd><code>crypt</code></dd>
+<dt>有効化するPAMプロファイル</dt>
+<dd>お好きにどうぞ。</dd>
+</dl>
+<p>MacがあったりするとmDNS（Multicast DNS）で <code>.local</code> が付いた名前を解決したくなるので、 <code>libnss-mdns</code> を導入して名前解決できるようにしておく。</p>
+<div class="highlight"><pre>% sudo apt-get install libnss-mdns
+</pre></div>
+<p>最後に、自動で管理されないという <code>/etc/nsswitch.conf</code> を編集する。</p>
+<div class="highlight"><pre>% sudo vi /etc/nsswitch.conf
+</pre></div>
+<div class="highlight"><pre>...
+passwd:         files ldap
+group:          files ldap
+shadow:         files ldap
+...
+hosts:          files mdns4_minimal [NOTFOUND=return] dns mdns4 ldap
+...
+</pre></div>
+<p><code>_minimal</code> を付けると、ホスト名の最後に <code>.local</code> が付いていないかアドレスがmDNSの範囲を超えている場合に名前解決をしなくなる。
+なので、上記のように見つからなかった場合を規程しておくことでDNSを見つつローカルネットワークのホストも名前解決できる。
+らしい。</p>
+<p>ここまでできたら、別コンソールや <code>su -</code> などによりLDAPに存在するユーザでログインしてみる。
+入れない場合はとりあえず <code>/var/log/auth.log</code> などを参照しながら修正すべし。</p>
+</div>
 
             </div>
             <!-- /.entry-content -->
@@ -412,6 +477,11 @@ olcAccess: {2}to * by * read
             <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/debian.html">
+                            debian
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
                         <a href="http://pman0214.github.io/blog/tag/linux.html">
                             linux
                         </a>
@@ -421,19 +491,9 @@ olcAccess: {2}to * by * read
                             redmine
                         </a>
                     </li>
-                    <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/debian.html">
-                            debian
-                        </a>
-                    </li>
                     <li class="list-group-item tag-2">
                         <a href="http://pman0214.github.io/blog/tag/github.html">
                             github
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/python.html">
-                            python
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
@@ -442,43 +502,18 @@ olcAccess: {2}to * by * read
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/python.html">
+                            python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
                         <a href="http://pman0214.github.io/blog/tag/efi.html">
                             efi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
-                            pelican
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
-                            backlogs
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/cron.html">
-                            cron
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
-                            ldap
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/raspberry-pi.html">
-                            raspberry pi
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
-                            virtualenv
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/blog.html">
-                            blog
+                        <a href="http://pman0214.github.io/blog/tag/gitlab.html">
+                            gitlab
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -487,8 +522,38 @@ olcAccess: {2}to * by * read
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/gitlab.html">
-                            gitlab
+                        <a href="http://pman0214.github.io/blog/tag/raspberry-pi.html">
+                            raspberry pi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/blog.html">
+                            blog
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/backlogs.html">
+                            backlogs
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
+                            ldap
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
+                            virtualenv
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/cron.html">
+                            cron
                         </a>
                     </li>
                     <li class="list-group-item tag-4">

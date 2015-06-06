@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 05 Jun 2015 19:30:00 +0900</lastBuildDate><item><title>Debian 8.0 (jessie)でLDAPサーバを構築</title><link>http://pman0214.github.io/blog/debian-ldap.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 06 Jun 2015 10:30:00 +0900</lastBuildDate><item><title>Debian 8.0 (jessie)でLDAPサーバを構築</title><link>http://pman0214.github.io/blog/debian-ldap.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;Debian 8.0 (jessie)のslapdは2.4.40で、設定の仕方が今までとは異なるようなのでメモ。
@@ -235,7 +235,72 @@ olcAccess: {2}to * by * read
 % ldapsearch -h &amp;lt;新マシン&amp;gt; -x -W -D &lt;span class="s2"&gt;&amp;quot;cn=xxxxx,dc=hoge,dc=com&amp;quot;&lt;/span&gt; -b &lt;span class="s2"&gt;&amp;quot;dc=hoge,dc=com&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Fri, 05 Jun 2015 19:30:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-05:blog/debian-ldap.html</guid><category>linux</category><category>ldap</category></item><item><title>Debian jessieでGitLabをRedmineと共存させる</title><link>http://pman0214.github.io/blog/debian-gitlab.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h2&gt;クライアント側の設定例（2015/06/06 10:30追記）&lt;/h2&gt;
+&lt;p&gt;クライアント側の設定をしてみる。
+とりあえず、LDAPサーバ自体のログインもLDAPにしてしまおう。&lt;/p&gt;
+&lt;p&gt;Ubuntuでは &lt;code&gt;ldap-auth-client&lt;/code&gt; なるパッケージがあるそうなのだが、Debianには存在しない。
+残念。&lt;/p&gt;
+&lt;p&gt;というわけで、手動で各種設定を行う。
+まずは必要なパッケージ類の導入。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install libpam-ldap libnss-ldap nscd
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;libnss-ldap&lt;/code&gt; の設定は以下の通り。&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;LDAPサーバのURI&lt;/dt&gt;
+&lt;dd&gt;&lt;code&gt;ldap://127.0.0.1/&lt;/code&gt;
+もちろん、新マシンのIPアドレスを入力してもOK。
+FQDNは解決が必要になるから使わない方が無難だ。&lt;/dd&gt;
+&lt;dt&gt;検索ベースの識別名&lt;/dt&gt;
+&lt;dd&gt;&lt;code&gt;dc=hoge,dc=com&lt;/code&gt;
+要するにBase DNのこと。&lt;/dd&gt;
+&lt;dt&gt;利用するLDAPバージョン&lt;/dt&gt;
+&lt;dd&gt;3&lt;/dd&gt;
+&lt;dt&gt;LDAPデータベースはログインを必要とするか？&lt;/dt&gt;
+&lt;dd&gt;いいえ&lt;/dd&gt;
+&lt;dt&gt;rootへの特別なLDAP権限？&lt;/dt&gt;
+&lt;dd&gt;いいえ&lt;/dd&gt;
+&lt;dt&gt;オーナのみ設定ファイルの読み書きができるようにする？&lt;/dt&gt;
+&lt;dd&gt;はい&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;つづいて &lt;code&gt;libpam-ldap&lt;/code&gt; の設定。&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;LDAPサーバのURI&lt;/dt&gt;
+&lt;dd&gt;&lt;code&gt;ldap://127.0.0.1/&lt;/code&gt;&lt;/dd&gt;
+&lt;dt&gt;検索ベースの識別名&lt;/dt&gt;
+&lt;dd&gt;&lt;code&gt;dc=hoge,dc=com&lt;/code&gt;&lt;/dd&gt;
+&lt;dt&gt;利用するLDAPバージョン&lt;/dt&gt;
+&lt;dd&gt;3&lt;/dd&gt;
+&lt;dt&gt;LDAP管理アカウントがローカルのrootのように振る舞うことを許すか？&lt;/dt&gt;
+&lt;dd&gt;普通は「はい」でいいけど、注意書きにあるように &lt;code&gt;/etc&lt;/code&gt; とかを外に出しているなら「いいえ」にすべき。&lt;/dd&gt;
+&lt;dt&gt;LDAPデータベースはログインが必要？&lt;/dt&gt;
+&lt;dd&gt;いいえ&lt;/dd&gt;
+&lt;dt&gt;パスワードに使うローカル暗号化アルゴリズム&lt;/dt&gt;
+&lt;dd&gt;&lt;code&gt;crypt&lt;/code&gt;&lt;/dd&gt;
+&lt;dt&gt;有効化するPAMプロファイル&lt;/dt&gt;
+&lt;dd&gt;お好きにどうぞ。&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;MacがあったりするとmDNS（Multicast DNS）で &lt;code&gt;.local&lt;/code&gt; が付いた名前を解決したくなるので、 &lt;code&gt;libnss-mdns&lt;/code&gt; を導入して名前解決できるようにしておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install libnss-mdns
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;最後に、自動で管理されないという &lt;code&gt;/etc/nsswitch.conf&lt;/code&gt; を編集する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/nsswitch.conf
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+passwd:         files ldap
+group:          files ldap
+shadow:         files ldap
+...
+hosts:          files mdns4_minimal [NOTFOUND=return] dns mdns4 ldap
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;_minimal&lt;/code&gt; を付けると、ホスト名の最後に &lt;code&gt;.local&lt;/code&gt; が付いていないかアドレスがmDNSの範囲を超えている場合に名前解決をしなくなる。
+なので、上記のように見つからなかった場合を規程しておくことでDNSを見つつローカルネットワークのホストも名前解決できる。
+らしい。&lt;/p&gt;
+&lt;p&gt;ここまでできたら、別コンソールや &lt;code&gt;su -&lt;/code&gt; などによりLDAPに存在するユーザでログインしてみる。
+入れない場合はとりあえず &lt;code&gt;/var/log/auth.log&lt;/code&gt; などを参照しながら修正すべし。&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Sat, 06 Jun 2015 10:30:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-05:blog/debian-ldap.html</guid><category>linux</category><category>ldap</category></item><item><title>Debian jessieでGitLabをRedmineと共存させる</title><link>http://pman0214.github.io/blog/debian-gitlab.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;環境&lt;/h2&gt;
 &lt;ul class="simple"&gt;
