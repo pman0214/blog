@@ -180,6 +180,20 @@ postgres# <span class="se">\q</span>
 <div class="highlight"><pre>...
 redis:x:113:git   ← ★gitを追加する
 </pre></div>
+<div class="section" id="id5">
+<h4>2015/06/23追記:</h4>
+<p>このままでは外部から接続できてしまうので、bindの設定を変えておく。</p>
+<div class="highlight"><pre>% <span class="nb">cd</span> /etc/redis/
+% sudo vi redis.conf
+</pre></div>
+<div class="highlight"><pre>...
+bind 127.0.0.1  ← ★コメントアウトされているので、有効化する
+...
+</pre></div>
+<p>redis-serverを再起動して完了。</p>
+<div class="highlight"><pre>% sudo /etc/init.d/redis-server restart
+</pre></div>
+</div>
 </div>
 <div class="section" id="gitlab">
 <h3>GitLabの導入</h3>
@@ -323,6 +337,25 @@ nginx: configuration file /etc/nginx/nginx.conf <span class="nb">test </span>is 
 <p>ブラウザからアクセスすれば見えるはず。</p>
 <p>見えないときは、どこまで接続できているかによって見るログが変わってくる。
 nginxのリバースプロキシでgitlabに接続できないときは、unicorn関連の設定かnginxの設定、gitlabのエラーが見えたときは、gitlabのログを参照してデバッグすると良い。</p>
+<div class="section" id="id6">
+<h4>2015/06/23追記:</h4>
+</div>
+</div>
+<div class="section" id="gitlab-shell">
+<h3>GitLab-Shellの設定変更</h3>
+<p>sshでpushしたときには <code>GitLab-Shell</code> というのが呼ばれるのだが、ここもまたRedis関連の設定の整合性が取れてないので、設定変更が必要。
+<code>localhost:6379</code> を使うように修正する。</p>
+<div class="highlight"><pre>% <span class="nb">cd</span> /home/git/gitlab-shell
+% sudo -u git vi config.yml
+</pre></div>
+<div class="highlight"><pre><span class="nn">...</span>
+<span class="l-Scalar-Plain">redis</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">...</span>
+  <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">localhost  ← ★追加する</span>
+  <span class="l-Scalar-Plain">port</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">6379       ← ★追加する</span>
+  <span class="c1"># socket: /var/run/redis/redis.sock  ← ★コメントアウトする</span>
+  <span class="l-Scalar-Plain">...</span>
+</pre></div>
 </div>
 </div>
 
@@ -390,13 +423,18 @@ nginxのリバースプロキシでgitlabに接続できないときは、unicor
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
                         <a href="http://pman0214.github.io/blog/tag/linux.html">
                             linux
                         </a>
                     </li>
-                    <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
-                            redmine
+                    <li class="list-group-item tag-2">
+                        <a href="http://pman0214.github.io/blog/tag/python.html">
+                            python
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
@@ -410,13 +448,18 @@ nginxのリバースプロキシでgitlabに接続できないときは、unicor
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/python.html">
-                            python
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
                         <a href="http://pman0214.github.io/blog/tag/efi.html">
                             efi
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
+                            ldap
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
+                            virtualenv
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -435,6 +478,11 @@ nginxのリバースプロキシでgitlabに接続できないときは、unicor
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
+                            pelican
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/blog.html">
                             blog
                         </a>
@@ -445,28 +493,13 @@ nginxのリバースプロキシでgitlabに接続できないときは、unicor
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
-                            ldap
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/pelican.html">
-                            pelican
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
-                            virtualenv
+                        <a href="http://pman0214.github.io/blog/tag/raid.html">
+                            raid
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/cron.html">
                             cron
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/raid.html">
-                            raid
                         </a>
                     </li>
                 </ul>

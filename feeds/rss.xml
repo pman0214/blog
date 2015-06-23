@@ -361,6 +361,20 @@ postgres# &lt;span class="se"&gt;\q&lt;/span&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;...
 redis:x:113:git   ← ★gitを追加する
 &lt;/pre&gt;&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h4&gt;2015/06/23追記:&lt;/h4&gt;
+&lt;p&gt;このままでは外部から接続できてしまうので、bindの設定を変えておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /etc/redis/
+% sudo vi redis.conf
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+bind 127.0.0.1  ← ★コメントアウトされているので、有効化する
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;redis-serverを再起動して完了。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/redis-server restart
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="gitlab"&gt;
 &lt;h3&gt;GitLabの導入&lt;/h3&gt;
@@ -504,6 +518,25 @@ nginx: configuration file /etc/nginx/nginx.conf &lt;span class="nb"&gt;test &lt;
 &lt;p&gt;ブラウザからアクセスすれば見えるはず。&lt;/p&gt;
 &lt;p&gt;見えないときは、どこまで接続できているかによって見るログが変わってくる。
 nginxのリバースプロキシでgitlabに接続できないときは、unicorn関連の設定かnginxの設定、gitlabのエラーが見えたときは、gitlabのログを参照してデバッグすると良い。&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h4&gt;2015/06/23追記:&lt;/h4&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="gitlab-shell"&gt;
+&lt;h3&gt;GitLab-Shellの設定変更&lt;/h3&gt;
+&lt;p&gt;sshでpushしたときには &lt;code&gt;GitLab-Shell&lt;/code&gt; というのが呼ばれるのだが、ここもまたRedis関連の設定の整合性が取れてないので、設定変更が必要。
+&lt;code&gt;localhost:6379&lt;/code&gt; を使うように修正する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/git/gitlab-shell
+% sudo -u git vi config.yml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;redis&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;...&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;host&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;localhost  ← ★追加する&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;port&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;6379       ← ★追加する&lt;/span&gt;
+  &lt;span class="c1"&gt;# socket: /var/run/redis/redis.sock  ← ★コメントアウトする&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 </description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Fri, 05 Jun 2015 18:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-06-05:blog/debian-gitlab.html</guid><category>debian</category><category>gitlab</category><category>redmine</category></item><item><title>カテゴリを整理しました</title><link>http://pman0214.github.io/blog/category-change.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
