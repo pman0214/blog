@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-06-06T10:30:00+09:00</updated><entry><title>Debian 8.0 (jessie)でLDAPサーバを構築</title><link href="http://pman0214.github.io/blog/debian-ldap.html" rel="alternate"></link><updated>2015-06-06T10:30:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-06-05:blog/debian-ldap.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-07-15T17:00:00+09:00</updated><entry><title>Chromium on MacOSXでPPAPIなFlash Playerを使う</title><link href="http://pman0214.github.io/blog/chromium-pepper-flash.html" rel="alternate"></link><updated>2015-07-15T17:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-07-15:blog/chromium-pepper-flash.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;ChromeではFlash Playerが内部に入っているようだが、Flash Playerはオープンソースではないため巷に転がっているChromiumではFlash Playerが使えない。
+そして、AdobeからFlash Playerを落としてきてインストールしても、なぜか使えない。&lt;/p&gt;
+&lt;p&gt;どういうことだってばよ！！と思ったが、どうやら2つの原因があるようだ。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;PPAPI版のFlash Playerを入れないといけない。&lt;/li&gt;
+&lt;li&gt;コマンドラインオプションでPluginへのパスを指定しないといけない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;PPAPI版のFlash Playerは簡単に導入できるのだが、Chromiumのアイコンをクリックして起動した場合にFlash Playerが動かないと困ったことになるサイトがたまーにあるので、コマンドラインオプションを何とか付けて起動されることにする。&lt;/p&gt;
+&lt;p&gt;具体的には、Chromiumを起動するシェルスクリプトを.app化する。
+&lt;a class="reference external" href="https://mathiasbynens.be/notes/shell-script-mac-apps"&gt;How to create simple Mac apps from shell scripts&lt;/a&gt; に同じことをする方法があるのだが、Chromiumを起動するとDockに2つのアイコンが表示されて気持ち悪いから却下。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;やり方&lt;/h2&gt;
+&lt;p&gt;ざっくり書くと、コマンドラインオプションを付けてChromiumを起動するシェルスクリプトを作成し、これを &lt;code&gt;Chromium.app&lt;/code&gt; 内に配置する。
+これだけで予想できる人は以降を読む必要はない。&lt;/p&gt;
+&lt;p&gt;なにはともあれ、「システムの環境設定」（日本語があってるか不明）のFlash Playerを開き、現状インストールされているやつを確認する。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://www.flickr.com/photos/23629678&amp;#64;N04/19523105128/"&gt;&lt;img alt="system-preferences" src="https://farm1.staticflickr.com/391/19523105128_c72eb6ca87.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;「Updates」タブを開くと、現在インストールされているFlash Playerのバージョンが表示される。
+今回は &lt;code&gt;PPAPI Plug-in&lt;/code&gt; の方の &lt;code&gt;Check Now&lt;/code&gt; ボタンをクリックして、最新版をインストールする。
+これで、 &lt;code&gt;/Library/Internet Plug-Ins/PepperFlashPlayer&lt;/code&gt; というディレクトリにインストールされるはず。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://www.flickr.com/photos/23629678&amp;#64;N04/19523127180/"&gt;&lt;img alt="system-pref-flash-player" src="https://farm1.staticflickr.com/355/19523127180_65bb291052.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;つづいてシェルスクリプトを作成するのだが、 &lt;code&gt;Chromium&lt;/code&gt; という名前にしたいので元のファイルの名前を変更しておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /Applications/Chromium.app/Contents/MacOS
+% mv Chromium Chromium-orig
+% vi Chromium
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/sh&lt;/span&gt;
+
+/Applications/Chromium.app/Contents/MacOS/Chromium-orig &lt;span class="se"&gt;\&lt;/span&gt;
+  --ppapi-flash-path&lt;span class="o"&gt;=&lt;/span&gt;/Library/Internet&lt;span class="se"&gt;\ &lt;/span&gt;Plug-Ins/PepperFlashPlayer/PepperFlashPlayer.plugin &lt;span class="se"&gt;\&lt;/span&gt;
+  --ppapi-flash-version&lt;span class="o"&gt;=&lt;/span&gt;18.0.0.209
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;バージョンは自分の環境に合わせて変更すること。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% chmod &lt;span class="m"&gt;755&lt;/span&gt; Chromium
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで、 &lt;code&gt;Chromium.app&lt;/code&gt; をダブルクリックしてChromiumが普通に起動するはず。&lt;/p&gt;
+&lt;p&gt;Chromiumのアドレスバーに &lt;code&gt;chrome://plugins&lt;/code&gt; と入力して、Flash Playerが表示されればOK。
+ダメならパスなどが間違っていないか確認する。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://www.flickr.com/photos/23629678&amp;#64;N04/19715724301/"&gt;&lt;img alt="check-plugin" src="https://farm1.staticflickr.com/483/19715724301_922a7be027.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;アップデート多すぎ。Flash滅びろ。&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="chrome"></category><category term="chromium"></category></entry><entry><title>Debian 8.0 (jessie)でLDAPサーバを構築</title><link href="http://pman0214.github.io/blog/debian-ldap.html" rel="alternate"></link><updated>2015-06-06T10:30:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-06-05:blog/debian-ldap.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;Debian 8.0 (jessie)のslapdは2.4.40で、設定の仕方が今までとは異なるようなのでメモ。
