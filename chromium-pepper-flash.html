@@ -131,7 +131,7 @@ pLog            </a>
 </ul>
 <p>PPAPI版のFlash Playerは簡単に導入できるのだが、Chromiumのアイコンをクリックして起動した場合にFlash Playerが動かないと困ったことになるサイトがたまーにあるので、コマンドラインオプションを何とか付けて起動されることにする。</p>
 <p>具体的には、Chromiumを起動するシェルスクリプトを.app化する。
-<a class="reference external" href="https://mathiasbynens.be/notes/shell-script-mac-apps">How to create simple Mac apps from shell scripts</a> に同じことをする方法があるのだが、Chromiumを起動するとDockに2つのアイコンが表示されて気持ち悪いから却下。</p>
+<a class="reference external" href="https://mathiasbynens.be/notes/shell-script-mac-apps">How to create simple Mac apps from shell scripts</a> に同じようなことをする方法があるのだが、Chromiumを起動するとDockに2つのアイコンが表示されて気持ち悪いから却下。</p>
 </div>
 <div class="section" id="id2">
 <h2>やり方</h2>
@@ -161,6 +161,8 @@ pLog            </a>
 <p>Chromiumのアドレスバーに <code>chrome://plugins</code> と入力して、Flash Playerが表示されればOK。
 ダメならパスなどが間違っていないか確認する。</p>
 <p><a class="reference external" href="https://www.flickr.com/photos/23629678&#64;N04/19715724301/"><img alt="check-plugin" src="https://farm1.staticflickr.com/483/19715724301_922a7be027.jpg" /></a></p>
+<p><strong>作成したスクリプトはChromiumのアップデートで消える</strong> ので気をつけよう。
+スクリプトを <code>/usr/local/bin</code> などに作成してシンボリックリンクを作成する方が良いかもしれない。</p>
 </div>
 <div class="section" id="id3">
 <h2>まとめ</h2>
@@ -226,11 +228,6 @@ pLog            </a>
             <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
-                            redmine
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
                         <a href="http://pman0214.github.io/blog/tag/linux.html">
                             linux
                         </a>
@@ -240,9 +237,14 @@ pLog            </a>
                             debian
                         </a>
                     </li>
+                    <li class="list-group-item tag-1">
+                        <a href="http://pman0214.github.io/blog/tag/redmine.html">
+                            redmine
+                        </a>
+                    </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/info.html">
-                            info
+                        <a href="http://pman0214.github.io/blog/tag/efi.html">
+                            efi
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
@@ -256,8 +258,13 @@ pLog            </a>
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://pman0214.github.io/blog/tag/efi.html">
-                            efi
+                        <a href="http://pman0214.github.io/blog/tag/info.html">
+                            info
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
+                            ldap
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -271,33 +278,8 @@ pLog            </a>
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/chromium.html">
-                            chromium
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/ldap.html">
-                            ldap
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/cron.html">
                             cron
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/category.html">
-                            category
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
-                            virtualenv
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/gitlab.html">
-                            gitlab
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -306,8 +288,23 @@ pLog            </a>
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/category.html">
+                            category
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
                         <a href="http://pman0214.github.io/blog/tag/chrome.html">
                             chrome
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/gitlab.html">
+                            gitlab
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/raspberry-pi.html">
+                            raspberry pi
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
@@ -316,8 +313,13 @@ pLog            </a>
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://pman0214.github.io/blog/tag/raspberry-pi.html">
-                            raspberry pi
+                        <a href="http://pman0214.github.io/blog/tag/chromium.html">
+                            chromium
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://pman0214.github.io/blog/tag/virtualenv.html">
+                            virtualenv
                         </a>
                     </li>
                 </ul>

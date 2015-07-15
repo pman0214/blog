@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 15 Jul 2015 17:00:00 +0900</lastBuildDate><item><title>Chromium on MacOSXでPPAPIなFlash Playerを使う</title><link>http://pman0214.github.io/blog/chromium-pepper-flash.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 15 Jul 2015 17:15:00 +0900</lastBuildDate><item><title>Chromium on MacOSXでPPAPIなFlash Playerを使う</title><link>http://pman0214.github.io/blog/chromium-pepper-flash.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;ChromeではFlash Playerが内部に入っているようだが、Flash Playerはオープンソースではないため巷に転がっているChromiumではFlash Playerが使えない。
@@ -11,7 +11,7 @@
 &lt;/ul&gt;
 &lt;p&gt;PPAPI版のFlash Playerは簡単に導入できるのだが、Chromiumのアイコンをクリックして起動した場合にFlash Playerが動かないと困ったことになるサイトがたまーにあるので、コマンドラインオプションを何とか付けて起動されることにする。&lt;/p&gt;
 &lt;p&gt;具体的には、Chromiumを起動するシェルスクリプトを.app化する。
-&lt;a class="reference external" href="https://mathiasbynens.be/notes/shell-script-mac-apps"&gt;How to create simple Mac apps from shell scripts&lt;/a&gt; に同じことをする方法があるのだが、Chromiumを起動するとDockに2つのアイコンが表示されて気持ち悪いから却下。&lt;/p&gt;
+&lt;a class="reference external" href="https://mathiasbynens.be/notes/shell-script-mac-apps"&gt;How to create simple Mac apps from shell scripts&lt;/a&gt; に同じようなことをする方法があるのだが、Chromiumを起動するとDockに2つのアイコンが表示されて気持ち悪いから却下。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;やり方&lt;/h2&gt;
@@ -41,12 +41,14 @@
 &lt;p&gt;Chromiumのアドレスバーに &lt;code&gt;chrome://plugins&lt;/code&gt; と入力して、Flash Playerが表示されればOK。
 ダメならパスなどが間違っていないか確認する。&lt;/p&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://www.flickr.com/photos/23629678&amp;#64;N04/19715724301/"&gt;&lt;img alt="check-plugin" src="https://farm1.staticflickr.com/483/19715724301_922a7be027.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;作成したスクリプトはChromiumのアップデートで消える&lt;/strong&gt; ので気をつけよう。
+スクリプトを &lt;code&gt;/usr/local/bin&lt;/code&gt; などに作成してシンボリックリンクを作成する方が良いかもしれない。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id3"&gt;
 &lt;h2&gt;まとめ&lt;/h2&gt;
 &lt;p&gt;アップデート多すぎ。Flash滅びろ。&lt;/p&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 15 Jul 2015 17:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-07-15:blog/chromium-pepper-flash.html</guid><category>chrome</category><category>chromium</category></item><item><title>Debian 8.0 (jessie)でLDAPサーバを構築</title><link>http://pman0214.github.io/blog/debian-ldap.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 15 Jul 2015 17:15:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-07-15:blog/chromium-pepper-flash.html</guid><category>chrome</category><category>chromium</category></item><item><title>Debian 8.0 (jessie)でLDAPサーバを構築</title><link>http://pman0214.github.io/blog/debian-ldap.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;Debian 8.0 (jessie)のslapdは2.4.40で、設定の仕方が今までとは異なるようなのでメモ。
