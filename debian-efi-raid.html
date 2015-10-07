@@ -1,131 +1,89 @@
 <!DOCTYPE html>
-<html lang="ja" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<html lang="ja">
 <head>
-    <title>EFIなマシンにソフトRAID1でDebianをインストール - pLog</title>
-    <!-- Using the latest rendering mode for IE -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-<link rel="canonical" href="http://pman0214.github.io/blog/debian-efi-raid.html">
-
-        <meta name="author" content="pman0214" />
-        <meta name="keywords" content="debian,linux,efi,raid" />
-        <meta name="description" content="EFI起動のマシンにソフトウェアRAID1を組みつつDebianをインストールする手順。" />
-
-        <meta property="og:site_name" content="pLog" />
-        <meta property="og:type" content="article"/>
-        <meta property="og:title" content="EFIなマシンにソフトRAID1でDebianをインストール"/>
-        <meta property="og:url" content="http://pman0214.github.io/blog/debian-efi-raid.html"/>
-        <meta property="og:description" content="EFI起動のマシンにソフトウェアRAID1を組みつつDebianをインストールする手順。"/>
-        <meta property="article:published_time" content="2015-06-01" />
-            <meta property="article:section" content="linux" />
-            <meta property="article:tag" content="debian" />
-            <meta property="article:tag" content="linux" />
-            <meta property="article:tag" content="efi" />
-            <meta property="article:tag" content="raid" />
-            <meta property="article:author" content="pman0214" />
-
-
-    <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
-    <link href="http://pman0214.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
-
-    <link href="http://pman0214.github.io/blog/theme/css/pygments/native.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css" type="text/css"/>
-
-        <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate"
-              title="pLog ATOM Feed"/>
-
-        <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate"
-              title="pLog RSS Feed"/>
-
-
-
+  <title>EFIなマシンにソフトRAID1でDebianをインストール - pLog</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=11">
+  <meta name="author" content="pman0214">
+  <meta name="keywords" content="debian,linux,efi,raid">
+  <meta name="description" content="EFI起動のマシンにソフトウェアRAID1を組みつつDebianをインストールする手順。">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments/github.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-min.css">
+  <!--<![endif]-->
+  <!--[if lt IE 9]>
+    <script src="http://pman0214.github.io/blog/theme/js/html5shiv.js"></script>
+  <![endif]-->
+  <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="pLog Full Atom Feed">
+  <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
+  <!-- open graph tags -->
+  <meta property="og:site_name" content="pLog">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="EFIなマシンにソフトRAID1でDebianをインストール">
+  <meta property="og:url" content="http://pman0214.github.io/blog/debian-efi-raid.html">
+  <meta property="og:description" content="EFI起動のマシンにソフトウェアRAID1を組みつつDebianをインストールする手順。">
+  <meta property="article:published_time" content="2015-06-01">
+  <meta property="article:section" content="linux">
+  <meta property="article:tag" content="debian">
+  <meta property="article:tag" content="linux">
+  <meta property="article:tag" content="efi">
+  <meta property="article:tag" content="raid">
 </head>
+
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-	<div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a href="http://pman0214.github.io/blog/" class="navbar-brand">
-pLog            </a>
-        </div>
-        <div class="collapse navbar-collapse navbar-ex1-collapse">
-            <ul class="nav navbar-nav">
-                        <li >
-                            <a href="http://pman0214.github.io/blog/category/devel.html">Devel</a>
-                        </li>
-                        <li >
-                            <a href="http://pman0214.github.io/blog/category/info.html">Info</a>
-                        </li>
-                        <li class="active">
-                            <a href="http://pman0214.github.io/blog/category/linux.html">Linux</a>
-                        </li>
-                        <li >
-                            <a href="http://pman0214.github.io/blog/category/osx.html">Osx</a>
-                        </li>
-                        <li >
-                            <a href="http://pman0214.github.io/blog/category/python.html">Python</a>
-                        </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="http://pman0214.github.io/blog/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
-            </ul>
-        </div>
-        <!-- /.navbar-collapse -->
+<header>
+  <nav>
+    <div class="pure-menu pure-menu-horizontal">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog" class="pure-menu-heading pure-menu-link">pLog</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+          <a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">Categories</a>
+          <ul class="pure-menu-children">
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+          </ul>
+        </li>
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/archives.html" class="pure-menu-link">Archives</a></li>
+      </ul>
     </div>
-</div> <!-- /.navbar -->
-<!-- Banner -->
-<!-- End Banner -->
-<div class="container">
-    <div class="row">
-        <div class="col-sm-9">
+  </nav>
+</header>
 
-    <section id="content">
-        <article>
-            <header class="page-header">
-                <h1>
-                    <a href="http://pman0214.github.io/blog/debian-efi-raid.html"
-                       rel="bookmark"
-                       title="Permalink to EFIなマシンにソフトRAID1でDebianをインストール">
-                        EFIなマシンにソフトRAID1でDebianをインストール
-                    </a>
-                </h1>
-            </header>
-            <div class="entry-content">
-                <div class="panel">
-                    <div class="panel-body">
-<footer class="post-info">
-    <span class="label label-default">Date</span>
-    <span class="published">
-        <i class="fa fa-calendar"></i><time datetime="2015-06-01T17:30:00+09:00"> 2015年06月01日 17:30</time>
-    </span>
+<main>
+<div id="main" class="pure-g">
+<!-- main contents -->
+<div class="pure-u-1 pure-u-md-4-5">
+<section>
+<header>
+  <h1 class="sub-head"><a href="http://pman0214.github.io/blog/debian-efi-raid.html" rel="bookmark" title="Permalink to EFIなマシンにソフトRAID1でDebianをインストール">EFIなマシンにソフトRAID1でDebianをインストール</a></h1>
 
+  <div class="basic-info">
+    <div class="on-create">Created: <time datetime="2015-06-01T17:30:00+09:00">2015年06月01日 17:30</time></div>
+    <div class="on-update">Updated: <time datetime="2015-06-02T11:05:00+09:00">2015年06月02日 11:05</time></div>
+  </div>
+  <div class="basic-info">
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
+    <div class="tags">Tags:
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
+    </div>
+</header>
 
-
-
-
-<span class="label label-default">Tags</span>
-	<a href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
-        /
-	<a href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
-        /
-	<a href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
-        /
-	<a href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
-    
-</footer><!-- /.post-info -->                    </div>
-                </div>
-                <!-- -*- coding: utf-8; -*- -->
+<article>
+<div class="main-content">
+<!-- -*- coding: utf-8; -*- -->
 <div class="section" id="id1">
 <h2>概要</h2>
 <p>(U)EFIなマシンがよく分かっていない。
@@ -301,118 +259,31 @@ Boot000B* Hard Drive
 </pre></div>
 </div>
 
-            </div>
-            <!-- /.entry-content -->
-    <hr/>
-    <section class="comments" id="comments">
-        <h2>Comments</h2>
-
-        <div id="disqus_thread"></div>
-        <script type="text/javascript">
-            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-            var disqus_shortname = 'pman0214-plog'; // required: replace example with your forum shortname
-
-                    var disqus_identifier = 'debian-efi-raid';
-                var disqus_url = 'http://pman0214.github.io/blog/debian-efi-raid.html';
-
-            var disqus_config = function () {
-                this.language = "ja";
-            };
-
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function () {
-                var dsq = document.createElement('script');
-                dsq.type = 'text/javascript';
-                dsq.async = true;
-                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-        </script>
-        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
-            Disqus.</a></noscript>
-        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-
-    </section>
-        </article>
-    </section>
-
-        </div>
-        <div class="col-sm-3" id="sidebar">
-            <aside>
-<div id="aboutme">
-    <p>
-        <strong>About pman0214</strong><br/>
-        ハードからソフトまで分かる研究者。そういうものに私はなりたい。
-    </p>
 </div>
-<section class="well well-sm">
-    <ul class="list-group list-group-flush">
-            <li class="list-group-item"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
-              <ul class="list-group" id="social">
-                <li class="list-group-item"><a href="https://www.facebook.com/pman0214"><i class="fa fa-facebook-square fa-lg"></i> facebook</a></li>
-                <li class="list-group-item"><a href="https://twitter.com/pman0214"><i class="fa fa-twitter-square fa-lg"></i> twitter</a></li>
-                <li class="list-group-item"><a href="https://github.com/pman0214"><i class="fa fa-github-square fa-lg"></i> github</a></li>
-              </ul>
-            </li>
-
-
-
-            <li class="list-group-item"><a href="http://pman0214.github.io/blog/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
-                <ul class="list-group " id="tags">
-                </ul>
-            </li>
-
-
-    <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
-      <ul class="list-group" id="links">
-        <li class="list-group-item">
-            <a href="http://www.f.ait.kyushu-u.ac.jp/~ishida/" target="_blank">
-                Research
-            </a>
-        </li>
-      </ul>
-    </li>
-    </ul>
+</article>
 </section>
-            </aside>
-        </div>
+<!-- main contents end --></div>
+
+<!-- sidebar -->
+<div class="pure-u-1 pure-u-md-1-5">
+  <aside>
+  <div class="sidebar">
+    <div class="about-me">
+      <h4 class="sub-head">About pman0214</h4>
+      <p>ハードからソフトまで分かる研究者。そういうものに私はなりたい。</p>
     </div>
+  </div>
+  </aside>
+<!-- sidebar end --></div>
 </div>
+</main>
+
 <footer>
-   <div class="container">
-      <hr>
-      <div class="row">
-         <div class="col-xs-10">&copy; 2015 pman0214
-            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
-            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
-            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
-         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
-      </div>
-   </div>
-</footer>
-<script src="http://pman0214.github.io/blog/theme/js/jquery.min.js"></script>
-
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://pman0214.github.io/blog/theme/js/bootstrap.min.js"></script>
-
-<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://pman0214.github.io/blog/theme/js/respond.min.js"></script>
-
-    <!-- Disqus -->
-    <script type="text/javascript">
-        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-        var disqus_shortname = 'pman0214-plog'; // required: replace example with your forum shortname
-
-        /* * * DON'T EDIT BELOW THIS LINE * * */
-        (function () {
-            var s = document.createElement('script');
-            s.async = true;
-            s.type = 'text/javascript';
-            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-        }());
-    </script>
-    <!-- End Disqus Code -->
-
-</body>
+  <div id="footer">
+    &copy; 2015 pman0214
+    &nbsp; | &nbsp;
+    Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+    with <a href="https://github.com/pman0214/pelican-pure" target="_blank">Pure theme</a>
+  </div>
+</footer></body>
 </html>
