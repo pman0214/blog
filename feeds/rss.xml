@@ -1,5 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 15 Jul 2015 17:15:00 +0900</lastBuildDate><item><title>Chromium on MacOSXでPPAPIなFlash Playerを使う</title><link>http://pman0214.github.io/blog/chromium-pepper-flash.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 15 Oct 2015 18:42:00 +0900</lastBuildDate><item><title>GitLabのレポジトリを移動する</title><link>http://pman0214.github.io/blog/gitlab-repo-change-path.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;研究室ではGitLabを運用している。
+比較的最近、新しいファイルサーバを導入したのでサーバ上の大事なデータはこの上に集めているのだが、GitLab上のレポジトリはまだ移行していなかった。&lt;/p&gt;
+&lt;p&gt;なのでこの度移動させた。
+ちなみにシンボリックリンクは使えないので、移動後には設定ファイルを変更するしかない。&lt;/p&gt;
+&lt;p&gt;環境は以下。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;GitLab 7.0.0 de9bf7d&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;p&gt;ぶっちゃけ、かなり簡単。&lt;/p&gt;
+&lt;p&gt;まず、GitLabを停止させる。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://pman0214.github.io/blog/debian-gitlab.html"&gt;このブログのGitLabインストール手順&lt;/a&gt; に従っている場合、 &lt;code&gt;/etc/init.d/gitlab&lt;/code&gt; というスクリプトがあるはずなので、これを使って停止させる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/gitlab stop
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;次に、レポジトリを移動する。
+デフォルトの設定から変更していなければ、 &lt;code&gt;/home/git/repositories&lt;/code&gt; というディレクトリにレポジトリが格納されている。
+ファイルサーバをNFSでマウントしているディレクトリにこのレポジトリ格納ディレクトリを移動する。
+怖い場合はユーザ情報を保持したままコピーする方が良い。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo mv /home/git/repositories /path/to/nfs-dir/
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;設定を変更する。
+設定は、gitlab本体とgitlab-shellの両方に必要なので注意。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; /home/git
+% sudo -u git vi gitlab/config/gitlab.yml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;span class="c1"&gt;# REPOS_PATH MUST NOT BE A SYMLINK!!!&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;repos_path&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;/path/to/nfs-dir/repositories/  ★ここを変更する&lt;/span&gt;
+&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo -u git vi gitlab-shell/config.yml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;repos_path&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/path/to/nfs-dir/repositories/&amp;quot;&lt;/span&gt;  &lt;span class="l-Scalar-Plain"&gt;★ここを変更する&lt;/span&gt;
+&lt;span class="nn"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これでGitLabを起動させれば完了。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/gitlab start
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;念のため、新しいレポジトリを作成したり、git pushできるかなどを確認しよう。&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Thu, 15 Oct 2015 18:42:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-10-15:blog/gitlab-repo-change-path.html</guid><category>gitlab</category></item><item><title>Chromium on MacOSXでPPAPIなFlash Playerを使う</title><link>http://pman0214.github.io/blog/chromium-pepper-flash.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;ChromeではFlash Playerが内部に入っているようだが、Flash Playerはオープンソースではないため巷に転がっているChromiumではFlash Playerが使えない。
