@@ -1,5 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 15 Oct 2015 18:42:00 +0900</lastBuildDate><item><title>GitLabのレポジトリを移動する</title><link>http://pman0214.github.io/blog/gitlab-repo-change-path.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 16 Nov 2015 12:05:00 +0900</lastBuildDate><item><title>Debianでautofsを使う</title><link>http://pman0214.github.io/blog/debian-autofs.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;各ユーザのホームをファイルサーバにまとめている場合は各ユーザのホームディレクトリをオートマウントしたくなることがある。
+こんなときにはautofsを使ってそのディレクトリを使用するときだけマウントすればいいのだが、いつも導入手順を忘れるのでメモ代わりにここにまとめることにした。
+以下の手順はLDAPクライアントの設定が終わっていて正常にログインできることを確認していることを前提とする。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;p&gt;何はともあれNFSで当該のディレクトリをマウントできるようにしておかなければ始まらない。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install nfs-kernel-server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;NFSサーバ側ではきちんと &lt;code&gt;/etc/exports&lt;/code&gt; が設定されているものとする。
+この段階でとりあえずmountできることを確認しておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/fstab
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+xx.xx.xx.xx:/home /home nfs  defaults    0   0  ★xxの部分はNFSサーバのIPを指定する
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo mount /home
+% ls /home
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;確認できたらunmountしておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo umount /home
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;autofsをインストールする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install autofs
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで &lt;code&gt;/etc&lt;/code&gt; に &lt;code&gt;auto.master&lt;/code&gt;, &lt;code&gt;auto.misc&lt;/code&gt;, &lt;code&gt;auto.net&lt;/code&gt;, &lt;code&gt;auto.smb&lt;/code&gt; などといったファイルができる。&lt;/p&gt;
+&lt;p&gt;まずは &lt;code&gt;/etc/auto.master&lt;/code&gt; に &lt;code&gt;/home&lt;/code&gt; の設定ファイルのありかとオプションを書く。
+今回はタイムアウトは300秒とした。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/auto.master
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+/home    /etc/auto.home  --timeout 300
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;続いて、今書いた設定ファイルを編集する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo vi /etc/auto.home
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;*    -fstype=nfs4,rw xx.xx.xx.xx:/tank/home/&amp;amp;  ★xxの部分はNFSサーバのIPを指定する
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;*&lt;/code&gt; というワイルドカードを使うことができる。
+&lt;code&gt;&amp;amp;&lt;/code&gt; の部分はユーザ名で置き換えられる。&lt;/p&gt;
+&lt;p&gt;ここまで書けたらautofsを再起動する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo /etc/init.d/autofs restart
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで誰かのホームディレクトリを &lt;code&gt;ls&lt;/code&gt; できればOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% ls /home/somebody
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 16 Nov 2015 12:05:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-11-16:blog/debian-autofs.html</guid><category>debian</category><category>ldap</category><category>autofs</category></item><item><title>GitLabのレポジトリを移動する</title><link>http://pman0214.github.io/blog/gitlab-repo-change-path.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;研究室ではGitLabを運用している。
