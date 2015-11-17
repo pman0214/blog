@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>Valgrindでのメモリリークチェックがおかしい件 - pLog</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=11">
+  <meta name="author" content="pman0214">
+  <meta name="keywords" content="pthread,valgrind">
+  <meta name="description" content="Valgrindでメモリリークをチェックする場合にpthreadを使っているとうまくいかない件について。">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments/github.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-min.css">
+  <!--<![endif]-->
+  <!--[if lt IE 9]>
+    <script src="http://pman0214.github.io/blog/theme/js/html5shiv.js"></script>
+  <![endif]-->
+  <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="pLog Full Atom Feed">
+  <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
+  <!-- open graph tags -->
+  <meta property="og:site_name" content="pLog">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Valgrindでのメモリリークチェックがおかしい件">
+  <meta property="og:url" content="http://pman0214.github.io/blog/valgrind-bug.html">
+  <meta property="og:description" content="Valgrindでメモリリークをチェックする場合にpthreadを使っているとうまくいかない件について。">
+  <meta property="article:published_time" content="2015-11-17">
+  <meta property="article:section" content="devel">
+  <meta property="article:tag" content="pthread">
+  <meta property="article:tag" content="valgrind">
+</head>
+
+<body>
+<header>
+  <nav id="menu">
+    <div class="pure-menu pure-menu-horizontal">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog" class="pure-menu-heading pure-menu-link">pLog</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+          <a href="#" class="pure-menu-link">Categories</a>
+          <ul class="pure-menu-children">
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
+          </ul>
+        </li>
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/archives.html" class="pure-menu-link">Archives</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div id="layout" class="pure-g">
+<div class="pure-u-1 pure-u-lg-3-4">
+<main id="main">
+<article>
+<header>
+  <h1><a href="http://pman0214.github.io/blog/valgrind-bug.html" rel="bookmark" title="Permalink to Valgrindでのメモリリークチェックがおかしい件">Valgrindでのメモリリークチェックがおかしい件</a></h1>
+  <div class="article-info">
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-11-17T16:42:00+09:00">2015年11月17日 16:42</time></div>
+    </div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
+    <div class="tags">Tags:
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/pthread.html">pthread</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
+    </div>
+  </div>
+</header>
+<section class="contents">
+<!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id1">
+<h2>概要</h2>
+<p>プログラム開発時に有用な <a class="reference external" href="http://valgrind.org/">Valgrind</a> というツールがある。
+Valgrindは色々なツールを提供してくれる。
+この記事を書いた時点では以下のように書かれていて、6つのツールが提供されているとのこと。</p>
+<blockquote>
+The Valgrind distribution currently includes six production-quality tools: a memory error detector, two thread error detectors, a cache and branch-prediction profiler, a call-graph generating cache and branch-prediction profiler, and a heap profiler.</blockquote>
+<p>今回はこの中でもメモリチェックツールのお話。
+Linux上でpthreadを使用している場合に常にメモリリークとなってしまう件。</p>
+<p>環境は以下。
+Vagrantで作成したdebian sid。</p>
+<div class="highlight"><pre>% uname -a
+Linux debian 4.2.0-1-amd64 <span class="c">#1 SMP Debian 4.2.6-1 (2015-11-10) x86_64 GNU/Linux</span>
+% valgrind --version
+valgrind-3.11.0
+</pre></div>
+</div>
+<div class="section" id="id3">
+<h2>再現手順</h2>
+<p>メモリリークしないコード <code>test.c</code> を用意する。
+<code>pthread_create</code> して <code>pthread_join</code> するだけの簡単なお仕事。</p>
+<div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include &lt;pthread.h&gt;</span>
+<span class="cp">#include &lt;unistd.h&gt;</span>
+
+<span class="kt">void</span> <span class="o">*</span><span class="nf">test</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="n">pthread_exit</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">pthread_t</span> <span class="n">th</span><span class="p">;</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">th</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">pthread_join</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">));</span>
+
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+<p>スレッドとして起動する関数 <code>test</code> ではちょっと待ってから <code>pthread_exit</code> するだけ。
+起動元では <code>pthread_join</code> してあげる。
+これでスレッド用の資源が回収されるのでメモリリークはない。はずなのだが・・・。</p>
+<p>このプログラムをコンパイルして、valgrindを実行してみる。</p>
+<div class="highlight"><pre>% gcc -Wall -g -lpthread -otest test.c
+% valgrind --tool<span class="o">=</span>memcheck <span class="se">\</span>
+  --leak-check<span class="o">=</span>yes <span class="se">\</span>
+  --leak-resolution<span class="o">=</span>high <span class="se">\</span>
+  --num-callers<span class="o">=</span><span class="m">40</span> <span class="se">\</span>
+  --undef-value-errors<span class="o">=</span>no <span class="se">\</span>
+  --run-libc-freeres<span class="o">=</span>no <span class="se">\</span>
+  -v ./test
+</pre></div>
+<p>結果は以下。</p>
+<div class="highlight"><pre>==1424== Memcheck, a memory error detector
+==1424== Copyright (C) 2002-2015, and GNU GPL&#39;d, by Julian Seward et al.
+==1424== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==1424== Command: ./test
+==1424==
+--1424-- Valgrind options:
+--1424--    --tool=memcheck
+--1424--    --leak-check=yes
+--1424--    --leak-resolution=high
+--1424--    --num-callers=40
+--1424--    --undef-value-errors=no
+--1424--    --run-libc-freeres=no
+--1424--    -v
+--1424-- Contents of /proc/version:
+--1424--   Linux version 4.2.0-1-amd64 (debian-kernel@lists.debian.org) (gcc version 4.9.3 (Debian 4.9.3-5) ) #1 SMP Debian 4.2.6-1 (2015-11-10)
+--1424--
+--1424-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-rdtscp-sse3-avx
+--1424-- Page sizes: currently 4096, max supported 4096
+--1424-- Valgrind library directory: /usr/lib/valgrind
+--1424-- Reading syms from /home/vagrant/tmp/test
+--1424-- Reading syms from /lib/x86_64-linux-gnu/ld-2.19.so
+--1424--   Considering /lib/x86_64-linux-gnu/ld-2.19.so ..
+--1424--   .. CRC mismatch (computed 809091d5 wanted 33fd79cd)
+--1424--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.19.so ..
+--1424--   .. CRC is valid
+--1424-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--1424--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--1424--   .. CRC mismatch (computed 2611121c wanted fdf174ed)
+--1424--   Considering /usr/lib/debug/usr/lib/valgrind/memcheck-amd64-linux ..
+--1424--   .. CRC is valid
+--1424--    object doesn&#39;t have a dynamic symbol table
+--1424-- Scheduler: using generic scheduler lock implementation.
+--1424-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==1424== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-1424-by-vagrant-on-???
+==1424== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-1424-by-vagrant-on-???
+==1424== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-1424-by-vagrant-on-???
+==1424==
+==1424== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==1424== don&#39;t want to do, unless you know exactly what you&#39;re doing,
+==1424== or are doing some strange experiment):
+==1424==   /usr/lib/valgrind/../../bin/vgdb --pid=1424 ...command...
+==1424==
+==1424== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==1424==   /path/to/gdb ./test
+==1424== and then give GDB the following command
+==1424==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=1424
+==1424== --pid is optional if only one valgrind process is running
+==1424==
+--1424-- REDIR: 0x4017960 (ld-linux-x86-64.so.2:strlen) redirected to 0x3809e1b1 (vgPlain_amd64_linux_REDIR_FOR_strlen)
+--1424-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--1424--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--1424--   .. CRC mismatch (computed 0900b121 wanted bb491432)
+--1424--   Considering /usr/lib/debug/usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--1424--   .. CRC is valid
+--1424-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--1424--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--1424--   .. CRC mismatch (computed d60576bf wanted 177f5f93)
+--1424--   Considering /usr/lib/debug/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--1424--   .. CRC is valid
+==1424== WARNING: new redirection conflicts with existing -- ignoring it
+--1424--     old: 0x04017960 (strlen              ) R-&gt; (0000.0) 0x3809e1b1 vgPlain_amd64_linux_REDIR_FOR_strlen
+--1424--     new: 0x04017960 (strlen              ) R-&gt; (2007.0) 0x04c2c0e0 strlen
+--1424-- REDIR: 0x4017710 (ld-linux-x86-64.so.2:index) redirected to 0x4c2bc80 (index)
+--1424-- REDIR: 0x4017930 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c2d190 (strcmp)
+--1424-- REDIR: 0x4018660 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c303b0 (mempcpy)
+--1424-- Reading syms from /lib/x86_64-linux-gnu/libpthread-2.19.so
+--1424--   Considering /lib/x86_64-linux-gnu/libpthread-2.19.so ..
+--1424--   .. CRC mismatch (computed f433f5b8 wanted a1539920)
+--1424--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libpthread-2.19.so ..
+--1424--   .. CRC is valid
+--1424-- Reading syms from /lib/x86_64-linux-gnu/libc-2.19.so
+--1424--   Considering /lib/x86_64-linux-gnu/libc-2.19.so ..
+--1424--   .. CRC mismatch (computed f7678cca wanted c4a92976)
+--1424--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.19.so ..
+--1424--   .. CRC is valid
+--1424-- REDIR: 0x50d7e20 (libc.so.6:strcasecmp) redirected to 0x4a23730 (_vgnU_ifunc_wrapper)
+--1424-- REDIR: 0x50da110 (libc.so.6:strncasecmp) redirected to 0x4a23730 (_vgnU_ifunc_wrapper)
+--1424-- REDIR: 0x50d75f0 (libc.so.6:memcpy@GLIBC_2.2.5) redirected to 0x4a23730 (_vgnU_ifunc_wrapper)
+--1424-- REDIR: 0x50d5970 (libc.so.6:rindex) redirected to 0x4c2b960 (rindex)
+--1424-- REDIR: 0x50ce990 (libc.so.6:calloc) redirected to 0x4c2ab60 (calloc)
+--1424-- REDIR: 0x50de7b0 (libc.so.6:strchrnul) redirected to 0x4c2fee0 (strchrnul)
+--1424-- REDIR: 0x50d77d0 (libc.so.6:__GI_mempcpy) redirected to 0x4c300e0 (__GI_mempcpy)
+--1424-- REDIR: 0x50ce020 (libc.so.6:malloc) redirected to 0x4c28be0 (malloc)
+--1424-- Reading syms from /lib/x86_64-linux-gnu/libgcc_s.so.1
+--1424--   Considering /lib/x86_64-linux-gnu/libgcc_s.so.1 ..
+--1424--   .. CRC mismatch (computed de5828bf wanted 0f4d8de1)
+--1424--    object doesn&#39;t have a symbol table
+--1424-- REDIR: 0x50d3c70 (libc.so.6:strlen) redirected to 0x4c2c020 (strlen)
+--1424-- REDIR: 0x50ce660 (libc.so.6:free) redirected to 0x4c29e40 (free)
+==1424==
+==1424== HEAP SUMMARY:
+==1424==     in use at exit: 1,942 bytes in 6 blocks
+==1424==   total heap usage: 6 allocs, 0 frees, 1,942 bytes allocated
+==1424==
+==1424== Searching for pointers to 6 not-freed blocks
+==1424== Checked 8,483,328 bytes
+==1424==
+==1424== 272 bytes in 1 blocks are possibly lost in loss record 4 of 6
+==1424==    at 0x4C2AC15: calloc (vg_replace_malloc.c:711)
+==1424==    by 0x4010FE1: allocate_dtv (dl-tls.c:296)
+==1424==    by 0x40116ED: _dl_allocate_tls (dl-tls.c:460)
+==1424==    by 0x4E3DC27: allocate_stack (allocatestack.c:589)
+==1424==    by 0x4E3DC27: pthread_create@@GLIBC_2.2.5 (pthread_create.c:495)
+==1424==    by 0x400728: main (test.c:16)
+==1424==
+==1424== LEAK SUMMARY:
+==1424==    definitely lost: 0 bytes in 0 blocks
+==1424==    indirectly lost: 0 bytes in 0 blocks
+==1424==      possibly lost: 272 bytes in 1 blocks
+==1424==    still reachable: 1,670 bytes in 5 blocks
+==1424==         suppressed: 0 bytes in 0 blocks
+==1424== Reachable blocks (those to which a pointer was found) are not shown.
+==1424== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==1424==
+==1424== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==1424== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+</pre></div>
+<p>この部分が「リークしているかも」と言われている。
+これは明らかに <code>pthread_create</code> した分。</p>
+<div class="highlight"><pre>==1424== 272 bytes in 1 blocks are possibly lost in loss record 4 of 6
+==1424==    at 0x4C2AC15: calloc (vg_replace_malloc.c:711)
+==1424==    by 0x4010FE1: allocate_dtv (dl-tls.c:296)
+==1424==    by 0x40116ED: _dl_allocate_tls (dl-tls.c:460)
+==1424==    by 0x4E3DC27: allocate_stack (allocatestack.c:589)
+==1424==    by 0x4E3DC27: pthread_create@@GLIBC_2.2.5 (pthread_create.c:495)
+==1424==    by 0x400728: main (test.c:16)
+</pre></div>
+<p>うーむ・・・。</p>
+</div>
+
+</section>
+<section id="comments">
+<!-- Disqus -->
+<div id="disqus_thread"></div>
+<script>
+/**
+ *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
+ *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+ *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+ *    https://disqus.com/admin/universalcode/#configuration-variables
+ */
+var disqus_config = function () {
+  this.language = 'ja';
+  this.page.url = 'http://pman0214.github.io/blog/valgrind-bug.html';
+  this.page.identifier = 'valgrind-bug';
+};
+(function() {  // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//pman0214-plog.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</section>
+</article>
+</main>
+</div>
+
+<div class="pure-u-1 pure-u-lg-1-4">
+<aside id="sidebar">
+    <section>
+      <h1>About pman0214</h1>
+      <p>ハードからソフトまで分かる研究者。そういうものに私はなりたい。</p>
+    </section>
+  <section>
+    <h1>Links</h1>
+    <ul class="links">
+      <li><a href="https://www.f.ait.kyushu-u.ac.jp/~ishida/">Research</a></li>
+    </ul>
+  </section>
+  <section>
+    <h1>Social Links</h1>
+    <ul class="links">
+      <li><a href="https://www.facebook.com/pman0214">facebook</a></li>
+      <li><a href="https://twitter.com/pman0214">twitter</a></li>
+      <li><a href="https://github.com/pman0214">github</a></li>
+    </ul>
+  </section>
+  <section class="tags">
+    <h1>Tags</h1>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/github.html">github</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pelican.html">pelican</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pthread.html">pthread</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/python.html">python</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
+    <p><a href="http://pman0214.github.io/blog/tags.html">See all...</a></p>
+  </section>
+</aside>
+</div>
+<!-- #layout --></div>
+
+<footer id="footer">
+  &copy; 2015 pman0214
+  &nbsp; | &nbsp;
+  Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+  with <a href="https://github.com/pman0214/pelican-pure" target="_blank">Pure theme</a>
+</footer>
+</body>
+</html>

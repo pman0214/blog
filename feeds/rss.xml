@@ -1,5 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 16 Nov 2015 12:05:00 +0900</lastBuildDate><item><title>Debianでautofsを使う</title><link>http://pman0214.github.io/blog/debian-autofs.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 17 Nov 2015 16:42:00 +0900</lastBuildDate><item><title>Valgrindでのメモリリークチェックがおかしい件</title><link>http://pman0214.github.io/blog/valgrind-bug.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;プログラム開発時に有用な &lt;a class="reference external" href="http://valgrind.org/"&gt;Valgrind&lt;/a&gt; というツールがある。
+Valgrindは色々なツールを提供してくれる。
+この記事を書いた時点では以下のように書かれていて、6つのツールが提供されているとのこと。&lt;/p&gt;
+&lt;blockquote&gt;
+The Valgrind distribution currently includes six production-quality tools: a memory error detector, two thread error detectors, a cache and branch-prediction profiler, a call-graph generating cache and branch-prediction profiler, and a heap profiler.&lt;/blockquote&gt;
+&lt;p&gt;今回はこの中でもメモリチェックツールのお話。
+Linux上でpthreadを使用している場合に常にメモリリークとなってしまう件。&lt;/p&gt;
+&lt;p&gt;環境は以下。
+Vagrantで作成したdebian sid。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% uname -a
+Linux debian 4.2.0-1-amd64 &lt;span class="c"&gt;#1 SMP Debian 4.2.6-1 (2015-11-10) x86_64 GNU/Linux&lt;/span&gt;
+% valgrind --version
+valgrind-3.11.0
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;再現手順&lt;/h2&gt;
+&lt;p&gt;メモリリークしないコード &lt;code&gt;test.c&lt;/code&gt; を用意する。
+&lt;code&gt;pthread_create&lt;/code&gt; して &lt;code&gt;pthread_join&lt;/code&gt; するだけの簡単なお仕事。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;pthread.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;
+
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nf"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;arg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;pthread_exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;pthread_t&lt;/span&gt; &lt;span class="n"&gt;th&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%d&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pthread_create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;th&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%d&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pthread_join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;th&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+
+    &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;スレッドとして起動する関数 &lt;code&gt;test&lt;/code&gt; ではちょっと待ってから &lt;code&gt;pthread_exit&lt;/code&gt; するだけ。
+起動元では &lt;code&gt;pthread_join&lt;/code&gt; してあげる。
+これでスレッド用の資源が回収されるのでメモリリークはない。はずなのだが・・・。&lt;/p&gt;
+&lt;p&gt;このプログラムをコンパイルして、valgrindを実行してみる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% gcc -Wall -g -lpthread -otest test.c
+% valgrind --tool&lt;span class="o"&gt;=&lt;/span&gt;memcheck &lt;span class="se"&gt;\&lt;/span&gt;
+  --leak-check&lt;span class="o"&gt;=&lt;/span&gt;yes &lt;span class="se"&gt;\&lt;/span&gt;
+  --leak-resolution&lt;span class="o"&gt;=&lt;/span&gt;high &lt;span class="se"&gt;\&lt;/span&gt;
+  --num-callers&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;40&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+  --undef-value-errors&lt;span class="o"&gt;=&lt;/span&gt;no &lt;span class="se"&gt;\&lt;/span&gt;
+  --run-libc-freeres&lt;span class="o"&gt;=&lt;/span&gt;no &lt;span class="se"&gt;\&lt;/span&gt;
+  -v ./test
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;結果は以下。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;==1424== Memcheck, a memory error detector
+==1424== Copyright (C) 2002-2015, and GNU GPL&amp;#39;d, by Julian Seward et al.
+==1424== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==1424== Command: ./test
+==1424==
+--1424-- Valgrind options:
+--1424--    --tool=memcheck
+--1424--    --leak-check=yes
+--1424--    --leak-resolution=high
+--1424--    --num-callers=40
+--1424--    --undef-value-errors=no
+--1424--    --run-libc-freeres=no
+--1424--    -v
+--1424-- Contents of /proc/version:
+--1424--   Linux version 4.2.0-1-amd64 (debian-kernel@lists.debian.org) (gcc version 4.9.3 (Debian 4.9.3-5) ) #1 SMP Debian 4.2.6-1 (2015-11-10)
+--1424--
+--1424-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-rdtscp-sse3-avx
+--1424-- Page sizes: currently 4096, max supported 4096
+--1424-- Valgrind library directory: /usr/lib/valgrind
+--1424-- Reading syms from /home/vagrant/tmp/test
+--1424-- Reading syms from /lib/x86_64-linux-gnu/ld-2.19.so
+--1424--   Considering /lib/x86_64-linux-gnu/ld-2.19.so ..
+--1424--   .. CRC mismatch (computed 809091d5 wanted 33fd79cd)
+--1424--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.19.so ..
+--1424--   .. CRC is valid
+--1424-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--1424--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--1424--   .. CRC mismatch (computed 2611121c wanted fdf174ed)
+--1424--   Considering /usr/lib/debug/usr/lib/valgrind/memcheck-amd64-linux ..
+--1424--   .. CRC is valid
+--1424--    object doesn&amp;#39;t have a dynamic symbol table
+--1424-- Scheduler: using generic scheduler lock implementation.
+--1424-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==1424== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-1424-by-vagrant-on-???
+==1424== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-1424-by-vagrant-on-???
+==1424== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-1424-by-vagrant-on-???
+==1424==
+==1424== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==1424== don&amp;#39;t want to do, unless you know exactly what you&amp;#39;re doing,
+==1424== or are doing some strange experiment):
+==1424==   /usr/lib/valgrind/../../bin/vgdb --pid=1424 ...command...
+==1424==
+==1424== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==1424==   /path/to/gdb ./test
+==1424== and then give GDB the following command
+==1424==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=1424
+==1424== --pid is optional if only one valgrind process is running
+==1424==
+--1424-- REDIR: 0x4017960 (ld-linux-x86-64.so.2:strlen) redirected to 0x3809e1b1 (vgPlain_amd64_linux_REDIR_FOR_strlen)
+--1424-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--1424--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--1424--   .. CRC mismatch (computed 0900b121 wanted bb491432)
+--1424--   Considering /usr/lib/debug/usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--1424--   .. CRC is valid
+--1424-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--1424--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--1424--   .. CRC mismatch (computed d60576bf wanted 177f5f93)
+--1424--   Considering /usr/lib/debug/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--1424--   .. CRC is valid
+==1424== WARNING: new redirection conflicts with existing -- ignoring it
+--1424--     old: 0x04017960 (strlen              ) R-&amp;gt; (0000.0) 0x3809e1b1 vgPlain_amd64_linux_REDIR_FOR_strlen
+--1424--     new: 0x04017960 (strlen              ) R-&amp;gt; (2007.0) 0x04c2c0e0 strlen
+--1424-- REDIR: 0x4017710 (ld-linux-x86-64.so.2:index) redirected to 0x4c2bc80 (index)
+--1424-- REDIR: 0x4017930 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c2d190 (strcmp)
+--1424-- REDIR: 0x4018660 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c303b0 (mempcpy)
+--1424-- Reading syms from /lib/x86_64-linux-gnu/libpthread-2.19.so
+--1424--   Considering /lib/x86_64-linux-gnu/libpthread-2.19.so ..
+--1424--   .. CRC mismatch (computed f433f5b8 wanted a1539920)
+--1424--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libpthread-2.19.so ..
+--1424--   .. CRC is valid
+--1424-- Reading syms from /lib/x86_64-linux-gnu/libc-2.19.so
+--1424--   Considering /lib/x86_64-linux-gnu/libc-2.19.so ..
+--1424--   .. CRC mismatch (computed f7678cca wanted c4a92976)
+--1424--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.19.so ..
+--1424--   .. CRC is valid
+--1424-- REDIR: 0x50d7e20 (libc.so.6:strcasecmp) redirected to 0x4a23730 (_vgnU_ifunc_wrapper)
+--1424-- REDIR: 0x50da110 (libc.so.6:strncasecmp) redirected to 0x4a23730 (_vgnU_ifunc_wrapper)
+--1424-- REDIR: 0x50d75f0 (libc.so.6:memcpy@GLIBC_2.2.5) redirected to 0x4a23730 (_vgnU_ifunc_wrapper)
+--1424-- REDIR: 0x50d5970 (libc.so.6:rindex) redirected to 0x4c2b960 (rindex)
+--1424-- REDIR: 0x50ce990 (libc.so.6:calloc) redirected to 0x4c2ab60 (calloc)
+--1424-- REDIR: 0x50de7b0 (libc.so.6:strchrnul) redirected to 0x4c2fee0 (strchrnul)
+--1424-- REDIR: 0x50d77d0 (libc.so.6:__GI_mempcpy) redirected to 0x4c300e0 (__GI_mempcpy)
+--1424-- REDIR: 0x50ce020 (libc.so.6:malloc) redirected to 0x4c28be0 (malloc)
+--1424-- Reading syms from /lib/x86_64-linux-gnu/libgcc_s.so.1
+--1424--   Considering /lib/x86_64-linux-gnu/libgcc_s.so.1 ..
+--1424--   .. CRC mismatch (computed de5828bf wanted 0f4d8de1)
+--1424--    object doesn&amp;#39;t have a symbol table
+--1424-- REDIR: 0x50d3c70 (libc.so.6:strlen) redirected to 0x4c2c020 (strlen)
+--1424-- REDIR: 0x50ce660 (libc.so.6:free) redirected to 0x4c29e40 (free)
+==1424==
+==1424== HEAP SUMMARY:
+==1424==     in use at exit: 1,942 bytes in 6 blocks
+==1424==   total heap usage: 6 allocs, 0 frees, 1,942 bytes allocated
+==1424==
+==1424== Searching for pointers to 6 not-freed blocks
+==1424== Checked 8,483,328 bytes
+==1424==
+==1424== 272 bytes in 1 blocks are possibly lost in loss record 4 of 6
+==1424==    at 0x4C2AC15: calloc (vg_replace_malloc.c:711)
+==1424==    by 0x4010FE1: allocate_dtv (dl-tls.c:296)
+==1424==    by 0x40116ED: _dl_allocate_tls (dl-tls.c:460)
+==1424==    by 0x4E3DC27: allocate_stack (allocatestack.c:589)
+==1424==    by 0x4E3DC27: pthread_create@@GLIBC_2.2.5 (pthread_create.c:495)
+==1424==    by 0x400728: main (test.c:16)
+==1424==
+==1424== LEAK SUMMARY:
+==1424==    definitely lost: 0 bytes in 0 blocks
+==1424==    indirectly lost: 0 bytes in 0 blocks
+==1424==      possibly lost: 272 bytes in 1 blocks
+==1424==    still reachable: 1,670 bytes in 5 blocks
+==1424==         suppressed: 0 bytes in 0 blocks
+==1424== Reachable blocks (those to which a pointer was found) are not shown.
+==1424== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==1424==
+==1424== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+==1424== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この部分が「リークしているかも」と言われている。
+これは明らかに &lt;code&gt;pthread_create&lt;/code&gt; した分。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;==1424== 272 bytes in 1 blocks are possibly lost in loss record 4 of 6
+==1424==    at 0x4C2AC15: calloc (vg_replace_malloc.c:711)
+==1424==    by 0x4010FE1: allocate_dtv (dl-tls.c:296)
+==1424==    by 0x40116ED: _dl_allocate_tls (dl-tls.c:460)
+==1424==    by 0x4E3DC27: allocate_stack (allocatestack.c:589)
+==1424==    by 0x4E3DC27: pthread_create@@GLIBC_2.2.5 (pthread_create.c:495)
+==1424==    by 0x400728: main (test.c:16)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;うーむ・・・。&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Tue, 17 Nov 2015 16:42:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-11-17:blog/valgrind-bug.html</guid><category>pthread</category><category>valgrind</category></item><item><title>Debianでautofsを使う</title><link>http://pman0214.github.io/blog/debian-autofs.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;各ユーザのホームをファイルサーバにまとめている場合は各ユーザのホームディレクトリをオートマウントしたくなることがある。
