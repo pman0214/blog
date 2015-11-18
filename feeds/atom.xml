@@ -1,5 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-11-17T16:42:00+09:00</updated><entry><title>Valgrindでのメモリリークチェックがおかしい件</title><link href="http://pman0214.github.io/blog/valgrind-bug.html" rel="alternate"></link><updated>2015-11-17T16:42:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-11-17:blog/valgrind-bug.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-11-18T21:54:00+09:00</updated><entry><title>軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する</title><link href="http://pman0214.github.io/blog/pure-css-new-unit-grid.html" rel="alternate"></link><updated>2015-11-18T21:54:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-11-18:blog/pure-css-new-unit-grid.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;最近、Webサイトを構築するときに &lt;a class="reference external" href="http://purecss.io/"&gt;Pure.css&lt;/a&gt; というCSSフレームワークを使用している。
+Pure.cssはとても軽いCSSフレームワークで、提供されている機能は少ないが使い勝手がとてもいいので重宝している。&lt;/p&gt;
+&lt;p&gt;CSSフレームワークを使ったレイアウトの基本はグリッドシステムを使うことだと思うのだが、提供されているグリッドではどうにもならない事態が発生した。
+Pure.cssでは任意の単位のグリッドを生成できるプログラム &lt;a class="reference external" href="https://github.com/yahoo/rework-pure-grids"&gt;rework-pure-grids&lt;/a&gt; を提供してくれているので、これを使って自分の好きなグリッドを生成することにした。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;ことの発端&lt;/h2&gt;
+&lt;p&gt;4:3の画像が3枚あるとする。
+1つは横長、2つが縦長である。
+これを、高さを揃えて横に3枚並べたい。&lt;/p&gt;
+&lt;p&gt;Pure.cssはブラウザの横幅を1として1/5ベースと1/24ベースのグリッドを提供してくれるのだが、上記の要求はこのグリッドでは満たせない。
+横長の画像の幅をA、縦長の画像の幅をBとすると B = (9A)/16 となるため、1/9ベースのグリッドが欲しくなった。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/yahoo/rework-pure-grids"&gt;rework-pure-grids&lt;/a&gt; はNode.jsを使用するため、Node.jsを導入する。
+Macの場合はHomebrewでnodebrewを導入し、最新安定版を導入すれば良い。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% brew install nodebrew
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Homebrewで入れてもPATHが通らないので、 &lt;code&gt;~/.bashrc&lt;/code&gt; などにPATHの設定を追加する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.nodebrew/current/bin:&lt;span class="nv"&gt;$PATH&lt;/span&gt;
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;つづいてNode.js本体をインストールする。
+インストール可能なバージョンを確認。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% nodebrew ls-remote
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ここで &lt;code&gt;io&amp;#64;&lt;/code&gt; というのが付いていないやつが安定版。
+だと思う。
+この記事を書いている現時点での最新版は5.1.0。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% nodebrew install-binary v5.1.0
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Node.jsの本家サーバが遅いと時間がかかるかもしれない。&lt;/p&gt;
+&lt;p&gt;インストールしたバージョンを使う宣言をする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% nodebrew use v5.1.0
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これでNode.jsが使えるようになった。&lt;/p&gt;
+&lt;p&gt;Node.jsの使い方がイマイチよく分かっていないのだが、とりあえず、 &lt;code&gt;rework-pure-grids&lt;/code&gt; の説明にある通り &lt;code&gt;rework&lt;/code&gt; と &lt;code&gt;rework-pure-grids&lt;/code&gt; をインストールする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% npm install rework rework-pure-grids
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで &lt;code&gt;node_modules&lt;/code&gt; というディレクトリが作成され、その中に &lt;code&gt;rework&lt;/code&gt; と &lt;code&gt;rework-pure-grids&lt;/code&gt; 、依存するパッケージがインストールされる。&lt;/p&gt;
+&lt;p&gt;ここまで来たらグリッドを生成するための簡単なプログラムを書く。
+&lt;a class="reference external" href="https://github.com/yahoo/rework-pure-grids"&gt;rework-pure-grids&lt;/a&gt; にある書き方を参考にして、今回は1/9ベースのグリッドを生成するプログラムを書く。
+ここでは &lt;code&gt;app.js&lt;/code&gt; という名前で保存することにする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;sys&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sys&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;rework&lt;/span&gt;    &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;rework&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="nx"&gt;pureGrids&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;rework-pure-grids&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Creates a 9ths-based Grid.&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;css&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;rework&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;use&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;pureGrids&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;units&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;mediaQueries&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;screen and (min-width: 35.5em)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nx"&gt;md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;screen and (min-width: 48em)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nx"&gt;lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;screen and (min-width: 64em)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nx"&gt;xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;screen and (min-width: 80em)&amp;#39;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;})).&lt;/span&gt;&lt;span class="nx"&gt;toString&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+
+&lt;span class="nx"&gt;sys&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;css&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これを実行するとグリッド用のCSSが出力されるので、ファイルに保存する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% node app.js &amp;gt; pure-grid-1-9.css
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ちなみに &lt;code&gt;sys&lt;/code&gt; を使うのは古いやり方だというWarningが出た。
+が、新しいやり方は調べていない・・・。&lt;/p&gt;
+&lt;p&gt;Pure.cssでは、例えば1/5幅の &lt;code&gt;div&lt;/code&gt; を作るときに &lt;code&gt;&amp;lt;div class=&amp;quot;pure-u-1-5&amp;quot;&amp;gt;&lt;/code&gt; などと書く。
+生成した &lt;code&gt;pure-grid-1-9.css&lt;/code&gt; をHTMLファイルで読み込めば、この書き方と同じように &lt;code&gt;&amp;lt;div class=&amp;quot;pure-u-1-9&amp;quot;&amp;gt;&lt;/code&gt; などと書けるようになる。
+CSSファイルを小さくしたいなら &lt;code&gt;tr&lt;/code&gt; コマンドで改行とスペースを削除すればいい。&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="html"></category><category term="css framework"></category></entry><entry><title>Valgrindでのメモリリークチェックがおかしい件</title><link href="http://pman0214.github.io/blog/valgrind-bug.html" rel="alternate"></link><updated>2015-11-17T16:42:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-11-17:blog/valgrind-bug.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;プログラム開発時に有用な &lt;a class="reference external" href="http://valgrind.org/"&gt;Valgrind&lt;/a&gt; というツールがある。

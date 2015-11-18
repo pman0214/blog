@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する - pLog</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=11">
+  <meta name="author" content="pman0214">
+  <meta name="keywords" content="html,css framework">
+  <meta name="description" content="軽量CSSフレームワークPure.cssでは1/5ベースと1/24ベースのグリッドが提供されているが、これでは都合が悪い場合は任意の単位のグリッドを作成することができる。その方法を簡単にまとめる。">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments/github.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-min.css">
+  <!--<![endif]-->
+  <!--[if lt IE 9]>
+    <script src="http://pman0214.github.io/blog/theme/js/html5shiv.js"></script>
+  <![endif]-->
+  <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="pLog Full Atom Feed">
+  <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
+  <!-- open graph tags -->
+  <meta property="og:site_name" content="pLog">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する">
+  <meta property="og:url" content="http://pman0214.github.io/blog/pure-css-new-unit-grid.html">
+  <meta property="og:description" content="軽量CSSフレームワークPure.cssでは1/5ベースと1/24ベースのグリッドが提供されているが、これでは都合が悪い場合は任意の単位のグリッドを作成することができる。その方法を簡単にまとめる。">
+  <meta property="article:published_time" content="2015-11-18">
+  <meta property="article:section" content="devel">
+  <meta property="article:tag" content="html">
+  <meta property="article:tag" content="css framework">
+</head>
+
+<body>
+<header>
+  <nav id="menu">
+    <div class="pure-menu pure-menu-horizontal">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog" class="pure-menu-heading pure-menu-link">pLog</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+          <a href="#" class="pure-menu-link">Categories</a>
+          <ul class="pure-menu-children">
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
+          </ul>
+        </li>
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/archives.html" class="pure-menu-link">Archives</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div id="layout" class="pure-g">
+<div class="pure-u-1 pure-u-lg-3-4">
+<main id="main">
+<article>
+<header>
+  <h1><a href="http://pman0214.github.io/blog/pure-css-new-unit-grid.html" rel="bookmark" title="Permalink to 軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する">軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する</a></h1>
+  <div class="article-info">
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-11-18T21:54:00+09:00">2015年11月18日 21:54</time></div>
+    </div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
+    <div class="tags">Tags:
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
+    </div>
+  </div>
+</header>
+<section class="contents">
+<!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id1">
+<h2>概要</h2>
+<p>最近、Webサイトを構築するときに <a class="reference external" href="http://purecss.io/">Pure.css</a> というCSSフレームワークを使用している。
+Pure.cssはとても軽いCSSフレームワークで、提供されている機能は少ないが使い勝手がとてもいいので重宝している。</p>
+<p>CSSフレームワークを使ったレイアウトの基本はグリッドシステムを使うことだと思うのだが、提供されているグリッドではどうにもならない事態が発生した。
+Pure.cssでは任意の単位のグリッドを生成できるプログラム <a class="reference external" href="https://github.com/yahoo/rework-pure-grids">rework-pure-grids</a> を提供してくれているので、これを使って自分の好きなグリッドを生成することにした。</p>
+</div>
+<div class="section" id="id2">
+<h2>ことの発端</h2>
+<p>4:3の画像が3枚あるとする。
+1つは横長、2つが縦長である。
+これを、高さを揃えて横に3枚並べたい。</p>
+<p>Pure.cssはブラウザの横幅を1として1/5ベースと1/24ベースのグリッドを提供してくれるのだが、上記の要求はこのグリッドでは満たせない。
+横長の画像の幅をA、縦長の画像の幅をBとすると B = (9A)/16 となるため、1/9ベースのグリッドが欲しくなった。</p>
+</div>
+<div class="section" id="id3">
+<h2>手順</h2>
+<p><a class="reference external" href="https://github.com/yahoo/rework-pure-grids">rework-pure-grids</a> はNode.jsを使用するため、Node.jsを導入する。
+Macの場合はHomebrewでnodebrewを導入し、最新安定版を導入すれば良い。</p>
+<div class="highlight"><pre>% brew install nodebrew
+</pre></div>
+<p>Homebrewで入れてもPATHが通らないので、 <code>~/.bashrc</code> などにPATHの設定を追加する。</p>
+<div class="highlight"><pre>...
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.nodebrew/current/bin:<span class="nv">$PATH</span>
+...
+</pre></div>
+<p>つづいてNode.js本体をインストールする。
+インストール可能なバージョンを確認。</p>
+<div class="highlight"><pre>% nodebrew ls-remote
+</pre></div>
+<p>ここで <code>io&#64;</code> というのが付いていないやつが安定版。
+だと思う。
+この記事を書いている現時点での最新版は5.1.0。</p>
+<div class="highlight"><pre>% nodebrew install-binary v5.1.0
+</pre></div>
+<p>Node.jsの本家サーバが遅いと時間がかかるかもしれない。</p>
+<p>インストールしたバージョンを使う宣言をする。</p>
+<div class="highlight"><pre>% nodebrew use v5.1.0
+</pre></div>
+<p>これでNode.jsが使えるようになった。</p>
+<p>Node.jsの使い方がイマイチよく分かっていないのだが、とりあえず、 <code>rework-pure-grids</code> の説明にある通り <code>rework</code> と <code>rework-pure-grids</code> をインストールする。</p>
+<div class="highlight"><pre>% npm install rework rework-pure-grids
+</pre></div>
+<p>これで <code>node_modules</code> というディレクトリが作成され、その中に <code>rework</code> と <code>rework-pure-grids</code> 、依存するパッケージがインストールされる。</p>
+<p>ここまで来たらグリッドを生成するための簡単なプログラムを書く。
+<a class="reference external" href="https://github.com/yahoo/rework-pure-grids">rework-pure-grids</a> にある書き方を参考にして、今回は1/9ベースのグリッドを生成するプログラムを書く。
+ここでは <code>app.js</code> という名前で保存することにする。</p>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">sys</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;sys&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">rework</span>    <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;rework&#39;</span><span class="p">),</span>
+    <span class="nx">pureGrids</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;rework-pure-grids&#39;</span><span class="p">);</span>
+
+<span class="c1">// Creates a 9ths-based Grid.</span>
+<span class="kd">var</span> <span class="nx">css</span> <span class="o">=</span> <span class="nx">rework</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">).</span><span class="nx">use</span><span class="p">(</span><span class="nx">pureGrids</span><span class="p">.</span><span class="nx">units</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">mediaQueries</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">sm</span><span class="o">:</span> <span class="s1">&#39;screen and (min-width: 35.5em)&#39;</span><span class="p">,</span>
+        <span class="nx">md</span><span class="o">:</span> <span class="s1">&#39;screen and (min-width: 48em)&#39;</span><span class="p">,</span>
+        <span class="nx">lg</span><span class="o">:</span> <span class="s1">&#39;screen and (min-width: 64em)&#39;</span><span class="p">,</span>
+        <span class="nx">xl</span><span class="o">:</span> <span class="s1">&#39;screen and (min-width: 80em)&#39;</span>
+    <span class="p">}</span>
+<span class="p">})).</span><span class="nx">toString</span><span class="p">();</span>
+
+<span class="nx">sys</span><span class="p">.</span><span class="nx">print</span><span class="p">(</span><span class="nx">css</span><span class="p">);</span>
+</pre></div>
+<p>これを実行するとグリッド用のCSSが出力されるので、ファイルに保存する。</p>
+<div class="highlight"><pre>% node app.js &gt; pure-grid-1-9.css
+</pre></div>
+<p>ちなみに <code>sys</code> を使うのは古いやり方だというWarningが出た。
+が、新しいやり方は調べていない・・・。</p>
+<p>Pure.cssでは、例えば1/5幅の <code>div</code> を作るときに <code>&lt;div class=&quot;pure-u-1-5&quot;&gt;</code> などと書く。
+生成した <code>pure-grid-1-9.css</code> をHTMLファイルで読み込めば、この書き方と同じように <code>&lt;div class=&quot;pure-u-1-9&quot;&gt;</code> などと書けるようになる。
+CSSファイルを小さくしたいなら <code>tr</code> コマンドで改行とスペースを削除すればいい。</p>
+</div>
+
+</section>
+<section id="comments">
+<!-- Disqus -->
+<div id="disqus_thread"></div>
+<script>
+/**
+ *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
+ *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+ *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+ *    https://disqus.com/admin/universalcode/#configuration-variables
+ */
+var disqus_config = function () {
+  this.language = 'ja';
+  this.page.url = 'http://pman0214.github.io/blog/pure-css-new-unit-grid.html';
+  this.page.identifier = 'pure-css-new-unit-grid';
+};
+(function() {  // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//pman0214-plog.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</section>
+</article>
+</main>
+</div>
+
+<div class="pure-u-1 pure-u-lg-1-4">
+<aside id="sidebar">
+    <section>
+      <h1>About pman0214</h1>
+      <p>ハードからソフトまで分かる研究者。そういうものに私はなりたい。</p>
+    </section>
+  <section>
+    <h1>Links</h1>
+    <ul class="links">
+      <li><a href="https://www.f.ait.kyushu-u.ac.jp/~ishida/">Research</a></li>
+    </ul>
+  </section>
+  <section>
+    <h1>Social Links</h1>
+    <ul class="links">
+      <li><a href="https://www.facebook.com/pman0214">facebook</a></li>
+      <li><a href="https://twitter.com/pman0214">twitter</a></li>
+      <li><a href="https://github.com/pman0214">github</a></li>
+    </ul>
+  </section>
+  <section class="tags">
+    <h1>Tags</h1>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/github.html">github</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pelican.html">pelican</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pthread.html">pthread</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/python.html">python</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
+    <p><a href="http://pman0214.github.io/blog/tags.html">See all...</a></p>
+  </section>
+</aside>
+</div>
+<!-- #layout --></div>
+
+<footer id="footer">
+  &copy; 2015 pman0214
+  &nbsp; | &nbsp;
+  Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+  with <a href="https://github.com/pman0214/pelican-pure" target="_blank">Pure theme</a>
+</footer>
+</body>
+</html>
