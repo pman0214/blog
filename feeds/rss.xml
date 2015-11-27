@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 18 Nov 2015 21:54:00 +0900</lastBuildDate><item><title>軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する</title><link>http://pman0214.github.io/blog/pure-css-new-unit-grid.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 27 Nov 2015 19:31:00 +0900</lastBuildDate><item><title>軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する</title><link>http://pman0214.github.io/blog/pure-css-new-unit-grid.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;最近、Webサイトを構築するときに &lt;a class="reference external" href="http://purecss.io/"&gt;Pure.css&lt;/a&gt; というCSSフレームワークを使用している。
@@ -35,6 +35,18 @@ Macの場合はHomebrewでnodebrewを導入し、最新安定版を導入すれ�
 この記事を書いている現時点での最新版は5.1.0。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% nodebrew install-binary v5.1.0
 &lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;2015/11/27追記ここから&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Failed to create the file&lt;/code&gt; などというエラーになることがある。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;fetch: http://nodejs.org/dist/v5.1.0/node-v5.1.0-darwin-x64.tar.gz
+Warning: Failed to create the file
+Warning: /Users/pman0214/.nodebrew/src/v5.1.0/node-v5.1.0-darwin-x64.tar.gz: No such file or directory
+                                                                           0.0%
+ curl: &lt;span class="o"&gt;(&lt;/span&gt;23&lt;span class="o"&gt;)&lt;/span&gt; Failed writing body &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; 2493&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;この場合には、今表示されたディレクトリを手動で作成してやればいい。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% mkdir -p /Users/pman0214/.nodebrew/src/v5.1.0
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;2015/11/27追記ここまで&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Node.jsの本家サーバが遅いと時間がかかるかもしれない。&lt;/p&gt;
 &lt;p&gt;インストールしたバージョンを使う宣言をする。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;% nodebrew use v5.1.0
@@ -72,7 +84,7 @@ Macの場合はHomebrewでnodebrewを導入し、最新安定版を導入すれ�
 生成した &lt;code&gt;pure-grid-1-9.css&lt;/code&gt; をHTMLファイルで読み込めば、この書き方と同じように &lt;code&gt;&amp;lt;div class=&amp;quot;pure-u-1-9&amp;quot;&amp;gt;&lt;/code&gt; などと書けるようになる。
 CSSファイルを小さくしたいなら &lt;code&gt;tr&lt;/code&gt; コマンドで改行とスペースを削除すればいい。&lt;/p&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Wed, 18 Nov 2015 21:54:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-11-18:blog/pure-css-new-unit-grid.html</guid><category>html</category><category>css framework</category></item><item><title>Valgrindでのメモリリークチェックがおかしい件</title><link>http://pman0214.github.io/blog/valgrind-bug.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Fri, 27 Nov 2015 19:31:00 +0900</pubDate><guid>tag:pman0214.github.io,2015-11-18:blog/pure-css-new-unit-grid.html</guid><category>html</category><category>css framework</category></item><item><title>Valgrindでのメモリリークチェックがおかしい件</title><link>http://pman0214.github.io/blog/valgrind-bug.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;プログラム開発時に有用な &lt;a class="reference external" href="http://valgrind.org/"&gt;Valgrind&lt;/a&gt; というツールがある。

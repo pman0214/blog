@@ -113,6 +113,18 @@ Macの場合はHomebrewでnodebrewを導入し、最新安定版を導入すれ�
 この記事を書いている現時点での最新版は5.1.0。</p>
 <div class="highlight"><pre>% nodebrew install-binary v5.1.0
 </pre></div>
+<p><strong>2015/11/27追記ここから</strong></p>
+<p><code>Failed to create the file</code> などというエラーになることがある。</p>
+<div class="highlight"><pre>fetch: http://nodejs.org/dist/v5.1.0/node-v5.1.0-darwin-x64.tar.gz
+Warning: Failed to create the file
+Warning: /Users/pman0214/.nodebrew/src/v5.1.0/node-v5.1.0-darwin-x64.tar.gz: No such file or directory
+                                                                           0.0%
+ curl: <span class="o">(</span>23<span class="o">)</span> Failed writing body <span class="o">(</span><span class="m">0</span> !<span class="o">=</span> 2493<span class="o">)</span>
+</pre></div>
+<p>この場合には、今表示されたディレクトリを手動で作成してやればいい。</p>
+<div class="highlight"><pre>% mkdir -p /Users/pman0214/.nodebrew/src/v5.1.0
+</pre></div>
+<p><strong>2015/11/27追記ここまで</strong></p>
 <p>Node.jsの本家サーバが遅いと時間がかかるかもしれない。</p>
 <p>インストールしたバージョンを使う宣言をする。</p>
 <div class="highlight"><pre>% nodebrew use v5.1.0
