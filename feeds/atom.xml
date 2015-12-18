@@ -1,5 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-11-27T19:31:00+09:00</updated><entry><title>軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する</title><link href="http://pman0214.github.io/blog/pure-css-new-unit-grid.html" rel="alternate"></link><updated>2015-11-27T19:31:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-11-18:blog/pure-css-new-unit-grid.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-12-18T19:45:00+09:00</updated><entry><title>El Capitan用にEmacs 24.5をビルドする</title><link href="http://pman0214.github.io/blog/el-capitan-emacs-24.5.html" rel="alternate"></link><updated>2015-12-18T19:45:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-12-18:blog/el-capitan-emacs-24.5.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;はじめに&lt;/h2&gt;
+&lt;p&gt;これまで10.9 Mavericksを使い続けてきたが、評判がよろしいので手持ちのマシンの1台に10.11 El Capitanをインストールした。
+クリーンインストールしたので特に大きな問題は発生していないのだが、前のマシンからコピーしたEmacsでカーソル移動とともに表示が消える現象が発生したので、この度新しくビルドすることにした。&lt;/p&gt;
+&lt;p&gt;ビルド方法を説明するブログ等はたくさんあるのだが、 &lt;code&gt;/usr/local&lt;/code&gt; の下に一部のファイルが入るなど他のマシンにコピーするには都合の悪い部分がある。
+このため、 &lt;code&gt;Emacs.app&lt;/code&gt; を &lt;code&gt;/Applications&lt;/code&gt; にコピーさえすればとりあえず動く状態になるものをビルドすることにした。&lt;/p&gt;
+&lt;p&gt;なお、他のマシンにはまだコピーしていないのできちんと動くのか不明。
+ちなみに、10.9のマシンにコピーしても動かなかった。。。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;参考&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://qiita.com/scalper/items/7d779824d5e96353710b"&gt;El Capitanで Emacs-24.5 をビルドして動かす&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ほぼ手順通りだが、 &lt;code&gt;Emacs.app&lt;/code&gt; の中に各種ファイルが無理矢理入るようにした。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;p&gt;まずはソースを取得して展開する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% mkdir ~/build
+% &lt;span class="nb"&gt;cd&lt;/span&gt; !&lt;span class="err"&gt;$&lt;/span&gt;
+% curl -LO http://ftp.gnu.org/pub/gnu/emacs/emacs-24.5.tar.xz
+% curl -LO ftp://ftp.math.s.chiba-u.ac.jp/emacs/emacs-24.5-mac-5.11.tar.gz
+% tar Jxvf emacs-24.5.tar.xz
+% tar zxvf emacs-24.5-mac-5.11.tar.gz
+% &lt;span class="nb"&gt;cd &lt;/span&gt;emacs-24.5
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;パッチを当てて必要ファイルをコピーする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% patch -p1 &amp;lt; ../emacs-24.5-mac-5.11/patch-mac
+% cp -R ../emacs-24.5-mac-5.11/mac mac
+% cp ../emacs-24.5-mac-5.11/src/* src
+% cp ../emacs-24.5-mac-5.11/lisp/term/mac-win.el lisp/term
+% cp nextstep/Cocoa/Emacs.base/Contents/Resources/Emacs.icns mac/Emacs.app/Contents/Resources/Emacs.icns
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;confiugreする。
+このとき、 &lt;code&gt;--prefix&lt;/code&gt; を指定し、使用時にEmacs.appがインストールされるであろう場所に各種ファイルがインストールされるようにする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% ./configure --with-mac --without-x --prefix&lt;span class="o"&gt;=&lt;/span&gt;/Applications/Emacs.app/Contents/MacOS
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このディレクトリは多分作成しておかなければならない。
+古いバージョンのEmacsを使っている場合は移動しておくこと。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% mv /Applications/Emacs.app /Applications/Emacs_24.4.app
+% mkdir -p /Applications/Emacs.app/Contents/MacOS
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ビルドしてインストールする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make
+% make install
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;make install&lt;/code&gt; で &lt;code&gt;mac/Emacs.app&lt;/code&gt; が作られるのだが、一部のファイル &lt;code&gt;/Applications/Emacs.app/Contents/MacOS&lt;/code&gt; に入る。
+なのでこれをコピーする。
+&lt;code&gt;MacOS&lt;/code&gt; の後の &lt;code&gt;/&lt;/code&gt; をつけないと残念なことになるので注意。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd &lt;/span&gt;mac/Emacs.app/Contents/MacOS
+% rsync -avrz -e cp /Applications/Emacs.app/Contents/MacOS/ ./
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;Emacs.app&lt;/code&gt; の偽物を消して本物をコピーする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; ../../..
+% rm -rf /Applications/Emacs.app
+% cp -r Emacs.app /Applications/
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="yatex"&gt;
+&lt;h2&gt;ついでにYaTeXを入れる&lt;/h2&gt;
+&lt;p&gt;仕事柄 &lt;a class="reference external" href="https://www.yatex.org/"&gt;YaTeX&lt;/a&gt; をよく使うので &lt;code&gt;Emacs.app&lt;/code&gt; に同梱しておく。
+この記事を執筆時点の最新版は1.78.4。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% &lt;span class="nb"&gt;cd&lt;/span&gt; ~/build
+% curl -LO https://www.yatex.org/yatex1.78.4.tar.gz
+% tar zxvf yatex1.78.4.tar.gz
+% &lt;span class="nb"&gt;cd &lt;/span&gt;yatex1.78.4
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;Makefile&lt;/code&gt; を直接編集する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="err"&gt;...&lt;/span&gt;
+&lt;span class="nv"&gt;EMACS&lt;/span&gt;   &lt;span class="o"&gt;=&lt;/span&gt; /Applications/Emacs.app/Contents/MacOS/Emacs
+&lt;span class="nv"&gt;PREFIX&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; /Applications/Emacs.app/Contents/MacOS
+&lt;span class="nv"&gt;EMACSDIR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/share/emacs
+&lt;span class="err"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;make install&lt;/code&gt; すればOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make install
+% make insta-yahtml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;おわりに&lt;/h2&gt;
+&lt;p&gt;このメモは後から作成しているため、間違いがあるかもしれない・・・。&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="osx"></category><category term="emacs"></category><category term="yatex"></category></entry><entry><title>軽量CSSフレームワークPure.cssで異なる単位のグリッドを作成する</title><link href="http://pman0214.github.io/blog/pure-css-new-unit-grid.html" rel="alternate"></link><updated>2015-11-27T19:31:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-11-18:blog/pure-css-new-unit-grid.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;最近、Webサイトを構築するときに &lt;a class="reference external" href="http://purecss.io/"&gt;Pure.css&lt;/a&gt; というCSSフレームワークを使用している。

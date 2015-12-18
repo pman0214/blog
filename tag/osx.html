@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>GitLabのレポジトリを移動する - pLog</title>
+  <title>osx - pLog</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
   <meta http-equiv="X-UA-Compatible" content="IE=11">
-  <meta name="author" content="pman0214">
-  <meta name="keywords" content="gitlab">
-  <meta name="description" content="GitLabのレポジトリを移動する手順。">
+  <meta name="keywords" content="osx">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -25,13 +23,6 @@
   <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
   <!-- open graph tags -->
   <meta property="og:site_name" content="pLog">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="GitLabのレポジトリを移動する">
-  <meta property="og:url" content="http://pman0214.github.io/blog/gitlab-repo-change-path.html">
-  <meta property="og:description" content="GitLabのレポジトリを移動する手順。">
-  <meta property="article:published_time" content="2015-10-15">
-  <meta property="article:section" content="devel">
-  <meta property="article:tag" content="gitlab">
 </head>
 
 <body>
@@ -43,7 +34,7 @@
         <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
           <a href="#" class="pure-menu-link">Categories</a>
           <ul class="pure-menu-children">
-            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
@@ -60,95 +51,17 @@
 <div id="layout" class="pure-g">
 <div class="pure-u-1 pure-u-lg-3-4">
 <main id="main">
-<article>
-<header>
-  <h1><a href="http://pman0214.github.io/blog/gitlab-repo-change-path.html" rel="bookmark" title="Permalink to GitLabのレポジトリを移動する">GitLabのレポジトリを移動する</a></h1>
-  <div class="article-info">
-
-    <div class="pure-g">
-      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-10-15T18:42:00+09:00">2015年10月15日 18:42</time></div>
-    </div>
-    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
-    <div class="tags">Tags:
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
-    </div>
-  </div>
-</header>
-<section class="contents">
-<!-- -*- coding: utf-8; -*- -->
-<div class="section" id="id1">
-<h2>概要</h2>
-<p>研究室ではGitLabを運用している。
-比較的最近、新しいファイルサーバを導入したのでサーバ上の大事なデータはこの上に集めているのだが、GitLab上のレポジトリはまだ移行していなかった。</p>
-<p>なのでこの度移動させた。
-ちなみにシンボリックリンクは使えないので、移動後には設定ファイルを変更するしかない。</p>
-<p>環境は以下。</p>
-<ul class="simple">
-<li>GitLab 7.0.0 de9bf7d</li>
-</ul>
-</div>
-<div class="section" id="id2">
-<h2>手順</h2>
-<p>ぶっちゃけ、かなり簡単。</p>
-<p>まず、GitLabを停止させる。</p>
-<p><a class="reference external" href="http://pman0214.github.io/blog/debian-gitlab.html">このブログのGitLabインストール手順</a> に従っている場合、 <code>/etc/init.d/gitlab</code> というスクリプトがあるはずなので、これを使って停止させる。</p>
-<div class="highlight"><pre>% sudo /etc/init.d/gitlab stop
-</pre></div>
-<p>次に、レポジトリを移動する。
-デフォルトの設定から変更していなければ、 <code>/home/git/repositories</code> というディレクトリにレポジトリが格納されている。
-ファイルサーバをNFSでマウントしているディレクトリにこのレポジトリ格納ディレクトリを移動する。
-怖い場合はユーザ情報を保持したままコピーする方が良い。</p>
-<div class="highlight"><pre>% sudo mv /home/git/repositories /path/to/nfs-dir/
-</pre></div>
-<p>設定を変更する。
-設定は、gitlab本体とgitlab-shellの両方に必要なので注意。</p>
-<div class="highlight"><pre>% <span class="nb">cd</span> /home/git
-% sudo -u git vi gitlab/config/gitlab.yml
-</pre></div>
-<div class="highlight"><pre><span class="nn">...</span>
-<span class="c1"># REPOS_PATH MUST NOT BE A SYMLINK!!!</span>
-<span class="l-Scalar-Plain">repos_path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/nfs-dir/repositories/  ★ここを変更する</span>
-<span class="nn">...</span>
-</pre></div>
-<div class="highlight"><pre>% sudo -u git vi gitlab-shell/config.yml
-</pre></div>
-<div class="highlight"><pre><span class="nn">...</span>
-<span class="l-Scalar-Plain">repos_path</span><span class="p-Indicator">:</span> <span class="s">&quot;/path/to/nfs-dir/repositories/&quot;</span>  <span class="l-Scalar-Plain">★ここを変更する</span>
-<span class="nn">...</span>
-</pre></div>
-<p>これでGitLabを起動させれば完了。</p>
-<div class="highlight"><pre>% sudo /etc/init.d/gitlab start
-</pre></div>
-<p>念のため、新しいレポジトリを作成したり、git pushできるかなどを確認しよう。</p>
-</div>
-
-</section>
-<section id="comments">
-<!-- Disqus -->
-<div id="disqus_thread"></div>
-<script>
-/**
- *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
- *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
- *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
- *    https://disqus.com/admin/universalcode/#configuration-variables
- */
-var disqus_config = function () {
-  this.language = 'ja';
-  this.page.url = 'http://pman0214.github.io/blog/gitlab-repo-change-path.html';
-  this.page.identifier = 'gitlab-repo-change-path';
-};
-(function() {  // DON'T EDIT BELOW THIS LINE
-  var d = document, s = d.createElement('script');
-
-  s.src = '//pman0214-plog.disqus.com/embed.js';
-
-  s.setAttribute('data-timestamp', +new Date());
-  (d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-</section>
+<article class="archives">
+  <header>
+<h1>Articles in the osx tag</h1>  </header>
+  <section class="contents">
+    <table class="archive pure-table">
+      <tr>
+        <td class="on_create"><time datetime="2015-12-18T19:45:00+09:00">2015年12月18日 19:45</time></td>
+        <td class="title"><a href="http://pman0214.github.io/blog/el-capitan-emacs-24.5.html">El Capitan用にEmacs 24.5をビルドする</a></td>
+      </tr>
+    </table>
+  </section>
 </article>
 </main>
 </div>

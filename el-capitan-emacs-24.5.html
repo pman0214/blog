@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>GitLabのレポジトリを移動する - pLog</title>
+  <title>El Capitan用にEmacs 24.5をビルドする - pLog</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <meta name="author" content="pman0214">
-  <meta name="keywords" content="gitlab">
-  <meta name="description" content="GitLabのレポジトリを移動する手順。">
+  <meta name="keywords" content="osx,emacs,yatex">
+  <meta name="description" content="El Capitanで使えるようにEmacs 24.5をビルドする。">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -26,12 +26,14 @@
   <!-- open graph tags -->
   <meta property="og:site_name" content="pLog">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="GitLabのレポジトリを移動する">
-  <meta property="og:url" content="http://pman0214.github.io/blog/gitlab-repo-change-path.html">
-  <meta property="og:description" content="GitLabのレポジトリを移動する手順。">
-  <meta property="article:published_time" content="2015-10-15">
-  <meta property="article:section" content="devel">
-  <meta property="article:tag" content="gitlab">
+  <meta property="og:title" content="El Capitan用にEmacs 24.5をビルドする">
+  <meta property="og:url" content="http://pman0214.github.io/blog/el-capitan-emacs-24.5.html">
+  <meta property="og:description" content="El Capitanで使えるようにEmacs 24.5をビルドする。">
+  <meta property="article:published_time" content="2015-12-18">
+  <meta property="article:section" content="osx">
+  <meta property="article:tag" content="osx">
+  <meta property="article:tag" content="emacs">
+  <meta property="article:tag" content="yatex">
 </head>
 
 <body>
@@ -43,10 +45,10 @@
         <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
           <a href="#" class="pure-menu-link">Categories</a>
           <ul class="pure-menu-children">
-            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
-            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
           </ul>
@@ -62,64 +64,105 @@
 <main id="main">
 <article>
 <header>
-  <h1><a href="http://pman0214.github.io/blog/gitlab-repo-change-path.html" rel="bookmark" title="Permalink to GitLabのレポジトリを移動する">GitLabのレポジトリを移動する</a></h1>
+  <h1><a href="http://pman0214.github.io/blog/el-capitan-emacs-24.5.html" rel="bookmark" title="Permalink to El Capitan用にEmacs 24.5をビルドする">El Capitan用にEmacs 24.5をビルドする</a></h1>
   <div class="article-info">
 
     <div class="pure-g">
-      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-10-15T18:42:00+09:00">2015年10月15日 18:42</time></div>
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-12-18T19:45:00+09:00">2015年12月18日 19:45</time></div>
     </div>
-    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/osx.html">osx</a></div>
     <div class="tags">Tags:
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/osx.html">osx</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/yatex.html">yatex</a>
     </div>
   </div>
 </header>
 <section class="contents">
 <!-- -*- coding: utf-8; -*- -->
 <div class="section" id="id1">
-<h2>概要</h2>
-<p>研究室ではGitLabを運用している。
-比較的最近、新しいファイルサーバを導入したのでサーバ上の大事なデータはこの上に集めているのだが、GitLab上のレポジトリはまだ移行していなかった。</p>
-<p>なのでこの度移動させた。
-ちなみにシンボリックリンクは使えないので、移動後には設定ファイルを変更するしかない。</p>
-<p>環境は以下。</p>
-<ul class="simple">
-<li>GitLab 7.0.0 de9bf7d</li>
-</ul>
+<h2>はじめに</h2>
+<p>これまで10.9 Mavericksを使い続けてきたが、評判がよろしいので手持ちのマシンの1台に10.11 El Capitanをインストールした。
+クリーンインストールしたので特に大きな問題は発生していないのだが、前のマシンからコピーしたEmacsでカーソル移動とともに表示が消える現象が発生したので、この度新しくビルドすることにした。</p>
+<p>ビルド方法を説明するブログ等はたくさんあるのだが、 <code>/usr/local</code> の下に一部のファイルが入るなど他のマシンにコピーするには都合の悪い部分がある。
+このため、 <code>Emacs.app</code> を <code>/Applications</code> にコピーさえすればとりあえず動く状態になるものをビルドすることにした。</p>
+<p>なお、他のマシンにはまだコピーしていないのできちんと動くのか不明。
+ちなみに、10.9のマシンにコピーしても動かなかった。。。</p>
 </div>
 <div class="section" id="id2">
+<h2>参考</h2>
+<ul class="simple">
+<li><a class="reference external" href="http://qiita.com/scalper/items/7d779824d5e96353710b">El Capitanで Emacs-24.5 をビルドして動かす</a></li>
+</ul>
+<p>ほぼ手順通りだが、 <code>Emacs.app</code> の中に各種ファイルが無理矢理入るようにした。</p>
+</div>
+<div class="section" id="id3">
 <h2>手順</h2>
-<p>ぶっちゃけ、かなり簡単。</p>
-<p>まず、GitLabを停止させる。</p>
-<p><a class="reference external" href="http://pman0214.github.io/blog/debian-gitlab.html">このブログのGitLabインストール手順</a> に従っている場合、 <code>/etc/init.d/gitlab</code> というスクリプトがあるはずなので、これを使って停止させる。</p>
-<div class="highlight"><pre>% sudo /etc/init.d/gitlab stop
+<p>まずはソースを取得して展開する。</p>
+<div class="highlight"><pre>% mkdir ~/build
+% <span class="nb">cd</span> !<span class="err">$</span>
+% curl -LO http://ftp.gnu.org/pub/gnu/emacs/emacs-24.5.tar.xz
+% curl -LO ftp://ftp.math.s.chiba-u.ac.jp/emacs/emacs-24.5-mac-5.11.tar.gz
+% tar Jxvf emacs-24.5.tar.xz
+% tar zxvf emacs-24.5-mac-5.11.tar.gz
+% <span class="nb">cd </span>emacs-24.5
 </pre></div>
-<p>次に、レポジトリを移動する。
-デフォルトの設定から変更していなければ、 <code>/home/git/repositories</code> というディレクトリにレポジトリが格納されている。
-ファイルサーバをNFSでマウントしているディレクトリにこのレポジトリ格納ディレクトリを移動する。
-怖い場合はユーザ情報を保持したままコピーする方が良い。</p>
-<div class="highlight"><pre>% sudo mv /home/git/repositories /path/to/nfs-dir/
+<p>パッチを当てて必要ファイルをコピーする。</p>
+<div class="highlight"><pre>% patch -p1 &lt; ../emacs-24.5-mac-5.11/patch-mac
+% cp -R ../emacs-24.5-mac-5.11/mac mac
+% cp ../emacs-24.5-mac-5.11/src/* src
+% cp ../emacs-24.5-mac-5.11/lisp/term/mac-win.el lisp/term
+% cp nextstep/Cocoa/Emacs.base/Contents/Resources/Emacs.icns mac/Emacs.app/Contents/Resources/Emacs.icns
 </pre></div>
-<p>設定を変更する。
-設定は、gitlab本体とgitlab-shellの両方に必要なので注意。</p>
-<div class="highlight"><pre>% <span class="nb">cd</span> /home/git
-% sudo -u git vi gitlab/config/gitlab.yml
+<p>confiugreする。
+このとき、 <code>--prefix</code> を指定し、使用時にEmacs.appがインストールされるであろう場所に各種ファイルがインストールされるようにする。</p>
+<div class="highlight"><pre>% ./configure --with-mac --without-x --prefix<span class="o">=</span>/Applications/Emacs.app/Contents/MacOS
 </pre></div>
-<div class="highlight"><pre><span class="nn">...</span>
-<span class="c1"># REPOS_PATH MUST NOT BE A SYMLINK!!!</span>
-<span class="l-Scalar-Plain">repos_path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/nfs-dir/repositories/  ★ここを変更する</span>
-<span class="nn">...</span>
+<p>このディレクトリは多分作成しておかなければならない。
+古いバージョンのEmacsを使っている場合は移動しておくこと。</p>
+<div class="highlight"><pre>% mv /Applications/Emacs.app /Applications/Emacs_24.4.app
+% mkdir -p /Applications/Emacs.app/Contents/MacOS
 </pre></div>
-<div class="highlight"><pre>% sudo -u git vi gitlab-shell/config.yml
+<p>ビルドしてインストールする。</p>
+<div class="highlight"><pre>% make
+% make install
 </pre></div>
-<div class="highlight"><pre><span class="nn">...</span>
-<span class="l-Scalar-Plain">repos_path</span><span class="p-Indicator">:</span> <span class="s">&quot;/path/to/nfs-dir/repositories/&quot;</span>  <span class="l-Scalar-Plain">★ここを変更する</span>
-<span class="nn">...</span>
+<p><code>make install</code> で <code>mac/Emacs.app</code> が作られるのだが、一部のファイル <code>/Applications/Emacs.app/Contents/MacOS</code> に入る。
+なのでこれをコピーする。
+<code>MacOS</code> の後の <code>/</code> をつけないと残念なことになるので注意。</p>
+<div class="highlight"><pre>% <span class="nb">cd </span>mac/Emacs.app/Contents/MacOS
+% rsync -avrz -e cp /Applications/Emacs.app/Contents/MacOS/ ./
 </pre></div>
-<p>これでGitLabを起動させれば完了。</p>
-<div class="highlight"><pre>% sudo /etc/init.d/gitlab start
+<p><code>Emacs.app</code> の偽物を消して本物をコピーする。</p>
+<div class="highlight"><pre>% <span class="nb">cd</span> ../../..
+% rm -rf /Applications/Emacs.app
+% cp -r Emacs.app /Applications/
 </pre></div>
-<p>念のため、新しいレポジトリを作成したり、git pushできるかなどを確認しよう。</p>
+</div>
+<div class="section" id="yatex">
+<h2>ついでにYaTeXを入れる</h2>
+<p>仕事柄 <a class="reference external" href="https://www.yatex.org/">YaTeX</a> をよく使うので <code>Emacs.app</code> に同梱しておく。
+この記事を執筆時点の最新版は1.78.4。</p>
+<div class="highlight"><pre>% <span class="nb">cd</span> ~/build
+% curl -LO https://www.yatex.org/yatex1.78.4.tar.gz
+% tar zxvf yatex1.78.4.tar.gz
+% <span class="nb">cd </span>yatex1.78.4
+</pre></div>
+<p><code>Makefile</code> を直接編集する。</p>
+<div class="highlight"><pre><span class="err">...</span>
+<span class="nv">EMACS</span>   <span class="o">=</span> /Applications/Emacs.app/Contents/MacOS/Emacs
+<span class="nv">PREFIX</span>  <span class="o">=</span> /Applications/Emacs.app/Contents/MacOS
+<span class="nv">EMACSDIR</span> <span class="o">=</span> <span class="si">${</span><span class="nv">PREFIX</span><span class="si">}</span>/share/emacs
+<span class="err">...</span>
+</pre></div>
+<p><code>make install</code> すればOK。</p>
+<div class="highlight"><pre>% make install
+% make insta-yahtml
+</pre></div>
+</div>
+<div class="section" id="id5">
+<h2>おわりに</h2>
+<p>このメモは後から作成しているため、間違いがあるかもしれない・・・。</p>
 </div>
 
 </section>
@@ -135,8 +178,8 @@
  */
 var disqus_config = function () {
   this.language = 'ja';
-  this.page.url = 'http://pman0214.github.io/blog/gitlab-repo-change-path.html';
-  this.page.identifier = 'gitlab-repo-change-path';
+  this.page.url = 'http://pman0214.github.io/blog/el-capitan-emacs-24.5.html';
+  this.page.identifier = 'el-capitan-emacs-24.5';
 };
 (function() {  // DON'T EDIT BELOW THIS LINE
   var d = document, s = d.createElement('script');
