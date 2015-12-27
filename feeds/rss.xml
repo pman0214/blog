@@ -1166,7 +1166,7 @@ CPU数が分かっている場合は &lt;code&gt;-j&lt;/code&gt; オプション
 &lt;p&gt;全ディスクをマシンに刺して、ディスクのパーティション設定時以外は普通にインストールすればいい。
 各ディスクは同じパーティション構成にしておく。
 自分の場合はこんな感じにした。&lt;/p&gt;
-&lt;table border="1" class="docutils"&gt;
+&lt;table border="1" class="pure-table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="14%" /&gt;
 &lt;col width="21%" /&gt;
