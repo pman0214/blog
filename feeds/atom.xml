@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2015-12-18T19:45:00+09:00</updated><entry><title>El Capitan用にEmacs 24.5をビルドする</title><link href="http://pman0214.github.io/blog/el-capitan-emacs-24.5.html" rel="alternate"></link><updated>2015-12-18T19:45:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-12-18:blog/el-capitan-emacs-24.5.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2016-03-02T00:00:00+09:00</updated><entry><title>LaTeXiTで日本語を使う</title><link href="http://pman0214.github.io/blog/latexit-japanese.html" rel="alternate"></link><updated>2016-03-02T00:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2016-03-02:blog/latexit-japanese.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;PowerPointやKeynoteでプレゼンを作るときに数式があると、入力がとても面倒だ。
+そんなとき、OSXユーザなら &lt;a class="reference external" href="http://www.chachatelier.fr/latexit/"&gt;LaTeXiT&lt;/a&gt; を利用しているユーザも多いかと思う。&lt;/p&gt;
+&lt;p&gt;しかし、LaTeXiTでは &lt;tt class="docutils literal"&gt;pdflatex&lt;/tt&gt; を使用してPDFイメージを作成しているため、そのままの設定では日本語を表示できない。
+ここでは設定方法をメモとして残す。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;環境&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;OSはEl Capitan 10.11.3。&lt;/li&gt;
+&lt;li&gt;LaTeXiTのバージョンは2.8.0。&lt;/li&gt;
+&lt;li&gt;TeXはHomebrewで入れたTeX Live 2015のもの。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% platex --version
+e-pTeX 3.14159265-p3.6-141210-2.6 &lt;span class="o"&gt;(&lt;/span&gt;utf8.euc&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;TeX Live 2015&lt;span class="o"&gt;)&lt;/span&gt;
+kpathsea version 6.2.1
+ptexenc version 1.3.3
+Copyright &lt;span class="m"&gt;2015&lt;/span&gt; D.E. Knuth.
+There is NO warranty.  Redistribution of this software is
+covered by the terms of both the e-pTeX copyright and
+the Lesser GNU General Public License.
+For more information about these matters, see the file
+named COPYING and the e-pTeX source.
+Primary author of e-pTeX: Peter Breitenlohner.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;設定&lt;/h2&gt;
+&lt;p&gt;プリアンブルは &lt;tt class="docutils literal"&gt;amsmath&lt;/tt&gt; と &lt;tt class="docutils literal"&gt;amssymb&lt;/tt&gt; だけ有効化していれば十分。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://farm2.staticflickr.com/1651/25055344419_e0ee6de555_z.jpg"&gt;&lt;img alt="latexit-config-1" src="https://farm2.staticflickr.com/1651/25055344419_e0ee6de555_z.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;タイプセット設定で、 &lt;tt class="docutils literal"&gt;latex+dvipdf&lt;/tt&gt; を使うように変更する。
+その上で、 &lt;tt class="docutils literal"&gt;platex&lt;/tt&gt; と &lt;tt class="docutils literal"&gt;dvipdfmx&lt;/tt&gt; のパスを指定。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://farm2.staticflickr.com/1642/25422906615_8aaa3b9a7e_z.jpg"&gt;&lt;img alt="latexit-config-2" src="https://farm2.staticflickr.com/1642/25422906615_8aaa3b9a7e_z.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;これだけ。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;日本語の書き方&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;\mbox&lt;/tt&gt; に入れて書けばOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;F&lt;span class="nb"&gt;}&lt;/span&gt;&lt;span class="k"&gt;\mbox&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;値&lt;span class="nb"&gt;}&lt;/span&gt; &lt;span class="nb"&gt;&amp;amp;&lt;/span&gt;= &lt;span class="k"&gt;\frac&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;2 &lt;span class="k"&gt;\cdot&lt;/span&gt; &lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;Precision&lt;span class="nb"&gt;}&lt;/span&gt; &lt;span class="k"&gt;\cdot&lt;/span&gt;
+&lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;Recall&lt;span class="nb"&gt;}}{&lt;/span&gt;&lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;Precision&lt;span class="nb"&gt;}&lt;/span&gt; + &lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;Recall&lt;span class="nb"&gt;}}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary><category term="osx"></category><category term="latex"></category></entry><entry><title>El Capitan用にEmacs 24.5をビルドする</title><link href="http://pman0214.github.io/blog/el-capitan-emacs-24.5.html" rel="alternate"></link><updated>2015-12-18T19:45:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2015-12-18:blog/el-capitan-emacs-24.5.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;はじめに&lt;/h2&gt;
 &lt;p&gt;これまで10.9 Mavericksを使い続けてきたが、評判がよろしいので手持ちのマシンの1台に10.11 El Capitanをインストールした。
