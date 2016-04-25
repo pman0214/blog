@@ -175,6 +175,14 @@ src-git python_rpi https://github.com/pman0214/python_rpi.git
 <p>あとはImage Generatorの <tt class="docutils literal">PACKAGES</tt> で自分の作成したパッケージを指定すればOK。</p>
 </div>
 </div>
+<div class="section" id="id8">
+<h2>追記（2016-04-25 18:15）</h2>
+<p>一番メモしたいと思っていた情報を書き忘れていた。
+パッケージをビルドしただけでは <tt class="docutils literal">Packages</tt> や <tt class="docutils literal">Packages.gz</tt> が存在しないため、 <tt class="docutils literal">repositories.conf</tt> を書き換えてもエラーになる。
+パッケージを新たに追加した場合はBuildrootにおいて再インデックスが必要。</p>
+<div class="highlight"><pre>% make package/index
+</pre></div>
+</div>
 
 </section>
 <section id="comments">

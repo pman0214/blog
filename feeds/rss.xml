@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 25 Apr 2016 00:00:00 +0900</lastBuildDate><item><title>Python RPi.GPIOのOpenWrtパッケージを作ってみた</title><link>http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 25 Apr 2016 18:15:00 +0900</lastBuildDate><item><title>Python RPi.GPIOのOpenWrtパッケージを作ってみた</title><link>http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;モチベーション&lt;/h2&gt;
 &lt;p&gt;Raspberry PiにRaspbianを載せるとちょっと重くなるので、自分は &lt;a class="reference external" href="https://openwrt.org/"&gt;OpenWrt&lt;/a&gt; を載せることが多い。&lt;/p&gt;
@@ -93,7 +93,15 @@ src-git python_rpi https://github.com/pman0214/python_rpi.git
 &lt;p&gt;あとはImage Generatorの &lt;tt class="docutils literal"&gt;PACKAGES&lt;/tt&gt; で自分の作成したパッケージを指定すればOK。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 25 Apr 2016 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2016-04-25:blog/openwrt-python-rpi-gpio.html</guid><category>linux</category><category>openwrt</category><category>openwrt package</category><category>raspberry pi</category></item><item><title>Gnuplot 5で破線とか</title><link>http://pman0214.github.io/blog/gnuplot-dashed-line.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h2&gt;追記（2016-04-25 18:15）&lt;/h2&gt;
+&lt;p&gt;一番メモしたいと思っていた情報を書き忘れていた。
+パッケージをビルドしただけでは &lt;tt class="docutils literal"&gt;Packages&lt;/tt&gt; や &lt;tt class="docutils literal"&gt;Packages.gz&lt;/tt&gt; が存在しないため、 &lt;tt class="docutils literal"&gt;repositories.conf&lt;/tt&gt; を書き換えてもエラーになる。
+パッケージを新たに追加した場合はBuildrootにおいて再インデックスが必要。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make package/index
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 25 Apr 2016 18:15:00 +0900</pubDate><guid>tag:pman0214.github.io,2016-04-25:blog/openwrt-python-rpi-gpio.html</guid><category>linux</category><category>openwrt</category><category>openwrt package</category><category>raspberry pi</category></item><item><title>Gnuplot 5で破線とか</title><link>http://pman0214.github.io/blog/gnuplot-dashed-line.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="motivation"&gt;
 &lt;h2&gt;Motivation&lt;/h2&gt;
 &lt;p&gt;&lt;tt class="docutils literal"&gt;gnuplot&lt;/tt&gt; を使うときには &lt;tt class="docutils literal"&gt;line style&lt;/tt&gt; を定義してそれを参照することで線種や点種を指定している。
