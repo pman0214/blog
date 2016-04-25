@@ -1,5 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 11 Apr 2016 00:00:00 +0900</lastBuildDate><item><title>Gnuplot 5で破線とか</title><link>http://pman0214.github.io/blog/gnuplot-dashed-line.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>pLog</title><link>http://pman0214.github.io/blog/</link><description></description><atom:link href="http://pman0214.github.io/blog/feeds/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 25 Apr 2016 00:00:00 +0900</lastBuildDate><item><title>Python RPi.GPIOのOpenWrtパッケージを作ってみた</title><link>http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;モチベーション&lt;/h2&gt;
+&lt;p&gt;Raspberry PiにRaspbianを載せるとちょっと重くなるので、自分は &lt;a class="reference external" href="https://openwrt.org/"&gt;OpenWrt&lt;/a&gt; を載せることが多い。&lt;/p&gt;
+&lt;p&gt;Raspberry Piを使うならばGPIOが使えなければ始まらない（←何が!?）。
+最近はPythonでコードを書いているので &lt;a class="reference external" href="https://pypi.python.org/pypi/RPi.GPIO"&gt;RPi.GPIOパッケージ&lt;/a&gt; を入れようとpipを走らせたものの、ビルドはめっちゃ遅いし &lt;tt class="docutils literal"&gt;Python.hがないよ！&lt;/tt&gt; と怒られたので、メロスは激怒してパッケージ化しようと決意した。&lt;/p&gt;
+&lt;p&gt;Image Generatorを使って作成したパッケージを含むイメージを作成するところまでやっちゃう。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;前提&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;OpenWrtの &lt;a class="reference external" href="https://wiki.openwrt.org/jp/about/toolchain"&gt;Buildroot&lt;/a&gt; がすでに使える。&lt;/li&gt;
+&lt;li&gt;Raspberry Pi用の &lt;tt class="docutils literal"&gt;.config&lt;/tt&gt; はすでに用意してある。&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://wiki.openwrt.org/doc/howto/obtain.firmware.generate"&gt;Image Generator&lt;/a&gt; も用意してある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;環境&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;ビルド機はDebian 8.0。&lt;/li&gt;
+&lt;li&gt;ビルド対象はChaos Calmer 15.05。&lt;/li&gt;
+&lt;li&gt;ターゲットマシンはRaspberry Pi。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;やり方&lt;/h2&gt;
+&lt;div class="section" id="makefile"&gt;
+&lt;h3&gt;パッケージビルド用Makefileの作成&lt;/h3&gt;
+&lt;p&gt;パッケージ用のソースはネットのどこかにあるものである場合が多いので、それを自動的に取得してきてパッケージ化するための &lt;tt class="docutils literal"&gt;Makefile&lt;/tt&gt; を書けばOK。&lt;/p&gt;
+&lt;p&gt;自分が書いたものは &lt;a class="reference external" href="https://github.com/pman0214/python_rpi/blob/master/python-rpi-gpio/Makefile"&gt;Githubで公開&lt;/a&gt; している。
+書き方はOpenWrtのドキュメントを見ても良いし、Buildrootの &lt;tt class="docutils literal"&gt;feeds/packages/&lt;/tt&gt; の下にあるテキトーなパッケージの &lt;tt class="docutils literal"&gt;Makefile&lt;/tt&gt; を見るのがとても参考になる。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="feed"&gt;
+&lt;h3&gt;パッケージ提供feedの作成&lt;/h3&gt;
+&lt;p&gt;OpenWrtでは新しいパッケージを追加する場合にfeedというものを追加する。
+なので作成したパッケージを追加するfeedを用意する。&lt;/p&gt;
+&lt;p&gt;と言っても、作成したパッケージ用Makefileが入ったディレクトリを含むgitレポジトリを用意すればいいだけ。
+自分の場合、 &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;python-rpi-gpio&lt;/span&gt;&lt;/tt&gt; パッケージを作成したので &lt;a class="reference external" href="https://github.com/pman0214/python_rpi"&gt;feed用レポジトリ&lt;/a&gt; の構成は以下のようになった。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/pman0214/python_rpi"&gt;python_rpiレポジトリ&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;python-rpi-gpio/&lt;ul&gt;
+&lt;li&gt;Makefile&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;LICENSE&lt;/li&gt;
+&lt;li&gt;README.rst&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;外に公開する場合にはきちんとLICENSEを定義してあげよう。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h3&gt;feedの追加&lt;/h3&gt;
+&lt;p&gt;Buildrootのfeed設定に今作成したfeed用レポジトリを追加してやる。
+こんな感じ。
+&lt;tt class="docutils literal"&gt;feeds.conf&lt;/tt&gt; に空行を入れたらエラーになった。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% vi feeds.conf
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;...
+src-git python_rpi https://github.com/pman0214/python_rpi.git
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;src-git&lt;/span&gt;&lt;/tt&gt; と書いていることから、もしかするとgit以外も使えるのかもしれない。
+ドキュメント参照ということで。&lt;/p&gt;
+&lt;p&gt;あとは普通に、feedを取得してパッケージをインストール。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% ./scripts/feeds update python_rpi
+% ./scripts/feeds install python-rpi-gpio
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;updateで &lt;tt class="docutils literal"&gt;feeds/&lt;/tt&gt; の下に &lt;tt class="docutils literal"&gt;python_rpi&lt;/tt&gt; というディレクトリが作成される。
+これはfeed用レポジトリのmasterだけを &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--single-branch&lt;/span&gt;&lt;/tt&gt; でcloneしたもの。&lt;/p&gt;
+&lt;p&gt;installを実行すると &lt;tt class="docutils literal"&gt;packages/feeds/&lt;/tt&gt; の下に &lt;tt class="docutils literal"&gt;python_rpi&lt;/tt&gt; というディレクトリが作成され、その下にinstallしたパッケージのリンクが作成される。
+このディレクトリにあるものは &lt;tt class="docutils literal"&gt;make&lt;/tt&gt; したときに呼び出されるということのようだ。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="make"&gt;
+&lt;h3&gt;働いたらmake！&lt;/h3&gt;
+&lt;p&gt;手順は &lt;a class="reference external" href="https://wiki.openwrt.org/doc/howtobuild/single.package"&gt;How to Build a Single Package&lt;/a&gt; に書いてある。
+まずはツール類をビルドする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make tools/install
+% make toolchain/install
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;そしてパッケージをビルドする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% make package/python-rpi-gpip/compile
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h3&gt;Image Generatorでパッケージにアクセス&lt;/h3&gt;
+&lt;p&gt;Image Generatorの &lt;tt class="docutils literal"&gt;repositories.conf&lt;/tt&gt; の上の方にコメントアウトしてある行を参考にして、以下のように書く。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;src custom file:///usr/src/openwrt/bin/brcm2708/packages
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ここで、 &lt;tt class="docutils literal"&gt;/usr/src/openwrt&lt;/tt&gt; がBuildrootへのパス。
+今回のターゲットマシンはRaspberry Piなので、ビルドしたパッケージは &lt;tt class="docutils literal"&gt;bin/brcm2708/packages/&lt;/tt&gt; に格納されている。&lt;/p&gt;
+&lt;p&gt;あとはImage Generatorの &lt;tt class="docutils literal"&gt;PACKAGES&lt;/tt&gt; で自分の作成したパッケージを指定すればOK。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 25 Apr 2016 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2016-04-25:blog/openwrt-python-rpi-gpio.html</guid><category>linux</category><category>openwrt</category><category>openwrt package</category><category>raspberry pi</category></item><item><title>Gnuplot 5で破線とか</title><link>http://pman0214.github.io/blog/gnuplot-dashed-line.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="motivation"&gt;
 &lt;h2&gt;Motivation&lt;/h2&gt;
 &lt;p&gt;&lt;tt class="docutils literal"&gt;gnuplot&lt;/tt&gt; を使うときには &lt;tt class="docutils literal"&gt;line style&lt;/tt&gt; を定義してそれを参照することで線種や点種を指定している。
@@ -52,7 +146,7 @@ gnuplotが5.0になって破線の表示ができなくなったので調べた�
 &lt;span class="k"&gt;test&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 11 Apr 2016 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2016-04-11:blog/gnuplot-dashed-line.html</guid><category>gnuplot</category><category>line style</category></item><item><title>LaTeXiTで日本語を使う</title><link>http://pman0214.github.io/blog/latexit-japanese.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 25 Apr 2016 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2016-04-11:blog/gnuplot-dashed-line.html</guid><category>gnuplot</category><category>line style</category></item><item><title>LaTeXiTで日本語を使う</title><link>http://pman0214.github.io/blog/latexit-japanese.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;PowerPointやKeynoteでプレゼンを作るときに数式があると、入力がとても面倒だ。
@@ -96,7 +190,7 @@ Primary author of e-pTeX: Peter Breitenlohner.
 &lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;Recall&lt;span class="nb"&gt;}}{&lt;/span&gt;&lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;Precision&lt;span class="nb"&gt;}&lt;/span&gt; + &lt;span class="k"&gt;\mathrm&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;Recall&lt;span class="nb"&gt;}}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 11 Apr 2016 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2016-03-02:blog/latexit-japanese.html</guid><category>osx</category><category>latex</category></item><item><title>El Capitan用にEmacs 24.5をビルドする</title><link>http://pman0214.github.io/blog/el-capitan-emacs-24.5.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">pman0214</dc:creator><pubDate>Mon, 25 Apr 2016 00:00:00 +0900</pubDate><guid>tag:pman0214.github.io,2016-03-02:blog/latexit-japanese.html</guid><category>osx</category><category>latex</category></item><item><title>El Capitan用にEmacs 24.5をビルドする</title><link>http://pman0214.github.io/blog/el-capitan-emacs-24.5.html</link><description>&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;はじめに&lt;/h2&gt;
 &lt;p&gt;これまで10.9 Mavericksを使い続けてきたが、評判がよろしいので手持ちのマシンの1台に10.11 El Capitanをインストールした。

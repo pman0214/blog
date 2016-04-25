@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>Raspberry Pi用のOpenWrtをビルドする - pLog</title>
+  <title>Python RPi.GPIOのOpenWrtパッケージを作ってみた - pLog</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <meta name="author" content="pman0214">
-  <meta name="keywords" content="linux,raspberry pi">
-  <meta name="description" content="Raspberry Piで動くOpenWrtをビルドする手順。">
+  <meta name="keywords" content="linux,openwrt,openwrt package,raspberry pi">
+  <meta name="description" content="Python RPi.GPIOのOpenWrtパッケージを作成したときの手順メモ。">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -26,12 +26,14 @@
   <!-- open graph tags -->
   <meta property="og:site_name" content="pLog">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Raspberry Pi用のOpenWrtをビルドする">
-  <meta property="og:url" content="http://pman0214.github.io/blog/raspi-openwrt.html">
-  <meta property="og:description" content="Raspberry Piで動くOpenWrtをビルドする手順。">
-  <meta property="article:published_time" content="2015-06-03">
+  <meta property="og:title" content="Python RPi.GPIOのOpenWrtパッケージを作ってみた">
+  <meta property="og:url" content="http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html">
+  <meta property="og:description" content="Python RPi.GPIOのOpenWrtパッケージを作成したときの手順メモ。">
+  <meta property="article:published_time" content="2016-04-25">
   <meta property="article:section" content="linux">
   <meta property="article:tag" content="linux">
+  <meta property="article:tag" content="openwrt">
+  <meta property="article:tag" content="openwrt package">
   <meta property="article:tag" content="raspberry pi">
 </head>
 
@@ -63,15 +65,17 @@
 <main id="main">
 <article>
 <header>
-  <h1><a href="http://pman0214.github.io/blog/raspi-openwrt.html" rel="bookmark" title="Permalink to Raspberry Pi用のOpenWrtをビルドする">Raspberry Pi用のOpenWrtをビルドする</a></h1>
+  <h1><a href="http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html" rel="bookmark" title="Permalink to Python RPi.GPIOのOpenWrtパッケージを作ってみた">Python RPi.GPIOのOpenWrtパッケージを作ってみた</a></h1>
   <div class="article-info">
 
     <div class="pure-g">
-      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-06-03T10:30:00+09:00">2015年06月03日 10:30</time></div>
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2016-04-25T14:38:00+09:00">2016年04月25日 14:38</time></div>
     </div>
     <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
     <div class="tags">Tags:
       <a class="pure-button" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/openwrt.html">openwrt</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/openwrt-package.html">openwrt package</a>
       <a class="pure-button" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
     </div>
   </div>
@@ -79,97 +83,96 @@
 <section class="contents">
 <!-- -*- coding: utf-8; -*- -->
 <div class="section" id="id1">
-<h2>概要</h2>
-<p>Raspberry Piで動くOpenWrtをDebian 8.0でビルドする手順を概説する。</p>
-<p><a class="reference external" href="https://openwrt.org/">OpenWrt</a> は主にアクセスポイントなどを対象とした組込みLinuxディストリビューション。
-FONのAPなどで使われているらしい。
-Raspberry PiではRaspbianを動かすのが主流みたいだが、重いしSDの容量も大きくないとダメなのでちょっと使いたいときに不便。
-なのでOpenWrtを入れることにした。
-パッケージ類を入れまくらない限り、OpenWrtなら100Mもあれば動作させることが可能。
-あんまり小さい容量のSDカードは入手できない時代なので、自分は2GBのSDカードに書き込んだ。</p>
-<p>別にビルドしなくてもバイナリは公開されているのだが、自分の欲しいパッケージを組み込んだり、設定をした状態のバイナリが欲しい場合はビルドが必須になるのでメモ。
-ImageBuilderを使えば上記のことは可能なような気もするが、まぁ気にしないことにする。</p>
+<h2>モチベーション</h2>
+<p>Raspberry PiにRaspbianを載せるとちょっと重くなるので、自分は <a class="reference external" href="https://openwrt.org/">OpenWrt</a> を載せることが多い。</p>
+<p>Raspberry Piを使うならばGPIOが使えなければ始まらない（←何が!?）。
+最近はPythonでコードを書いているので <a class="reference external" href="https://pypi.python.org/pypi/RPi.GPIO">RPi.GPIOパッケージ</a> を入れようとpipを走らせたものの、ビルドはめっちゃ遅いし <tt class="docutils literal">Python.hがないよ！</tt> と怒られたので、メロスは激怒してパッケージ化しようと決意した。</p>
+<p>Image Generatorを使って作成したパッケージを含むイメージを作成するところまでやっちゃう。</p>
 </div>
 <div class="section" id="id2">
 <h2>前提</h2>
 <ul class="simple">
-<li>Debian機はすでに用意してあるものとする。
-本記事執筆時点では8.0（jessie）が最新の安定版リリース。</li>
-<li>ディスクの空き容量は少なくとも50GBくらい用意しておいた方が良い。
-カーネルをビルドすると意外と食う。
-ビルド完了時点でソースディレクトリは33GBを消費していた。
-この他にも必要なツール類を導入しないといけないため、ディスク容量は結構必要となる。</li>
+<li>OpenWrtの <a class="reference external" href="https://wiki.openwrt.org/jp/about/toolchain">Buildroot</a> がすでに使える。</li>
+<li>Raspberry Pi用の <tt class="docutils literal">.config</tt> はすでに用意してある。</li>
+<li><a class="reference external" href="https://wiki.openwrt.org/doc/howto/obtain.firmware.generate">Image Generator</a> も用意してある。</li>
 </ul>
 </div>
 <div class="section" id="id3">
-<h2>手順</h2>
+<h2>環境</h2>
+<ul class="simple">
+<li>ビルド機はDebian 8.0。</li>
+<li>ビルド対象はChaos Calmer 15.05。</li>
+<li>ターゲットマシンはRaspberry Pi。</li>
+</ul>
+</div>
 <div class="section" id="id4">
-<h3>ツールのインストール</h3>
-<p>まず必要ツールをインストールする。
-Debianなので <code>apt-get</code> すればOK。</p>
-<div class="highlight"><pre>% sudo apt-get update
-% sudo apt-get install git-core build-essential libssl-dev <span class="se">\</span>
-libncurses5-dev unzip subversion gawk python gettext pkg-config <span class="se">\</span>
-zip openjdk-7-jdk openjdk-7-jre libxml-parser-perl mercurial <span class="se">\</span>
-zlib1g-dev sdcc bzr
+<h2>やり方</h2>
+<div class="section" id="makefile">
+<h3>パッケージビルド用Makefileの作成</h3>
+<p>パッケージ用のソースはネットのどこかにあるものである場合が多いので、それを自動的に取得してきてパッケージ化するための <tt class="docutils literal">Makefile</tt> を書けばOK。</p>
+<p>自分が書いたものは <a class="reference external" href="https://github.com/pman0214/python_rpi/blob/master/python-rpi-gpio/Makefile">Githubで公開</a> している。
+書き方はOpenWrtのドキュメントを見ても良いし、Buildrootの <tt class="docutils literal">feeds/packages/</tt> の下にあるテキトーなパッケージの <tt class="docutils literal">Makefile</tt> を見るのがとても参考になる。</p>
+</div>
+<div class="section" id="feed">
+<h3>パッケージ提供feedの作成</h3>
+<p>OpenWrtでは新しいパッケージを追加する場合にfeedというものを追加する。
+なので作成したパッケージを追加するfeedを用意する。</p>
+<p>と言っても、作成したパッケージ用Makefileが入ったディレクトリを含むgitレポジトリを用意すればいいだけ。
+自分の場合、 <tt class="docutils literal"><span class="pre">python-rpi-gpio</span></tt> パッケージを作成したので <a class="reference external" href="https://github.com/pman0214/python_rpi">feed用レポジトリ</a> の構成は以下のようになった。</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/pman0214/python_rpi">python_rpiレポジトリ</a><ul>
+<li>python-rpi-gpio/<ul>
+<li>Makefile</li>
+</ul>
+</li>
+<li>LICENSE</li>
+<li>README.rst</li>
+</ul>
+</li>
+</ul>
+<p>外に公開する場合にはきちんとLICENSEを定義してあげよう。</p>
+</div>
+<div class="section" id="id6">
+<h3>feedの追加</h3>
+<p>Buildrootのfeed設定に今作成したfeed用レポジトリを追加してやる。
+こんな感じ。
+<tt class="docutils literal">feeds.conf</tt> に空行を入れたらエラーになった。</p>
+<div class="highlight"><pre>% vi feeds.conf
+</pre></div>
+<div class="highlight"><pre>...
+src-git python_rpi https://github.com/pman0214/python_rpi.git
+...
+</pre></div>
+<p><tt class="docutils literal"><span class="pre">src-git</span></tt> と書いていることから、もしかするとgit以外も使えるのかもしれない。
+ドキュメント参照ということで。</p>
+<p>あとは普通に、feedを取得してパッケージをインストール。</p>
+<div class="highlight"><pre>% ./scripts/feeds update python_rpi
+% ./scripts/feeds install python-rpi-gpio
+</pre></div>
+<p>updateで <tt class="docutils literal">feeds/</tt> の下に <tt class="docutils literal">python_rpi</tt> というディレクトリが作成される。
+これはfeed用レポジトリのmasterだけを <tt class="docutils literal"><span class="pre">--single-branch</span></tt> でcloneしたもの。</p>
+<p>installを実行すると <tt class="docutils literal">packages/feeds/</tt> の下に <tt class="docutils literal">python_rpi</tt> というディレクトリが作成され、その下にinstallしたパッケージのリンクが作成される。
+このディレクトリにあるものは <tt class="docutils literal">make</tt> したときに呼び出されるということのようだ。</p>
+</div>
+<div class="section" id="make">
+<h3>働いたらmake！</h3>
+<p>手順は <a class="reference external" href="https://wiki.openwrt.org/doc/howtobuild/single.package">How to Build a Single Package</a> に書いてある。
+まずはツール類をビルドする。</p>
+<div class="highlight"><pre>% make tools/install
+% make toolchain/install
+</pre></div>
+<p>そしてパッケージをビルドする。</p>
+<div class="highlight"><pre>% make package/python-rpi-gpip/compile
 </pre></div>
 </div>
-<div class="section" id="id5">
-<h3>OpenWrtのビルド</h3>
-<p>何はともあれソースを取得する。
-今回はこの記事執筆時点での最新版を入れることにする。
-意外と時間がかかるので注意。
-自分が取得したのは</p>
-<div class="highlight"><pre>% git clone git://git.openwrt.org/openwrt.git
+<div class="section" id="id7">
+<h3>Image Generatorでパッケージにアクセス</h3>
+<p>Image Generatorの <tt class="docutils literal">repositories.conf</tt> の上の方にコメントアウトしてある行を参考にして、以下のように書く。</p>
+<div class="highlight"><pre>src custom file:///usr/src/openwrt/bin/brcm2708/packages
 </pre></div>
-<p>安定版リリースを使いたい場合には <a class="reference external" href="http://wiki.openwrt.org/doc/howto/buildroot.exigence#downloading_sources">OpenWrtのドキュメント</a> を参照のこと。</p>
-<p>パッケージ類のソースはfeedで管理されているので、これを使って最新のソースを取得してくる。
-<code>feeds.conf</code> を編集すればfeedを追加できる。
-<code>feeds.conf</code> は最初は存在しないので、 <code>feeds.conf.default</code> をコピーして使う。</p>
-<div class="highlight"><pre>% <span class="nb">cd </span>openwrt
-% ./scripts/feeds update -a
-% ./scripts/feeds install -a
-</pre></div>
-<p>Raspberry Pi用のconfigを取得する。
-この記事執筆時点では14.07のものが最新なので、これを取得して足りない設定は自分で施す。
-元から <code>.config</code> がある場合にも上書きしてしまう。
-gitから取ってきているので、復活させたければ <code>git checkout</code> すればいい。</p>
-<div class="highlight"><pre>% wget http://downloads.openwrt.org/barrier_breaker/14.07/brcm2708/generic/config.brcm2708_generic
-% cp config.brcm2708_generic .config
-</pre></div>
-<p>必要となるパッケージのチェック。
-足りないパッケージがあったら適宜インストールすること。</p>
-<div class="highlight"><pre>% make prereq
-</pre></div>
-<p>カーネルコンフィグを変更する。
-特に、Raspberry Pi2を使っている場合は <code>Subtarget</code> を <code>BCM2709</code> に変更しないと動かない（手元にRaspberry Pi2がないから未検証）。
-コンフィグを変更したら保存して終了すること。
-自分の好きなように変更して良い。
-当然のことだが、パッケージを減らせばビルドが速くなる。
-イメージサイズは組み込むパッケージ数に依存するので、ビルドしたから必ず大きくなるとは限らない。
-ImageBuilderをビルドしておくと単一のパッケージをビルドしたり組み込むパッケージや設定を変更してイメージを作成したりできるので便利。</p>
-<div class="highlight"><pre>% make menuconfig
-</pre></div>
-<p>あとはmakeするだけなのだが、configファイルを配置したイメージをビルドしたい場合には <code>package/base-files/files/</code> に配置しておく。
-個人的には、設定ファイルを配置したイメージはImageBuilderをビルドしてから作る方が良いように思う。</p>
-<p>makeする。
-CPU数が分かっている場合は <code>-j</code> オプションで指定するとmakeが速くなるかも。
-エラーが出た場合は <code>make -j1 V=s</code> とするとエラーを見ることができる。
-もちろん最初から指定しておいてもOK。</p>
-<div class="highlight"><pre>% make -j5
-</pre></div>
-<p>初めてmakeするときは色々なソースコードを取得してくるのでとてつもなく時間がかかる。
-ネットワーク（特に相手側）の速度に依存するため、マシンが速くても速くはならない。</p>
-<p><code>make -j5</code> などとしているとビルドに失敗するときがある。
-<code>make -j1 V=s</code> で試せばエラーが分かる、と表示されるので実行してみると今度はエラーが起きなくなる。
-謎だ。</p>
-<p>ソースコードの取得に失敗してエラー終了した場合には、時間を空けてトライするとmakeに成功するかも。
-時間を空けてトライしてもダメなら当該パッケージを除外するのが楽な解決方法だ。
-自分の場合は依存関係が間違っている場合も何度かあった。
-その場合は当該パッケージのMakefileを修正してしまった。
-ビルドするパッケージによって他にもツールが必要となる場合があるので、エラーメッセージをよく見て足りないものを導入しながらmakeしていく。</p>
-<p>この記事を書いている時点では、新しいリリースに向けてパッケージ類も変更中なのかたくさんのエラーに遭遇した。
-というわけで、現時点ではややハードルが高いかもしれない。</p>
+<p>ここで、 <tt class="docutils literal">/usr/src/openwrt</tt> がBuildrootへのパス。
+今回のターゲットマシンはRaspberry Piなので、ビルドしたパッケージは <tt class="docutils literal">bin/brcm2708/packages/</tt> に格納されている。</p>
+<p>あとはImage Generatorの <tt class="docutils literal">PACKAGES</tt> で自分の作成したパッケージを指定すればOK。</p>
 </div>
 </div>
 
@@ -186,8 +189,8 @@ CPU数が分かっている場合は <code>-j</code> オプションで指定す
  */
 var disqus_config = function () {
   this.language = 'ja';
-  this.page.url = 'http://pman0214.github.io/blog/raspi-openwrt.html';
-  this.page.identifier = 'raspi-openwrt';
+  this.page.url = 'http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html';
+  this.page.identifier = 'openwrt-python-rpi-gpio';
 };
 (function() {  // DON'T EDIT BELOW THIS LINE
   var d = document, s = d.createElement('script');
