@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>Debianパッケージを作成する - pLog</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=11">
+  <meta name="author" content="pman0214">
+  <meta name="keywords" content="debian,linux,dpkg">
+  <meta name="description" content="Debianのdebパッケージを作成する手順（基本編）。">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments/github.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-min.css">
+  <!--<![endif]-->
+  <!--[if lt IE 9]>
+    <script src="http://pman0214.github.io/blog/theme/js/html5shiv.js"></script>
+  <![endif]-->
+  <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="pLog Full Atom Feed">
+  <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
+  <!-- open graph tags -->
+  <meta property="og:site_name" content="pLog">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Debianパッケージを作成する">
+  <meta property="og:url" content="http://pman0214.github.io/blog/debian-package.html">
+  <meta property="og:description" content="Debianのdebパッケージを作成する手順（基本編）。">
+  <meta property="article:published_time" content="2017-05-22">
+  <meta property="article:section" content="linux">
+  <meta property="article:tag" content="debian">
+  <meta property="article:tag" content="linux">
+  <meta property="article:tag" content="dpkg">
+</head>
+
+<body>
+<header>
+  <nav id="menu">
+    <div class="pure-menu pure-menu-horizontal">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog" class="pure-menu-heading pure-menu-link">pLog</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+          <a href="#" class="pure-menu-link">Categories</a>
+          <ul class="pure-menu-children">
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
+          </ul>
+        </li>
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/archives.html" class="pure-menu-link">Archives</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div id="layout" class="pure-g">
+<div class="pure-u-1 pure-u-lg-3-4">
+<main id="main">
+<article>
+<header>
+  <h1><a href="http://pman0214.github.io/blog/debian-package.html" rel="bookmark" title="Permalink to Debianパッケージを作成する">Debianパッケージを作成する</a></h1>
+  <div class="article-info">
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2017-05-22T09:00:00+09:00">2017年05月22日 09:00</time></div>
+    </div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
+    <div class="tags">Tags:
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
+    </div>
+  </div>
+</header>
+<section class="contents">
+<!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id1">
+<h2>概要と前提</h2>
+<p>研究で作成したソフトを使った評価など、たくさんのマシンに自作のソフトをインストールする必要が生じた場合にインストール作業を行うのは手間だ。
+自分はいつもDebianを使うので、Debianパッケージを作成してインストールすることで簡単にインストールできるようにした。</p>
+<p>C++で書いた場合などには <tt class="docutils literal">waf</tt> を使っているのでインストール・アンインストールはそんなに面倒ではない。
+ここではCで書いて <tt class="docutils literal">make</tt> しているものと想定する。
+以下のようなファイルがあるものとする。</p>
+<div class="section" id="main-c">
+<h3><tt class="docutils literal">main.c</tt></h3>
+<div class="highlight"><pre><span class="cm">/*</span>
+<span class="cm"> * MIT License</span>
+<span class="cm"> *</span>
+<span class="cm"> * Copyright (c) 2017 pman0214</span>
+<span class="cm"> *</span>
+<span class="cm"> * Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="cm"> * of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="cm"> * in the Software without restriction, including without limitation the rights</span>
+<span class="cm"> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="cm"> * copies of the Software, and to permit persons to whom the Software is</span>
+<span class="cm"> * furnished to do so, subject to the following conditions:</span>
+<span class="cm"> *</span>
+<span class="cm"> * The above copyright notice and this permission notice shall be included in all</span>
+<span class="cm"> * copies or substantial portions of the Software.</span>
+<span class="cm"> *</span>
+<span class="cm"> * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="cm"> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="cm"> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="cm"> * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="cm"> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="cm"> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="cm"> * SOFTWARE.</span>
+<span class="cm"> */</span>
+
+<span class="cp">#include &lt;stdio.h&gt;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello, world!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* end of main.c */</span>
+</pre></div>
+</div>
+<div class="section" id="makefile">
+<h3><tt class="docutils literal">Makefile</tt></h3>
+<div class="highlight"><pre><span class="c">#</span>
+<span class="c"># MIT License</span>
+<span class="c">#</span>
+<span class="c"># Copyright (c) 2017 pman0214</span>
+<span class="c">#</span>
+<span class="c"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c"># in the Software without restriction, including without limitation the rights</span>
+<span class="c"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c"># furnished to do so, subject to the following conditions:</span>
+<span class="c">#</span>
+<span class="c"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c"># copies or substantial portions of the Software.</span>
+<span class="c">#</span>
+<span class="c"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c"># SOFTWARE.</span>
+<span class="c">#</span>
+
+<span class="nv">CC</span>       <span class="o">=</span>gcc
+<span class="nv">TARGET</span>   <span class="o">=</span><span class="nb">test</span>-app
+<span class="nv">CFLAGS</span>   <span class="o">=</span>-Wall
+<span class="nv">OBJ</span>      <span class="o">=</span>main.o
+<span class="nv">bindir</span>   <span class="o">=</span>/usr/bin
+
+<span class="c"># main target</span>
+<span class="nf">$(TARGET)</span><span class="o">:</span> <span class="k">$(</span><span class="nv">OBJ</span><span class="k">)</span>
+     <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> -o<span class="nv">$@</span> <span class="nv">$^</span>
+
+<span class="nf">main.o</span><span class="o">:</span> <span class="n">main</span>.<span class="n">c</span>
+     <span class="k">$(</span>CC<span class="k">)</span> -c <span class="nv">$^</span>
+
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">install</span>
+<span class="nf">install</span><span class="o">:</span> <span class="k">$(</span><span class="nv">TARGET</span><span class="k">)</span>
+     install -pd <span class="k">$(</span>DESTDIR<span class="k">)$(</span>bindir<span class="k">)</span>
+     install -pm <span class="m">755</span> <span class="k">$(</span>TARGET<span class="k">)</span> <span class="k">$(</span>DESTDIR<span class="k">)$(</span>bindir<span class="k">)</span>
+
+<span class="c"># Cleaning</span>
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>
+<span class="nf">clean</span><span class="o">:</span>
+     -@<span class="k">$(</span>RM<span class="k">)</span> <span class="k">$(</span>OBJ<span class="k">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>必要パッケージの導入</h2>
+<p>何のパッケージが必要なのかがやや怪しい。
+とりあえず以下は必要なはず。</p>
+<div class="highlight"><pre>% sudo apt-get install devscripts build-essential lintian
+</pre></div>
+<p>これで <tt class="docutils literal">fakeroot</tt> や <tt class="docutils literal">debuild</tt> もインストールされるはず。</p>
+</div>
+<div class="section" id="id3">
+<h2>手順</h2>
+<div class="section" id="id4">
+<h3><tt class="docutils literal">debian/</tt> ディレクトリを作成する</h3>
+<div class="highlight"><pre>% mkdir debian
+</pre></div>
+</div>
+<div class="section" id="debian-control">
+<h3><tt class="docutils literal">debian/control</tt> ファイルを作成する</h3>
+<p><tt class="docutils literal">debian/control</tt> にはパッケージの情報を書く。
+パッケージ名や依存関係、説明などを書く。
+どんなフィールドがあるかは <a class="reference external" href="https://www.debian.org/doc/debian-policy/">Debian Policy Manual (Declaring relationships between packages)</a> を参照のこと。
+<tt class="docutils literal">Source</tt> と <tt class="docutils literal">Package</tt> のそれぞれについて使えるフィールドが異なるので注意すること。</p>
+<div class="highlight"><pre><span class="nf">Source</span><span class="o">:</span> <span class="n">my</span>-<span class="n">test</span>-<span class="n">app</span>
+<span class="nf">Maintainer</span><span class="o">:</span> <span class="n">pman</span>0214 &lt;<span class="n">hoge</span>@<span class="n">example</span>.<span class="n">com</span>&gt;
+<span class="nf">Build-Depends</span><span class="o">:</span> <span class="n">make</span><span class="p">,</span> <span class="n">gcc</span>
+<span class="nf">Section</span><span class="o">:</span> <span class="n">utils</span>
+
+<span class="nf">Package</span><span class="o">:</span> <span class="n">my</span>-<span class="n">test</span>-<span class="n">app</span>
+<span class="nf">Priority</span><span class="o">:</span> <span class="n">optional</span>
+<span class="nf">Architecture</span><span class="o">:</span> <span class="n">all</span>
+<span class="nf">Description</span><span class="o">:</span> <span class="n">My</span> <span class="n">test</span> <span class="n">application</span>
+ This package provides my Debian package <span class="nb">test </span>application.
+</pre></div>
+</div>
+<div class="section" id="debian-changelog">
+<h3><tt class="docutils literal">debian/changelog</tt> ファイルを作成する</h3>
+<p><tt class="docutils literal">dch</tt> コマンドを使用すると良い。</p>
+<div class="highlight"><pre>% dch -i --create
+</pre></div>
+<p>テンプレートが開くはず。</p>
+<div class="highlight"><pre>PACKAGE (VERSION) UNRELEASED; urgency=medium
+
+  * Initial release. (Closes: #XXXXXX)
+
+ --  &lt;hoge@example.com&gt;  Sun, 21 May 2017 17:30:00 +0900
+</pre></div>
+<p>これを参考にして書き換える。</p>
+<div class="highlight"><pre>my-test-app (0.1) unstable; urgency=low
+
+  * Initial release.
+
+ --  pman0214 &lt;hoge@example.com&gt;  Sun, 21 May 2017 17:30:00 +0900
+</pre></div>
+</div>
+<div class="section" id="debian-rules">
+<h3><tt class="docutils literal">debian/rules</tt> ファイルを作成する</h3>
+<p>このファイルはこのパッケージをビルド・インストールするときの <tt class="docutils literal">Makefile</tt> と思えばいい。
+今回の場合はすでに <tt class="docutils literal">Makefile</tt> があるのでこれを呼べばいい。</p>
+<div class="highlight"><pre><span class="c">#!/usr/bin/make -f</span>
+
+<span class="nf">%</span><span class="o">:</span>
+     dh <span class="nv">$@</span>
+</pre></div>
+</div>
+<div class="section" id="debian-copyright">
+<h3><tt class="docutils literal">debian/copyright</tt> ファイルを作成する</h3>
+<p>ライセンス情報を入れておけば良い。
+空でもOK。</p>
+<div class="highlight"><pre>MIT License
+
+Copyright (c) 2017 pman0214
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre></div>
+</div>
+<div class="section" id="debuild">
+<h3><tt class="docutils literal">debuild</tt> する</h3>
+<div class="highlight"><pre>% debuild -us -uc
+</pre></div>
+<p>これで1つ上のディレクトリにdebファイルができる。</p>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>インストールしてみる</h2>
+<p>試しにインストールしてみよう。</p>
+<div class="highlight"><pre>% sudo dpkg -i ../my-test-app_0.1_all.deb
+% ls /usr/bin/test-app
+/usr/bin/test-app
+</pre></div>
+<p>きちんと入ったようだ。
+削除してみる。</p>
+<div class="highlight"><pre>% sudo dpkg -r my-test-app
+% ls /usr/bin/test-app
+ls: cannot access /usr/bin/test-app: No such file or directory
+</pre></div>
+<p>きちんと削除できた。</p>
+<p>パッケージでどんなファイルが入るかは以下で確認できる。</p>
+<div class="highlight"><pre>% dpkg --contents ../my-test-app_0.1_all.deb
+drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./
+drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/
+drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/share/
+drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/share/doc/
+drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/share/doc/my-test-app/
+-rw-r--r-- root/root      <span class="m">1071</span> 2017-05-21 17:48 ./usr/share/doc/my-test-app/copyright
+-rw-r--r-- root/root       <span class="m">142</span> 2017-05-21 17:40 ./usr/share/doc/my-test-app/changelog.gz
+drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/bin/
+-rwxr-xr-x root/root      <span class="m">6712</span> 2017-05-22 08:47 ./usr/bin/test-app
+</pre></div>
+</div>
+
+</section>
+<section id="comments">
+<!-- Disqus -->
+<div id="disqus_thread"></div>
+<script>
+/**
+ *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
+ *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+ *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+ *    https://disqus.com/admin/universalcode/#configuration-variables
+ */
+var disqus_config = function () {
+  this.language = 'ja';
+  this.page.url = 'http://pman0214.github.io/blog/debian-package.html';
+  this.page.identifier = 'debian-package';
+};
+(function() {  // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//pman0214-plog.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</section>
+</article>
+</main>
+</div>
+
+<div class="pure-u-1 pure-u-lg-1-4">
+<aside id="sidebar">
+    <section>
+      <h1>About pman0214</h1>
+      <p>ハードからソフトまで分かる研究者。そういうものに私はなりたい。</p>
+    </section>
+  <section>
+    <h1>Links</h1>
+    <ul class="links">
+      <li><a href="https://www.f.ait.kyushu-u.ac.jp/~ishida/">Research</a></li>
+    </ul>
+  </section>
+  <section>
+    <h1>Social Links</h1>
+    <ul class="links">
+      <li><a href="https://www.facebook.com/pman0214">facebook</a></li>
+      <li><a href="https://twitter.com/pman0214">twitter</a></li>
+      <li><a href="https://github.com/pman0214">github</a></li>
+    </ul>
+  </section>
+  <section class="tags">
+    <h1>Tags</h1>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
+    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/github.html">github</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/openwrt.html">openwrt</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/openwrt-package.html">openwrt package</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/osx.html">osx</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pandas.html">pandas</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pelican.html">pelican</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pthread.html">pthread</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/python.html">python</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/yatex.html">yatex</a>
+    <p><a href="http://pman0214.github.io/blog/tags.html">See all...</a></p>
+  </section>
+</aside>
+</div>
+<!-- #layout --></div>
+
+<footer id="footer">
+  &copy; 2017 pman0214
+  &nbsp; | &nbsp;
+  Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+  with <a href="https://github.com/pman0214/pelican-pure" target="_blank">Pure theme</a>
+</footer>
+</body>
+</html>

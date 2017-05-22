@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>Debianでautofsを使う - pLog</title>
+  <title>pLog</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <meta name="author" content="pman0214">
-  <meta name="keywords" content="debian,ldap,autofs">
-  <meta name="description" content="DebianでautofsでNFSなディレクトリをマウントする手順。">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -25,15 +23,10 @@
   <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
   <!-- open graph tags -->
   <meta property="og:site_name" content="pLog">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="Debianでautofsを使う">
-  <meta property="og:url" content="http://pman0214.github.io/blog/debian-autofs.html">
-  <meta property="og:description" content="DebianでautofsでNFSなディレクトリをマウントする手順。">
-  <meta property="article:published_time" content="2015-11-16">
-  <meta property="article:section" content="linux">
-  <meta property="article:tag" content="debian">
-  <meta property="article:tag" content="ldap">
-  <meta property="article:tag" content="autofs">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="pLog">
+  <meta property="og:url" content="http://pman0214.github.io/blog">
+  <meta property="og:description" content="pLog">
 </head>
 
 <body>
@@ -47,7 +40,7 @@
           <ul class="pure-menu-children">
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
-            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
@@ -62,104 +55,34 @@
 <div id="layout" class="pure-g">
 <div class="pure-u-1 pure-u-lg-3-4">
 <main id="main">
-<article>
-<header>
-  <h1><a href="http://pman0214.github.io/blog/debian-autofs.html" rel="bookmark" title="Permalink to Debianでautofsを使う">Debianでautofsを使う</a></h1>
-  <div class="article-info">
-
-    <div class="pure-g">
-      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-11-16T12:05:00+09:00">2015年11月16日 12:05</time></div>
+<article class="index">
+  <header>
+    <h1><a href="http://pman0214.github.io/blog/pelican-blog-github.html">Pelican+GitHub Pagesでブログ引っ越し</a></h1>
+    <div class="article-info">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-04-26T18:00:00+09:00">2015年04月26日 18:00</time></div>
+      </div>
+      <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/info.html">info</a></div>
+      <div class="tags">Tags:
+        <a class="pure-button" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+        <a class="pure-button" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
+        <a class="pure-button" href="http://pman0214.github.io/blog/tag/python.html">python</a>
+        <a class="pure-button" href="http://pman0214.github.io/blog/tag/pelican.html">pelican</a>
+        <a class="pure-button" href="http://pman0214.github.io/blog/tag/github.html">github</a>
+      </div>
     </div>
-    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
-    <div class="tags">Tags:
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
-    </div>
-  </div>
-</header>
-<section class="contents">
-<!-- -*- coding: utf-8; -*- -->
-<div class="section" id="id1">
-<h2>概要</h2>
-<p>各ユーザのホームをファイルサーバにまとめている場合は各ユーザのホームディレクトリをオートマウントしたくなることがある。
-こんなときにはautofsを使ってそのディレクトリを使用するときだけマウントすればいいのだが、いつも導入手順を忘れるのでメモ代わりにここにまとめることにした。
-以下の手順はLDAPクライアントの設定が終わっていて正常にログインできることを確認していることを前提とする。</p>
-</div>
-<div class="section" id="id2">
-<h2>手順</h2>
-<p>何はともあれNFSで当該のディレクトリをマウントできるようにしておかなければ始まらない。</p>
-<div class="highlight"><pre>% sudo apt-get install nfs-kernel-server
-</pre></div>
-<p>NFSサーバ側ではきちんと <code>/etc/exports</code> が設定されているものとする。
-この段階でとりあえずmountできることを確認しておく。</p>
-<div class="highlight"><pre>% sudo vi /etc/fstab
-</pre></div>
-<div class="highlight"><pre>...
-xx.xx.xx.xx:/home /home nfs  defaults    0   0  ★xxの部分はNFSサーバのIPを指定する
-...
-</pre></div>
-<div class="highlight"><pre>% sudo mount /home
-% ls /home
-</pre></div>
-<p>確認できたらunmountしておく。</p>
-<div class="highlight"><pre>% sudo umount /home
-</pre></div>
-<p>autofsをインストールする。</p>
-<div class="highlight"><pre>% sudo apt-get install autofs
-</pre></div>
-<p>これで <code>/etc</code> に <code>auto.master</code>, <code>auto.misc</code>, <code>auto.net</code>, <code>auto.smb</code> などといったファイルができる。</p>
-<p>まずは <code>/etc/auto.master</code> に <code>/home</code> の設定ファイルのありかとオプションを書く。
-今回はタイムアウトは300秒とした。</p>
-<div class="highlight"><pre>% sudo vi /etc/auto.master
-</pre></div>
-<div class="highlight"><pre>...
-/home    /etc/auto.home  --timeout 300
-...
-</pre></div>
-<p>続いて、今書いた設定ファイルを編集する。</p>
-<div class="highlight"><pre>% sudo vi /etc/auto.home
-</pre></div>
-<div class="highlight"><pre>*    -fstype=nfs4,rw xx.xx.xx.xx:/tank/home/&amp;  ★xxの部分はNFSサーバのIPを指定する
-</pre></div>
-<p><code>*</code> というワイルドカードを使うことができる。
-<code>&amp;</code> の部分はユーザ名で置き換えられる。</p>
-<p>ここまで書けたらautofsを再起動する。</p>
-<div class="highlight"><pre>% sudo /etc/init.d/autofs restart
-</pre></div>
-<p>これで誰かのホームディレクトリを <code>ls</code> できればOK。</p>
-<div class="highlight"><pre>% ls /home/somebody
-</pre></div>
-</div>
-
-</section>
-<section id="comments">
-<!-- Disqus -->
-<div id="disqus_thread"></div>
-<script>
-/**
- *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
- *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
- *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
- *    https://disqus.com/admin/universalcode/#configuration-variables
- */
-var disqus_config = function () {
-  this.language = 'ja';
-  this.page.url = 'http://pman0214.github.io/blog/debian-autofs.html';
-  this.page.identifier = 'debian-autofs';
-};
-(function() {  // DON'T EDIT BELOW THIS LINE
-  var d = document, s = d.createElement('script');
-
-  s.src = '//pman0214-plog.disqus.com/embed.js';
-
-  s.setAttribute('data-timestamp', +new Date());
-  (d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-</section>
+  </header>
+  <section class="contents">
+    <p><p>技術系ネタを書くことが多いので、FC2からブログ引っ越してきました。</p></p>
+  </section>
 </article>
+<div id="pagination">
+  <a class="pure-button" href="http://pman0214.github.io/blog/index2.html">&laquo;</a>
+  <a class="pure-button" href="http://pman0214.github.io/blog/index.html">1</a>
+  <a class="pure-button" href="http://pman0214.github.io/blog/index2.html">2</a>
+  <a class="pure-button pure-button-active pure-button-primary" href="http://pman0214.github.io/blog/index3.html">3</a>
+  <a class="pure-button pure-button-disabled" href="#">&raquo;</a>
+</div>
 </main>
 </div>
 

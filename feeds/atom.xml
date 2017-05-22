@@ -1,5 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2016-10-21T16:25:00+09:00</updated><entry><title>Pandas DataFrameで日時データのタイムゾーン変換</title><link href="http://pman0214.github.io/blog/pandas-tz-convert.html" rel="alternate"></link><updated>2016-10-21T16:25:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2016-10-21:blog/pandas-tz-convert.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2017-05-22T00:00:00+09:00</updated><entry><title>Debianパッケージを作成する</title><link href="http://pman0214.github.io/blog/debian-package.html" rel="alternate"></link><updated>2017-05-22T00:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2017-05-22:blog/debian-package.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要と前提&lt;/h2&gt;
+&lt;p&gt;研究で作成したソフトを使った評価など、たくさんのマシンに自作のソフトをインストールする必要が生じた場合にインストール作業を行うのは手間だ。
+自分はいつもDebianを使うので、Debianパッケージを作成してインストールすることで簡単にインストールできるようにした。&lt;/p&gt;
+&lt;p&gt;C++で書いた場合などには &lt;tt class="docutils literal"&gt;waf&lt;/tt&gt; を使っているのでインストール・アンインストールはそんなに面倒ではない。
+ここではCで書いて &lt;tt class="docutils literal"&gt;make&lt;/tt&gt; しているものと想定する。
+以下のようなファイルがあるものとする。&lt;/p&gt;
+&lt;div class="section" id="main-c"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;main.c&lt;/tt&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cm"&gt;/*&lt;/span&gt;
+&lt;span class="cm"&gt; * MIT License&lt;/span&gt;
+&lt;span class="cm"&gt; *&lt;/span&gt;
+&lt;span class="cm"&gt; * Copyright (c) 2017 pman0214&lt;/span&gt;
+&lt;span class="cm"&gt; *&lt;/span&gt;
+&lt;span class="cm"&gt; * Permission is hereby granted, free of charge, to any person obtaining a copy&lt;/span&gt;
+&lt;span class="cm"&gt; * of this software and associated documentation files (the &amp;quot;Software&amp;quot;), to deal&lt;/span&gt;
+&lt;span class="cm"&gt; * in the Software without restriction, including without limitation the rights&lt;/span&gt;
+&lt;span class="cm"&gt; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell&lt;/span&gt;
+&lt;span class="cm"&gt; * copies of the Software, and to permit persons to whom the Software is&lt;/span&gt;
+&lt;span class="cm"&gt; * furnished to do so, subject to the following conditions:&lt;/span&gt;
+&lt;span class="cm"&gt; *&lt;/span&gt;
+&lt;span class="cm"&gt; * The above copyright notice and this permission notice shall be included in all&lt;/span&gt;
+&lt;span class="cm"&gt; * copies or substantial portions of the Software.&lt;/span&gt;
+&lt;span class="cm"&gt; *&lt;/span&gt;
+&lt;span class="cm"&gt; * THE SOFTWARE IS PROVIDED &amp;quot;AS IS&amp;quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR&lt;/span&gt;
+&lt;span class="cm"&gt; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,&lt;/span&gt;
+&lt;span class="cm"&gt; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE&lt;/span&gt;
+&lt;span class="cm"&gt; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER&lt;/span&gt;
+&lt;span class="cm"&gt; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,&lt;/span&gt;
+&lt;span class="cm"&gt; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE&lt;/span&gt;
+&lt;span class="cm"&gt; * SOFTWARE.&lt;/span&gt;
+&lt;span class="cm"&gt; */&lt;/span&gt;
+
+&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Hello, world!&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* end of main.c */&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="makefile"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;Makefile&lt;/tt&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# MIT License&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# Copyright (c) 2017 pman0214&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# Permission is hereby granted, free of charge, to any person obtaining a copy&lt;/span&gt;
+&lt;span class="c"&gt;# of this software and associated documentation files (the &amp;quot;Software&amp;quot;), to deal&lt;/span&gt;
+&lt;span class="c"&gt;# in the Software without restriction, including without limitation the rights&lt;/span&gt;
+&lt;span class="c"&gt;# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell&lt;/span&gt;
+&lt;span class="c"&gt;# copies of the Software, and to permit persons to whom the Software is&lt;/span&gt;
+&lt;span class="c"&gt;# furnished to do so, subject to the following conditions:&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# The above copyright notice and this permission notice shall be included in all&lt;/span&gt;
+&lt;span class="c"&gt;# copies or substantial portions of the Software.&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# THE SOFTWARE IS PROVIDED &amp;quot;AS IS&amp;quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR&lt;/span&gt;
+&lt;span class="c"&gt;# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,&lt;/span&gt;
+&lt;span class="c"&gt;# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE&lt;/span&gt;
+&lt;span class="c"&gt;# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER&lt;/span&gt;
+&lt;span class="c"&gt;# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,&lt;/span&gt;
+&lt;span class="c"&gt;# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE&lt;/span&gt;
+&lt;span class="c"&gt;# SOFTWARE.&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+
+&lt;span class="nv"&gt;CC&lt;/span&gt;       &lt;span class="o"&gt;=&lt;/span&gt;gcc
+&lt;span class="nv"&gt;TARGET&lt;/span&gt;   &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;test&lt;/span&gt;-app
+&lt;span class="nv"&gt;CFLAGS&lt;/span&gt;   &lt;span class="o"&gt;=&lt;/span&gt;-Wall
+&lt;span class="nv"&gt;OBJ&lt;/span&gt;      &lt;span class="o"&gt;=&lt;/span&gt;main.o
+&lt;span class="nv"&gt;bindir&lt;/span&gt;   &lt;span class="o"&gt;=&lt;/span&gt;/usr/bin
+
+&lt;span class="c"&gt;# main target&lt;/span&gt;
+&lt;span class="nf"&gt;$(TARGET)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nv"&gt;OBJ&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+     &lt;span class="k"&gt;$(&lt;/span&gt;CC&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;CFLAGS&lt;span class="k"&gt;)&lt;/span&gt; -o&lt;span class="nv"&gt;$@&lt;/span&gt; &lt;span class="nv"&gt;$^&lt;/span&gt;
+
+&lt;span class="nf"&gt;main.o&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;main&lt;/span&gt;.&lt;span class="n"&gt;c&lt;/span&gt;
+     &lt;span class="k"&gt;$(&lt;/span&gt;CC&lt;span class="k"&gt;)&lt;/span&gt; -c &lt;span class="nv"&gt;$^&lt;/span&gt;
+
+&lt;span class="nf"&gt;.PHONY&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt;
+&lt;span class="nf"&gt;install&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nv"&gt;TARGET&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+     install -pd &lt;span class="k"&gt;$(&lt;/span&gt;DESTDIR&lt;span class="k"&gt;)$(&lt;/span&gt;bindir&lt;span class="k"&gt;)&lt;/span&gt;
+     install -pm &lt;span class="m"&gt;755&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;TARGET&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;DESTDIR&lt;span class="k"&gt;)$(&lt;/span&gt;bindir&lt;span class="k"&gt;)&lt;/span&gt;
+
+&lt;span class="c"&gt;# Cleaning&lt;/span&gt;
+&lt;span class="nf"&gt;.PHONY&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt;
+&lt;span class="nf"&gt;clean&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+     -@&lt;span class="k"&gt;$(&lt;/span&gt;RM&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OBJ&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;必要パッケージの導入&lt;/h2&gt;
+&lt;p&gt;何のパッケージが必要なのかがやや怪しい。
+とりあえず以下は必要なはず。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo apt-get install devscripts build-essential lintian
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで &lt;tt class="docutils literal"&gt;fakeroot&lt;/tt&gt; や &lt;tt class="docutils literal"&gt;debuild&lt;/tt&gt; もインストールされるはず。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;debian/&lt;/tt&gt; ディレクトリを作成する&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% mkdir debian
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="debian-control"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;debian/control&lt;/tt&gt; ファイルを作成する&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;debian/control&lt;/tt&gt; にはパッケージの情報を書く。
+パッケージ名や依存関係、説明などを書く。
+どんなフィールドがあるかは &lt;a class="reference external" href="https://www.debian.org/doc/debian-policy/"&gt;Debian Policy Manual (Declaring relationships between packages)&lt;/a&gt; を参照のこと。
+&lt;tt class="docutils literal"&gt;Source&lt;/tt&gt; と &lt;tt class="docutils literal"&gt;Package&lt;/tt&gt; のそれぞれについて使えるフィールドが異なるので注意すること。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nf"&gt;Source&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;my&lt;/span&gt;-&lt;span class="n"&gt;test&lt;/span&gt;-&lt;span class="n"&gt;app&lt;/span&gt;
+&lt;span class="nf"&gt;Maintainer&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pman&lt;/span&gt;0214 &amp;lt;&lt;span class="n"&gt;hoge&lt;/span&gt;@&lt;span class="n"&gt;example&lt;/span&gt;.&lt;span class="n"&gt;com&lt;/span&gt;&amp;gt;
+&lt;span class="nf"&gt;Build-Depends&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;make&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gcc&lt;/span&gt;
+&lt;span class="nf"&gt;Section&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt;
+
+&lt;span class="nf"&gt;Package&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;my&lt;/span&gt;-&lt;span class="n"&gt;test&lt;/span&gt;-&lt;span class="n"&gt;app&lt;/span&gt;
+&lt;span class="nf"&gt;Priority&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;optional&lt;/span&gt;
+&lt;span class="nf"&gt;Architecture&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;all&lt;/span&gt;
+&lt;span class="nf"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;My&lt;/span&gt; &lt;span class="n"&gt;test&lt;/span&gt; &lt;span class="n"&gt;application&lt;/span&gt;
+ This package provides my Debian package &lt;span class="nb"&gt;test &lt;/span&gt;application.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="debian-changelog"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;debian/changelog&lt;/tt&gt; ファイルを作成する&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;dch&lt;/tt&gt; コマンドを使用すると良い。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% dch -i --create
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;テンプレートが開くはず。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;PACKAGE (VERSION) UNRELEASED; urgency=medium
+
+  * Initial release. (Closes: #XXXXXX)
+
+ --  &amp;lt;hoge@example.com&amp;gt;  Sun, 21 May 2017 17:30:00 +0900
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これを参考にして書き換える。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;my-test-app (0.1) unstable; urgency=low
+
+  * Initial release.
+
+ --  pman0214 &amp;lt;hoge@example.com&amp;gt;  Sun, 21 May 2017 17:30:00 +0900
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="debian-rules"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;debian/rules&lt;/tt&gt; ファイルを作成する&lt;/h3&gt;
+&lt;p&gt;このファイルはこのパッケージをビルド・インストールするときの &lt;tt class="docutils literal"&gt;Makefile&lt;/tt&gt; と思えばいい。
+今回の場合はすでに &lt;tt class="docutils literal"&gt;Makefile&lt;/tt&gt; があるのでこれを呼べばいい。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/usr/bin/make -f&lt;/span&gt;
+
+&lt;span class="nf"&gt;%&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+     dh &lt;span class="nv"&gt;$@&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="debian-copyright"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;debian/copyright&lt;/tt&gt; ファイルを作成する&lt;/h3&gt;
+&lt;p&gt;ライセンス情報を入れておけば良い。
+空でもOK。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;MIT License
+
+Copyright (c) 2017 pman0214
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &amp;quot;Software&amp;quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &amp;quot;AS IS&amp;quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="debuild"&gt;
+&lt;h3&gt;&lt;tt class="docutils literal"&gt;debuild&lt;/tt&gt; する&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% debuild -us -uc
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで1つ上のディレクトリにdebファイルができる。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;インストールしてみる&lt;/h2&gt;
+&lt;p&gt;試しにインストールしてみよう。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo dpkg -i ../my-test-app_0.1_all.deb
+% ls /usr/bin/test-app
+/usr/bin/test-app
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;きちんと入ったようだ。
+削除してみる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% sudo dpkg -r my-test-app
+% ls /usr/bin/test-app
+ls: cannot access /usr/bin/test-app: No such file or directory
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;きちんと削除できた。&lt;/p&gt;
+&lt;p&gt;パッケージでどんなファイルが入るかは以下で確認できる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;% dpkg --contents ../my-test-app_0.1_all.deb
+drwxr-xr-x root/root         &lt;span class="m"&gt;0&lt;/span&gt; 2017-05-22 08:47 ./
+drwxr-xr-x root/root         &lt;span class="m"&gt;0&lt;/span&gt; 2017-05-22 08:47 ./usr/
+drwxr-xr-x root/root         &lt;span class="m"&gt;0&lt;/span&gt; 2017-05-22 08:47 ./usr/share/
+drwxr-xr-x root/root         &lt;span class="m"&gt;0&lt;/span&gt; 2017-05-22 08:47 ./usr/share/doc/
+drwxr-xr-x root/root         &lt;span class="m"&gt;0&lt;/span&gt; 2017-05-22 08:47 ./usr/share/doc/my-test-app/
+-rw-r--r-- root/root      &lt;span class="m"&gt;1071&lt;/span&gt; 2017-05-21 17:48 ./usr/share/doc/my-test-app/copyright
+-rw-r--r-- root/root       &lt;span class="m"&gt;142&lt;/span&gt; 2017-05-21 17:40 ./usr/share/doc/my-test-app/changelog.gz
+drwxr-xr-x root/root         &lt;span class="m"&gt;0&lt;/span&gt; 2017-05-22 08:47 ./usr/bin/
+-rwxr-xr-x root/root      &lt;span class="m"&gt;6712&lt;/span&gt; 2017-05-22 08:47 ./usr/bin/test-app
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary><category term="debian"></category><category term="linux"></category><category term="dpkg"></category></entry><entry><title>Pandas DataFrameで日時データのタイムゾーン変換</title><link href="http://pman0214.github.io/blog/pandas-tz-convert.html" rel="alternate"></link><updated>2016-10-21T16:25:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2016-10-21:blog/pandas-tz-convert.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="timestamp"&gt;
 &lt;h2&gt;TimeStampデータのタイムゾーン変換問題&lt;/h2&gt;
 &lt;p&gt;PandasでTimeStampデータのタイムゾーンを変換する場合には少し気をつけないといけない。
@@ -201,7 +421,7 @@ src-git python_rpi https://github.com/pman0214/python_rpi.git
 &lt;div class="highlight"&gt;&lt;pre&gt;% make package/index
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-</summary><category term="linux"></category><category term="openwrt"></category><category term="openwrt package"></category><category term="raspberry pi"></category></entry><entry><title>Gnuplot 5で破線とか</title><link href="http://pman0214.github.io/blog/gnuplot-dashed-line.html" rel="alternate"></link><updated>2016-10-21T00:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2016-04-11:blog/gnuplot-dashed-line.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+</summary><category term="linux"></category><category term="openwrt"></category><category term="openwrt package"></category><category term="raspberry pi"></category></entry><entry><title>Gnuplot 5で破線とか</title><link href="http://pman0214.github.io/blog/gnuplot-dashed-line.html" rel="alternate"></link><updated>2017-05-22T00:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2016-04-11:blog/gnuplot-dashed-line.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="motivation"&gt;
 &lt;h2&gt;Motivation&lt;/h2&gt;
 &lt;p&gt;&lt;tt class="docutils literal"&gt;gnuplot&lt;/tt&gt; を使うときには &lt;tt class="docutils literal"&gt;line style&lt;/tt&gt; を定義してそれを参照することで線種や点種を指定している。
@@ -254,7 +474,7 @@ gnuplotが5.0になって破線の表示ができなくなったので調べた�
 &lt;span class="k"&gt;test&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-</summary><category term="gnuplot"></category><category term="line style"></category></entry><entry><title>LaTeXiTで日本語を使う</title><link href="http://pman0214.github.io/blog/latexit-japanese.html" rel="alternate"></link><updated>2016-10-21T00:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2016-03-02:blog/latexit-japanese.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+</summary><category term="gnuplot"></category><category term="line style"></category></entry><entry><title>LaTeXiTで日本語を使う</title><link href="http://pman0214.github.io/blog/latexit-japanese.html" rel="alternate"></link><updated>2017-05-22T00:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2016-03-02:blog/latexit-japanese.html</id><summary type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;PowerPointやKeynoteでプレゼンを作るときに数式があると、入力がとても面倒だ。
