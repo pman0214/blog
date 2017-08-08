@@ -50,6 +50,7 @@
             <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
           </ul>
         </li>
@@ -89,46 +90,46 @@
 <div class="section" id="id2">
 <h2>手順</h2>
 <p>何はともあれNFSで当該のディレクトリをマウントできるようにしておかなければ始まらない。</p>
-<div class="highlight"><pre>% sudo apt-get install nfs-kernel-server
+<div class="highlight"><pre><span></span>% sudo apt-get install nfs-kernel-server
 </pre></div>
 <p>NFSサーバ側ではきちんと <code>/etc/exports</code> が設定されているものとする。
 この段階でとりあえずmountできることを確認しておく。</p>
-<div class="highlight"><pre>% sudo vi /etc/fstab
+<div class="highlight"><pre><span></span>% sudo vi /etc/fstab
 </pre></div>
-<div class="highlight"><pre>...
+<div class="highlight"><pre><span></span>...
 xx.xx.xx.xx:/home /home nfs  defaults    0   0  ★xxの部分はNFSサーバのIPを指定する
 ...
 </pre></div>
-<div class="highlight"><pre>% sudo mount /home
+<div class="highlight"><pre><span></span>% sudo mount /home
 % ls /home
 </pre></div>
 <p>確認できたらunmountしておく。</p>
-<div class="highlight"><pre>% sudo umount /home
+<div class="highlight"><pre><span></span>% sudo umount /home
 </pre></div>
 <p>autofsをインストールする。</p>
-<div class="highlight"><pre>% sudo apt-get install autofs
+<div class="highlight"><pre><span></span>% sudo apt-get install autofs
 </pre></div>
 <p>これで <code>/etc</code> に <code>auto.master</code>, <code>auto.misc</code>, <code>auto.net</code>, <code>auto.smb</code> などといったファイルができる。</p>
 <p>まずは <code>/etc/auto.master</code> に <code>/home</code> の設定ファイルのありかとオプションを書く。
 今回はタイムアウトは300秒とした。</p>
-<div class="highlight"><pre>% sudo vi /etc/auto.master
+<div class="highlight"><pre><span></span>% sudo vi /etc/auto.master
 </pre></div>
-<div class="highlight"><pre>...
+<div class="highlight"><pre><span></span>...
 /home    /etc/auto.home  --timeout 300
 ...
 </pre></div>
 <p>続いて、今書いた設定ファイルを編集する。</p>
-<div class="highlight"><pre>% sudo vi /etc/auto.home
+<div class="highlight"><pre><span></span>% sudo vi /etc/auto.home
 </pre></div>
-<div class="highlight"><pre>*    -fstype=nfs4,rw xx.xx.xx.xx:/tank/home/&amp;  ★xxの部分はNFSサーバのIPを指定する
+<div class="highlight"><pre><span></span>*    -fstype=nfs4,rw xx.xx.xx.xx:/tank/home/&amp;  ★xxの部分はNFSサーバのIPを指定する
 </pre></div>
 <p><code>*</code> というワイルドカードを使うことができる。
 <code>&amp;</code> の部分はユーザ名で置き換えられる。</p>
 <p>ここまで書けたらautofsを再起動する。</p>
-<div class="highlight"><pre>% sudo /etc/init.d/autofs restart
+<div class="highlight"><pre><span></span>% sudo /etc/init.d/autofs restart
 </pre></div>
 <p>これで誰かのホームディレクトリを <code>ls</code> できればOK。</p>
-<div class="highlight"><pre>% ls /home/somebody
+<div class="highlight"><pre><span></span>% ls /home/somebody
 </pre></div>
 </div>
 
@@ -201,6 +202,7 @@ var disqus_config = function () {
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
@@ -216,6 +218,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>

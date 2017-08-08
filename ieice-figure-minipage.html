@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>EFIブートするUSBメモリでdebianをインストール - pLog</title>
+  <title>ieicej.clsのfigure環境内でminipageしたときにキャプションがおかしくなる件 - pLog</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <meta name="author" content="pman0214">
-  <meta name="keywords" content="debian,efi">
-  <meta name="description" content="EFIブートするUSBメモリを作成し、debianをインストールするまで。">
+  <meta name="keywords" content="tex,ieice">
+  <meta name="description" content="TeXで電子情報通信学会提供のクラスファイルieicej.clsを使っているときにfigure環境内でminipageしたときに自動的に改行されない問題を解決する。">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -26,13 +26,13 @@
   <!-- open graph tags -->
   <meta property="og:site_name" content="pLog">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="EFIブートするUSBメモリでdebianをインストール">
-  <meta property="og:url" content="http://pman0214.github.io/blog/debian-install-efi.html">
-  <meta property="og:description" content="EFIブートするUSBメモリを作成し、debianをインストールするまで。">
-  <meta property="article:published_time" content="2015-04-30">
-  <meta property="article:section" content="linux">
-  <meta property="article:tag" content="debian">
-  <meta property="article:tag" content="efi">
+  <meta property="og:title" content="ieicej.clsのfigure環境内でminipageしたときにキャプションがおかしくなる件">
+  <meta property="og:url" content="http://pman0214.github.io/blog/ieice-figure-minipage.html">
+  <meta property="og:description" content="TeXで電子情報通信学会提供のクラスファイルieicej.clsを使っているときにfigure環境内でminipageしたときに自動的に改行されない問題を解決する。">
+  <meta property="article:published_time" content="2017-08-08">
+  <meta property="article:section" content="tex">
+  <meta property="article:tag" content="tex">
+  <meta property="article:tag" content="ieice">
 </head>
 
 <body>
@@ -46,10 +46,10 @@
           <ul class="pure-menu-children">
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
-            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
-            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
           </ul>
         </li>
@@ -64,163 +64,73 @@
 <main id="main">
 <article>
 <header>
-  <h1><a href="http://pman0214.github.io/blog/debian-install-efi.html" rel="bookmark" title="Permalink to EFIブートするUSBメモリでdebianをインストール">EFIブートするUSBメモリでdebianをインストール</a></h1>
+  <h1><a href="http://pman0214.github.io/blog/ieice-figure-minipage.html" rel="bookmark" title="Permalink to ieicej.clsのfigure環境内でminipageしたときにキャプションがおかしくなる件">ieicej.clsのfigure環境内でminipageしたときにキャプションがおかしくなる件</a></h1>
   <div class="article-info">
 
     <div class="pure-g">
-      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-04-30T12:55:00+09:00">2015年04月30日 12:55</time></div>
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2017-08-08T10:00:00+09:00">2017年08月08日 10:00</time></div>
     </div>
-    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/tex.html">tex</a></div>
     <div class="tags">Tags:
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     </div>
   </div>
 </header>
 <section class="contents">
-<h2>概要</h2>
-<ul>
-<li>EFIブートするUSBメモリを作成し、これを使ってdebianをインストールする。</li>
-<li>古いXserveをdebian化しようとした中での例。<ul>
-<li>インストールできたものの、うまく起動しない状態で終わってます。多分ドライバ周り・・・。</li>
-</ul>
-</li>
-<li>grubを導入したUSBメモリを用意してしまえば、カーネルや初期RAMディスク、ISOイメージを書き換えるだけでよくなる。この作業はUSBメモリのファイルを書き換えるだけなので、debian機は不要。</li>
-</ul>
-<h2>必要なもの</h2>
-<ul>
-<li>2GBくらいのUSBメモリ<ul>
-<li>中身は完全に消える。</li>
-</ul>
-</li>
-<li>母艦となるdebian機<ul>
-<li>VMでも構わないが、USBメモリをmountできないとダメ。</li>
-</ul>
-</li>
-</ul>
-<h2>手順</h2>
-<h3>grubの準備</h3>
-<p>まずは母艦となるdebianでEFI対応のgrubを用意する。インストールしたいアーキテクチャに合わせたものを用意する。今回はx86の64bit版で。</p>
-<div class="highlight"><pre><span></span>sudo apt-get install grub-efi-x86_64-bin
+<!-- -*- coding: utf-8; -*- -->
+<p>電子情報通信学会の <tt class="docutils literal">ieicej.cls</tt> を使ってTeXで原稿を書くときに、細いカラムの中に縦長の図を横に2つ並べたいときがたまにある。
+このように書いて図を2つ並べようとする。</p>
+<div class="highlight"><pre><span></span><span class="k">\begin</span><span class="nb">{</span>figure<span class="nb">}</span>[bt]
+ <span class="k">\begin</span><span class="nb">{</span>minipage<span class="nb">}{</span>.49<span class="k">\hsize</span><span class="nb">}</span>
+  <span class="k">\centering</span>
+  <span class="k">\fbox</span><span class="nb">{</span><span class="k">\rule</span><span class="nb">{</span>0pt<span class="nb">}{</span>2cm<span class="nb">}</span><span class="k">\rule</span><span class="nb">{</span>2cm<span class="nb">}{</span>0pt<span class="nb">}}</span>
+  <span class="k">\caption</span><span class="nb">{</span>figure環境内でminipageすると，長いcaptionは折り返されないので
+  絶望せざるをえない<span class="nb">}</span>
+ <span class="k">\end</span><span class="nb">{</span>minipage<span class="nb">}</span>
+ <span class="k">\hfill</span>
+ <span class="k">\begin</span><span class="nb">{</span>minipage<span class="nb">}{</span>.49<span class="k">\hsize</span><span class="nb">}</span>
+  <span class="k">\centering</span>
+  <span class="k">\fbox</span><span class="nb">{</span><span class="k">\rule</span><span class="nb">{</span>0pt<span class="nb">}{</span>2cm<span class="nb">}</span><span class="k">\rule</span><span class="nb">{</span>2cm<span class="nb">}{</span>0pt<span class="nb">}}</span>
+  <span class="k">\caption</span><span class="nb">{</span>figure環境内でminipageすると，長いcaptionは折り返されないので
+  絶望せざるをえない2<span class="nb">}</span>
+ <span class="k">\end</span><span class="nb">{</span>minipage<span class="nb">}</span>
+<span class="k">\end</span><span class="nb">{</span>figure<span class="nb">}</span>
 </pre></div>
-
-
-<p>USBメモリにパーティションを作る。<code>/dev/sdb</code>の部分はUSBメモリのデバイス名を指定する。分からん場合は<code>sudo dmesg</code>とかで調べるべし。</p>
-<div class="highlight"><pre><span></span>sudo fdisk /dev/sdb
+<p>しかし、長いキャプションがあることで大変残念なことになった。
+誠に遺憾である。</p>
+<img alt="figure_in_minipage" src="images/figure_in_minipage.png" />
+<p>そこで、プリアンブルに以下を記述する。</p>
+<div class="highlight"><pre><span></span><span class="k">\makeatletter</span>
+<span class="k">\newif\ifcap</span>@minipage
+<span class="k">\cap</span>@minipagefalse
+<span class="k">\let\minipagebak\minipage</span>
+<span class="k">\def\minipage</span><span class="nb">{</span><span class="k">\cap</span>@minipagetrue<span class="k">\minipagebak</span><span class="nb">}</span>
+<span class="k">\let\@</span>captionbak<span class="k">\@</span>caption
+<span class="k">\def\@</span>caption<span class="nb">{</span><span class="c">%</span>
+ <span class="k">\ifcap</span>@minipage
+  <span class="k">\capwidth\hsize\ecapwidth\hsize</span>
+ <span class="k">\fi</span>
+ <span class="k">\@</span>captionbak<span class="nb">}</span>
+<span class="k">\makeatother</span>
 </pre></div>
+<p>するとどうであろう。</p>
+<img alt="figure_in_minipage_success" src="images/figure_in_minipage_success.png" />
+<p>きちんと折り返されて表示されるではないか！</p>
+<div class="section" id="id1">
+<h2>解説</h2>
+<p>minipage環境内でのcaption幅調整がうまくできていない。
+minipage環境内では <tt class="docutils literal">\hsize</tt> を基準にcaption幅を決めるべきところが、 <tt class="docutils literal">\textwidth</tt> を基準に決められている。
+なので無理矢理変更してやる。</p>
+<p>自分でフラグを導入し、これを参照してキャプションの幅を設定してやる。
+minipageやcaptionの定義を変更するのが面倒なので、  <tt class="docutils literal">\let</tt> でコピーしておいてその頭に必要な処理を加えている。
+メモリを無駄にしてるけど、昨今のマシンでは問題ないだろう。
+ちゃんとfalseにクリアしてないような気がしなくもないけど、気にするなということで。</p>
+<p>ちなみに、minipage環境に入ると <tt class="docutils literal">if&#64;minipage</tt> フラグがtrueにsetされる。
+なのでこれを参照しようかと思ったが、minipage環境内で最初の要素を出力する際の縦方向のスペース調整に利用された後にfalseに変更されてしまうようだ。
+図のキャプションのようにminipage環境の一番下でcaptionを出力する場合には <tt class="docutils literal">if&#64;minipage</tt> フラグはすでにfalseに変更された後となる。</p>
+</div>
 
-
-<p>あとはよしなに。FAT32にするのが良い。どんなマシンでもFAT32なら読めるみたいなので（確証なし）。partition IDをbにするとWin95 FAT32になる。</p>
-<p>FAT32でフォーマット。<code>-v</code>は詳細表示、<code>-c</code>は不良ブロック精査、<code>-F</code>は形式。16にすればFAT16になる。</p>
-<div class="highlight"><pre><span></span>sudo mkfs.vfat -v -c -F <span class="m">32</span> /dev/sdb1
-</pre></div>
-
-
-<ul>
-<li>Q. mkfs.vfatなんてないんだけど。</li>
-<li>A. dosfstoolsを入れるべし。<div class="highlight"><pre><span></span>sudo apt-get install dosfstools
-</pre></div>
-
-
-</li>
-</ul>
-<p>USBメモリをマウントし、EFIのディレクトリを指定してgrubをUSBメモリに書き込む。</p>
-<div class="highlight"><pre><span></span>sudo mount /dev/sdb1 /mnt
-sudo grub-install —target<span class="o">=</span>x86_64-efi —efi-directory<span class="o">=</span>/mnt —boot-directory<span class="o">=</span>/mnt/boot —no-floppy
-</pre></div>
-
-
-<p>ちなみに、Macで起動するためにはEFIの下を<code>boot/bootx64.efi</code>にしないとダメらしい。本当かしらん。まぁ、変更しておくということで。</p>
-<div class="highlight"><pre><span></span>sudo mv /mnt/efi/boot/grubx64.efi /mnt/efi/boot/bootx64.efi
-</pre></div>
-
-
-<p>grub.cfgを<code>boot/grub</code>に作成する。</p>
-<div class="highlight"><pre><span></span>sudo mkdir -p /mnt/boot/grub
-sudo vi /mnt/boot/grub/grub.cfg
-</pre></div>
-
-
-<p><code>grub.cfg</code>はこんな感じ。</p>
-<div class="highlight"><pre><span></span># Load Graphical modules
-insmod efi_gop
-insmod efi_uga
-
-# Load Font module
-insmod font
-
-
-# Setup GFXTERM along with loading unifont.pf2 font file
-
-if loadfont ${prefix}/fonts/unifont.pf2
-then
-   insmod gfxterm
-   set gfxmode=&quot;auto&quot;
-   set gfxpayload=keep
-   terminal_output gfxterm
-
-   set color_normal=light-blue/black
-   set color_highlight=light-cyan/blue
-fi
-
-insmod part_gpt
-insmod part_msdos
-insmod fat
-insmod ext2
-
-# Timeout for menu
-set timeout=5
-
-# Set default boot entry as Entry 0
-set default=0
-
-menuentry &quot;Debian Install (expert mode)&quot; {
-  set root=(hd0,msdos1)
-  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off priority=low ipv6.disable=1
-  initrd /boot/initrd.gz
-}
-menuentry &quot;Debian Install&quot; {
-  set root=(hd0,msdos1)
-  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off ipv6.disable=1
-  initrd /boot/initrd.gz
-}
-</pre></div>
-
-
-<p>これでgrubの準備は完了。</p>
-<h3>debianインストーラの導入</h3>
-<p>自分はいつも<a href="https://www.debian.org/devel/debian-installer/">debian開発者ページ（？）</a>からインストーラを取得している。
-ここで手に入るのはtesting版。だと思う。日次スナップショットはうまく起動しない場合もあるので注意。</p>
-<p>「その他のイメージ＞インストール先アーキテクチャ＞hd-media」とたどる。</p>
-<p>ここから<code>vmlinuz</code>（カーネル）と<code>initrd.gz</code>（初期RAMディスク）を取得する。
-また、元のページから「netinst CDイメージ」も取得しておく。</p>
-<p>あとはこれを配置するだけ。USBメモリをmountし、以下のように配置する。FAT32でフォーマットしてあるとMacからでもWinからでも配置できるので便利。MacのEFIで読めるのはFATとHFS+とかだった気がするけど定かではない。FAT32なら大丈夫だった。</p>
-<table>
-<thead>
-<tr>
-<th align="left">ファイル</th>
-<th align="left">配置場所</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">netinst CDイメージ（.isoファイル）</td>
-<td align="left">USBメモリのトップ/</td>
-</tr>
-<tr>
-<td align="left">vmlinuz</td>
-<td align="left">USBメモリのトップ/boot/</td>
-</tr>
-<tr>
-<td align="left">initrd.gz</td>
-<td align="left">USBメモリのトップ/boot/</td>
-</tr>
-</tbody>
-</table>
-<h2>インストールはどうやるの？</h2>
-<p>普通にUSBメモリからEFIで起動させればOK。</p>
-<p>インストーラでパーティションを切るときに、EFI用のディレクトリを作成しないとダメ。100MBくらいで十分なはずだけど、200MBくらいを確保している。</p>
-<p>Windowsが入っているマシンとかに後からdebianを追加するときは、すでにあるEFIシステムパーティションが利用できる。もちろん、WindowsがEFIブートでインストールされていれば、の話だが。</p>
 </section>
 <section id="comments">
 <!-- Disqus -->
@@ -234,8 +144,8 @@ menuentry &quot;Debian Install&quot; {
  */
 var disqus_config = function () {
   this.language = 'ja';
-  this.page.url = 'http://pman0214.github.io/blog/debian-install-efi.html';
-  this.page.identifier = 'debian-install-efi';
+  this.page.url = 'http://pman0214.github.io/blog/ieice-figure-minipage.html';
+  this.page.identifier = 'ieice-figure-minipage';
 };
 (function() {  // DON'T EDIT BELOW THIS LINE
   var d = document, s = d.createElement('script');

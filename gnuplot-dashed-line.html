@@ -49,6 +49,7 @@
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
           </ul>
         </li>
@@ -88,7 +89,7 @@ gnuplotが5.0になって破線の表示ができなくなったので調べた�
 <p><tt class="docutils literal"><span class="pre">~/.gnuplot</span></tt> を作成して <tt class="docutils literal">set line style</tt> していた。
 こんな感じ。
 <tt class="docutils literal">linetype</tt> (<tt class="docutils literal">lt</tt>) によって線種が変更されていた。</p>
-<div class="highlight"><pre><span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">1</span> <span class="n">pt</span> <span class="n">lt</span> <span class="mi">1</span> <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;blue&quot;</span>
+<div class="highlight"><pre><span></span><span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">1</span> <span class="n">pt</span> <span class="n">lt</span> <span class="mi">1</span> <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;blue&quot;</span>
 <span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">2</span> <span class="n">pt</span> <span class="n">lt</span> <span class="mi">2</span> <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;red&quot;</span>
 <span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">3</span> <span class="n">pt</span> <span class="n">lt</span> <span class="mi">3</span> <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;#008800&quot;</span>
 <span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">4</span> <span class="n">pt</span> <span class="n">lt</span> <span class="mi">4</span> <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;#EE00EE&quot;</span>
@@ -98,7 +99,7 @@ gnuplotが5.0になって破線の表示ができなくなったので調べた�
 </pre></div>
 <p>プロットする側ではこんな感じにして <tt class="docutils literal">eps enhanced</tt> を指定して出力。
 <tt class="docutils literal">color</tt> を消せばモノクロになる。</p>
-<div class="highlight"><pre><span class="k">set</span> <span class="nb">term</span> <span class="n">postscript</span> <span class="n">eps</span> <span class="n">enhanced</span> <span class="n">color</span> <span class="s">&quot;TimesNewRoman&quot;</span> <span class="mi">22</span>
+<div class="highlight"><pre><span></span><span class="k">set</span> <span class="nb">term</span> <span class="n">postscript</span> <span class="n">eps</span> <span class="n">enhanced</span> <span class="n">color</span> <span class="s">&quot;TimesNewRoman&quot;</span> <span class="mi">22</span>
 <span class="k">set</span> <span class="nb">output</span> <span class="s">&quot;hoge.eps&quot;</span>
 <span class="k">plot</span> <span class="s">&quot;hoge.dat&quot;</span> <span class="nb">u</span> <span class="mi">1</span><span class="o">:</span><span class="mi">2</span> <span class="nb">w</span> <span class="n">lp</span> <span class="n">ls</span> <span class="mi">1</span><span class="o">,</span> \
      <span class="s">&quot;hoge.dat&quot;</span> <span class="nb">u</span> <span class="mi">1</span><span class="o">:</span><span class="mi">3</span> <span class="nb">w</span> <span class="n">lp</span> <span class="n">ls</span> <span class="mi">2</span>
@@ -107,7 +108,7 @@ gnuplotが5.0になって破線の表示ができなくなったので調べた�
 <div class="section" id="id2">
 <h2>5.0から</h2>
 <p><tt class="docutils literal">dashtype</tt> (<tt class="docutils literal">dt</tt>) というのを使って破線の形を指定できるようになったらしい。</p>
-<div class="highlight"><pre><span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">1</span> <span class="n">pt</span> <span class="mi">6</span>                       <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;blue&quot;</span>
+<div class="highlight"><pre><span></span><span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">1</span> <span class="n">pt</span> <span class="mi">6</span>                       <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;blue&quot;</span>
 <span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">2</span> <span class="n">pt</span> <span class="mi">2</span>  <span class="nf">dt</span> <span class="p">(</span><span class="mi">5</span><span class="o">,</span><span class="mi">5</span><span class="p">)</span>             <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;red&quot;</span>
 <span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">3</span> <span class="n">pt</span> <span class="mi">8</span>  <span class="nf">dt</span> <span class="p">(</span><span class="mi">30</span><span class="o">,</span><span class="mi">10</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="mi">10</span><span class="p">)</span>      <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;#008800&quot;</span>
 <span class="k">set</span> <span class="nb">style</span> <span class="n">line</span> <span class="mi">4</span> <span class="n">pt</span> <span class="mi">4</span>  <span class="nf">dt</span> <span class="p">(</span><span class="mi">20</span><span class="o">,</span><span class="mi">10</span><span class="p">)</span>           <span class="n">lw</span> <span class="mi">2</span> <span class="n">lc</span> <span class="n">rgb</span> <span class="s">&quot;#EE00EE&quot;</span>
@@ -121,7 +122,7 @@ gnuplotが5.0になって破線の表示ができなくなったので調べた�
 <h2>ターミナルテスト</h2>
 <p>点の種類や線の種類、 <tt class="docutils literal">dashtype</tt> の例はターミナルテストをすると得ることができる。
 自分はEPSを出力した後にPDF化して保存し、必要なときに参照している。</p>
-<div class="highlight"><pre><span class="k">set</span> <span class="nb">output</span> <span class="s">&quot;gnuplot_eps-test.eps&quot;</span>
+<div class="highlight"><pre><span></span><span class="k">set</span> <span class="nb">output</span> <span class="s">&quot;gnuplot_eps-test.eps&quot;</span>
 <span class="k">set</span> <span class="nb">term</span> <span class="n">postscript</span> <span class="n">eps</span> <span class="n">enhanced</span>
 <span class="k">test</span>
 
@@ -200,6 +201,7 @@ var disqus_config = function () {
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
@@ -215,6 +217,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>

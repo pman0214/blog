@@ -50,6 +50,7 @@
             <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
           </ul>
         </li>
@@ -89,7 +90,7 @@
 以下のようなファイルがあるものとする。</p>
 <div class="section" id="main-c">
 <h3><tt class="docutils literal">main.c</tt></h3>
-<div class="highlight"><pre><span class="cm">/*</span>
+<div class="highlight"><pre><span></span><span class="cm">/*</span>
 <span class="cm"> * MIT License</span>
 <span class="cm"> *</span>
 <span class="cm"> * Copyright (c) 2017 pman0214</span>
@@ -113,7 +114,7 @@
 <span class="cm"> * SOFTWARE.</span>
 <span class="cm"> */</span>
 
-<span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
 <span class="p">{</span>
@@ -126,7 +127,7 @@
 </div>
 <div class="section" id="makefile">
 <h3><tt class="docutils literal">Makefile</tt></h3>
-<div class="highlight"><pre><span class="c">#</span>
+<div class="highlight"><pre><span></span><span class="c">#</span>
 <span class="c"># MIT License</span>
 <span class="c">#</span>
 <span class="c"># Copyright (c) 2017 pman0214</span>
@@ -151,17 +152,17 @@
 <span class="c">#</span>
 
 <span class="nv">CC</span>       <span class="o">=</span>gcc
-<span class="nv">TARGET</span>   <span class="o">=</span><span class="nb">test</span>-app
+<span class="nv">TARGET</span>   <span class="o">=</span>test-app
 <span class="nv">CFLAGS</span>   <span class="o">=</span>-Wall
 <span class="nv">OBJ</span>      <span class="o">=</span>main.o
 <span class="nv">bindir</span>   <span class="o">=</span>/usr/bin
 
 <span class="c"># main target</span>
 <span class="nf">$(TARGET)</span><span class="o">:</span> <span class="k">$(</span><span class="nv">OBJ</span><span class="k">)</span>
-     <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> -o<span class="nv">$@</span> <span class="nv">$^</span>
+     <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> -o<span class="nv">$@</span> $^
 
 <span class="nf">main.o</span><span class="o">:</span> <span class="n">main</span>.<span class="n">c</span>
-     <span class="k">$(</span>CC<span class="k">)</span> -c <span class="nv">$^</span>
+     <span class="k">$(</span>CC<span class="k">)</span> -c $^
 
 <span class="nf">.PHONY</span><span class="o">:</span> <span class="n">install</span>
 <span class="nf">install</span><span class="o">:</span> <span class="k">$(</span><span class="nv">TARGET</span><span class="k">)</span>
@@ -179,7 +180,7 @@
 <h2>必要パッケージの導入</h2>
 <p>何のパッケージが必要なのかがやや怪しい。
 とりあえず以下は必要なはず。</p>
-<div class="highlight"><pre>% sudo apt-get install devscripts build-essential lintian
+<div class="highlight"><pre><span></span>% sudo apt-get install devscripts build-essential lintian
 </pre></div>
 <p>これで <tt class="docutils literal">fakeroot</tt> や <tt class="docutils literal">debuild</tt> もインストールされるはず。</p>
 </div>
@@ -187,7 +188,7 @@
 <h2>手順</h2>
 <div class="section" id="id4">
 <h3><tt class="docutils literal">debian/</tt> ディレクトリを作成する</h3>
-<div class="highlight"><pre>% mkdir debian
+<div class="highlight"><pre><span></span>% mkdir debian
 </pre></div>
 </div>
 <div class="section" id="debian-control">
@@ -196,7 +197,7 @@
 パッケージ名や依存関係、説明などを書く。
 どんなフィールドがあるかは <a class="reference external" href="https://www.debian.org/doc/debian-policy/">Debian Policy Manual (Declaring relationships between packages)</a> を参照のこと。
 <tt class="docutils literal">Source</tt> と <tt class="docutils literal">Package</tt> のそれぞれについて使えるフィールドが異なるので注意すること。</p>
-<div class="highlight"><pre><span class="nf">Source</span><span class="o">:</span> <span class="n">my</span>-<span class="n">test</span>-<span class="n">app</span>
+<div class="highlight"><pre><span></span><span class="nf">Source</span><span class="o">:</span> <span class="n">my</span>-<span class="n">test</span>-<span class="n">app</span>
 <span class="nf">Maintainer</span><span class="o">:</span> <span class="n">pman</span>0214 &lt;<span class="n">hoge</span>@<span class="n">example</span>.<span class="n">com</span>&gt;
 <span class="nf">Build-Depends</span><span class="o">:</span> <span class="n">make</span><span class="p">,</span> <span class="n">gcc</span>
 <span class="nf">Section</span><span class="o">:</span> <span class="n">utils</span>
@@ -205,23 +206,23 @@
 <span class="nf">Priority</span><span class="o">:</span> <span class="n">optional</span>
 <span class="nf">Architecture</span><span class="o">:</span> <span class="n">all</span>
 <span class="nf">Description</span><span class="o">:</span> <span class="n">My</span> <span class="n">test</span> <span class="n">application</span>
- This package provides my Debian package <span class="nb">test </span>application.
+ This package provides my Debian package <span class="nb">test</span> application.
 </pre></div>
 </div>
 <div class="section" id="debian-changelog">
 <h3><tt class="docutils literal">debian/changelog</tt> ファイルを作成する</h3>
 <p><tt class="docutils literal">dch</tt> コマンドを使用すると良い。</p>
-<div class="highlight"><pre>% dch -i --create
+<div class="highlight"><pre><span></span>% dch -i --create
 </pre></div>
 <p>テンプレートが開くはず。</p>
-<div class="highlight"><pre>PACKAGE (VERSION) UNRELEASED; urgency=medium
+<div class="highlight"><pre><span></span>PACKAGE (VERSION) UNRELEASED; urgency=medium
 
   * Initial release. (Closes: #XXXXXX)
 
  --  &lt;hoge@example.com&gt;  Sun, 21 May 2017 17:30:00 +0900
 </pre></div>
 <p>これを参考にして書き換える。</p>
-<div class="highlight"><pre>my-test-app (0.1) unstable; urgency=low
+<div class="highlight"><pre><span></span>my-test-app (0.1) unstable; urgency=low
 
   * Initial release.
 
@@ -232,7 +233,7 @@
 <h3><tt class="docutils literal">debian/rules</tt> ファイルを作成する</h3>
 <p>このファイルはこのパッケージをビルド・インストールするときの <tt class="docutils literal">Makefile</tt> と思えばいい。
 今回の場合はすでに <tt class="docutils literal">Makefile</tt> があるのでこれを呼べばいい。</p>
-<div class="highlight"><pre><span class="c">#!/usr/bin/make -f</span>
+<div class="highlight"><pre><span></span><span class="c">#!/usr/bin/make -f</span>
 
 <span class="nf">%</span><span class="o">:</span>
      dh <span class="nv">$@</span>
@@ -242,7 +243,7 @@
 <h3><tt class="docutils literal">debian/copyright</tt> ファイルを作成する</h3>
 <p>ライセンス情報を入れておけば良い。
 空でもOK。</p>
-<div class="highlight"><pre>MIT License
+<div class="highlight"><pre><span></span>MIT License
 
 Copyright (c) 2017 pman0214
 
@@ -267,7 +268,7 @@ SOFTWARE.
 </div>
 <div class="section" id="debuild">
 <h3><tt class="docutils literal">debuild</tt> する</h3>
-<div class="highlight"><pre>% debuild -us -uc
+<div class="highlight"><pre><span></span>% debuild -us -uc
 </pre></div>
 <p>これで1つ上のディレクトリにdebファイルができる。</p>
 </div>
@@ -275,28 +276,28 @@ SOFTWARE.
 <div class="section" id="id5">
 <h2>インストールしてみる</h2>
 <p>試しにインストールしてみよう。</p>
-<div class="highlight"><pre>% sudo dpkg -i ../my-test-app_0.1_all.deb
+<div class="highlight"><pre><span></span>% sudo dpkg -i ../my-test-app_0.1_all.deb
 % ls /usr/bin/test-app
 /usr/bin/test-app
 </pre></div>
 <p>きちんと入ったようだ。
 削除してみる。</p>
-<div class="highlight"><pre>% sudo dpkg -r my-test-app
+<div class="highlight"><pre><span></span>% sudo dpkg -r my-test-app
 % ls /usr/bin/test-app
 ls: cannot access /usr/bin/test-app: No such file or directory
 </pre></div>
 <p>きちんと削除できた。</p>
 <p>パッケージでどんなファイルが入るかは以下で確認できる。</p>
-<div class="highlight"><pre>% dpkg --contents ../my-test-app_0.1_all.deb
-drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./
-drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/
-drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/share/
-drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/share/doc/
-drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/share/doc/my-test-app/
--rw-r--r-- root/root      <span class="m">1071</span> 2017-05-21 17:48 ./usr/share/doc/my-test-app/copyright
--rw-r--r-- root/root       <span class="m">142</span> 2017-05-21 17:40 ./usr/share/doc/my-test-app/changelog.gz
-drwxr-xr-x root/root         <span class="m">0</span> 2017-05-22 08:47 ./usr/bin/
--rwxr-xr-x root/root      <span class="m">6712</span> 2017-05-22 08:47 ./usr/bin/test-app
+<div class="highlight"><pre><span></span>% dpkg --contents ../my-test-app_0.1_all.deb
+drwxr-xr-x root/root         <span class="m">0</span> <span class="m">2017</span>-05-22 <span class="m">08</span>:47 ./
+drwxr-xr-x root/root         <span class="m">0</span> <span class="m">2017</span>-05-22 <span class="m">08</span>:47 ./usr/
+drwxr-xr-x root/root         <span class="m">0</span> <span class="m">2017</span>-05-22 <span class="m">08</span>:47 ./usr/share/
+drwxr-xr-x root/root         <span class="m">0</span> <span class="m">2017</span>-05-22 <span class="m">08</span>:47 ./usr/share/doc/
+drwxr-xr-x root/root         <span class="m">0</span> <span class="m">2017</span>-05-22 <span class="m">08</span>:47 ./usr/share/doc/my-test-app/
+-rw-r--r-- root/root      <span class="m">1071</span> <span class="m">2017</span>-05-21 <span class="m">17</span>:48 ./usr/share/doc/my-test-app/copyright
+-rw-r--r-- root/root       <span class="m">142</span> <span class="m">2017</span>-05-21 <span class="m">17</span>:40 ./usr/share/doc/my-test-app/changelog.gz
+drwxr-xr-x root/root         <span class="m">0</span> <span class="m">2017</span>-05-22 <span class="m">08</span>:47 ./usr/bin/
+-rwxr-xr-x root/root      <span class="m">6712</span> <span class="m">2017</span>-05-22 <span class="m">08</span>:47 ./usr/bin/test-app
 </pre></div>
 </div>
 
@@ -369,6 +370,7 @@ var disqus_config = function () {
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
@@ -384,6 +386,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>

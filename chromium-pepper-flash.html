@@ -49,6 +49,7 @@
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
           </ul>
         </li>
@@ -102,18 +103,18 @@
 これで、 <code>/Library/Internet Plug-Ins/PepperFlashPlayer</code> というディレクトリにインストールされるはず。</p>
 <p><a class="reference external" href="https://www.flickr.com/photos/23629678&#64;N04/19523127180/"><img alt="system-pref-flash-player" src="https://farm1.staticflickr.com/355/19523127180_65bb291052.jpg" /></a></p>
 <p>つづいてシェルスクリプトを作成するのだが、 <code>Chromium</code> という名前にしたいので元のファイルの名前を変更しておく。</p>
-<div class="highlight"><pre>% <span class="nb">cd</span> /Applications/Chromium.app/Contents/MacOS
+<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /Applications/Chromium.app/Contents/MacOS
 % mv Chromium Chromium-orig
 % vi Chromium
 </pre></div>
-<div class="highlight"><pre><span class="c">#!/bin/sh</span>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
 
 /Applications/Chromium.app/Contents/MacOS/Chromium-orig <span class="se">\</span>
   --ppapi-flash-path<span class="o">=</span>/Library/Internet<span class="se">\ </span>Plug-Ins/PepperFlashPlayer/PepperFlashPlayer.plugin <span class="se">\</span>
-  --ppapi-flash-version<span class="o">=</span>18.0.0.209
+  --ppapi-flash-version<span class="o">=</span><span class="m">18</span>.0.0.209
 </pre></div>
 <p>バージョンは自分の環境に合わせて変更すること。</p>
-<div class="highlight"><pre>% chmod <span class="m">755</span> Chromium
+<div class="highlight"><pre><span></span>% chmod <span class="m">755</span> Chromium
 </pre></div>
 <p>これで、 <code>Chromium.app</code> をダブルクリックしてChromiumが普通に起動するはず。</p>
 <p>Chromiumのアドレスバーに <code>chrome://plugins</code> と入力して、Flash Playerが表示されればOK。
@@ -196,6 +197,7 @@ var disqus_config = function () {
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
@@ -211,6 +213,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
