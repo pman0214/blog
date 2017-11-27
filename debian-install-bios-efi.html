@@ -101,14 +101,13 @@ EFI起動のLinuxでないとダメなので注意。
 <div class="section" id="id4">
 <h3>パーティション作成</h3>
 <p>まずはgdiskを使ってパーティションを作成する。
-BIOSのための領域（MBR）部分を空けておいてもできるのかもしれないが、念のためBIOS boot partitionとして確保しておく。</p>
-<p>今回の例では某会議でもらったProceedingsが入っている8GBのディスク（ただしMacでFATで初期化済み）を用いることとする。</p>
+今回の例では某会議でもらったProceedingsが入っている8GBのディスク（ただしMacでFATで初期化済み）を用いることとする。</p>
 <p>USBメディアは <tt class="docutils literal">/dev/sdb</tt> にあるとする。
 <tt class="docutils literal">sudo dmesg</tt> などで確認しておくこと。</p>
 <p>まずは現在の状態を確認。</p>
-<div class="highlight"><pre>sudo gdisk -l /dev/sdb
+<div class="highlight"><pre><span></span>sudo gdisk -l /dev/sdb
 </pre></div>
-<div class="highlight"><pre>GPT fdisk (gdisk) version 1.0.1
+<div class="highlight"><pre><span></span>GPT fdisk (gdisk) version 1.0.1
 
 Partition table scan:
   MBR: MBR only
@@ -139,9 +138,9 @@ Number  Start (sector)    End (sector)  Size       Code  Name
 </pre></div>
 <p>なにやらおかしいとエラーが出てるが気にしない。
 消えてもらうぜ。</p>
-<div class="highlight"><pre>sudo gdisk /dev/sdb
+<div class="highlight"><pre><span></span>sudo gdisk /dev/sdb
 </pre></div>
-<div class="highlight"><pre>GPT fdisk (gdisk) version 1.0.1
+<div class="highlight"><pre><span></span>GPT fdisk (gdisk) version 1.0.1
 
 Partition table scan:
   MBR: MBR only
@@ -165,42 +164,43 @@ You will need to delete this partition or resize it in another utility.
 Command (? for help): d
 Using 1
 </pre></div>
-<p>BIOS boot partitionを作成するという人もいるようだが、その領域を空けていれば特に問題ないので作成しないこととする。</p>
+<p>BIOS boot partitionを作成するという人もいるようだが、その領域を空けていれば特に問題ないので作成しないこととする。
+セクタ2047までは空けておくこと。</p>
 <p>EFI Systemパーティションを作成。
 サイズは適当に256Mとした。</p>
-<div class="highlight"><pre>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: n
-Partition number <span class="o">(</span>1-128, default 1<span class="o">)</span>:
-First sector <span class="o">(</span>34-15728606, <span class="nv">default</span> <span class="o">=</span> 2048<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
-Last sector <span class="o">(</span>2048-15728606, <span class="nv">default</span> <span class="o">=</span> 15728606<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>: +256M
-Current <span class="nb">type </span>is <span class="s1">&#39;Linux filesystem&#39;</span>
-Hex code or GUID <span class="o">(</span>L to show codes, <span class="nv">Enter</span> <span class="o">=</span> 8300<span class="o">)</span>: ef00
-Changed <span class="nb">type </span>of partition to <span class="s1">&#39;EFI System&#39;</span>
+<div class="highlight"><pre><span></span>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: n
+Partition number <span class="o">(</span><span class="m">1</span>-128, default <span class="m">1</span><span class="o">)</span>:
+First sector <span class="o">(</span><span class="m">34</span>-15728606, <span class="nv">default</span> <span class="o">=</span> <span class="m">2048</span><span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
+Last sector <span class="o">(</span><span class="m">2048</span>-15728606, <span class="nv">default</span> <span class="o">=</span> <span class="m">15728606</span><span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>: +256M
+Current <span class="nb">type</span> is <span class="s1">&#39;Linux filesystem&#39;</span>
+Hex code or GUID <span class="o">(</span>L to show codes, <span class="nv">Enter</span> <span class="o">=</span> <span class="m">8300</span><span class="o">)</span>: ef00
+Changed <span class="nb">type</span> of partition to <span class="s1">&#39;EFI System&#39;</span>
 </pre></div>
 <p>続いてインストールメディアやgrubファイルを置くためのパーティション。
 ディスクサイズが小さいので残り全部。
 SSDを使って同じようなインストールメディアを作ったときは8GBのパーティションとした。</p>
-<div class="highlight"><pre>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: n
-Partition number <span class="o">(</span>2-128, default 2<span class="o">)</span>:
-First sector <span class="o">(</span>34-15728606, <span class="nv">default</span> <span class="o">=</span> 526336<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
-Last sector <span class="o">(</span>526336-15728606, <span class="nv">default</span> <span class="o">=</span> 15728606<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
-Current <span class="nb">type </span>is <span class="s1">&#39;Linux filesystem&#39;</span>
-Hex code or GUID <span class="o">(</span>L to show codes, <span class="nv">Enter</span> <span class="o">=</span> 8300<span class="o">)</span>: 0700
-Changed <span class="nb">type </span>of partition to <span class="s1">&#39;Microsoft basic data&#39;</span>
+<div class="highlight"><pre><span></span>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: n
+Partition number <span class="o">(</span><span class="m">2</span>-128, default <span class="m">2</span><span class="o">)</span>:
+First sector <span class="o">(</span><span class="m">34</span>-15728606, <span class="nv">default</span> <span class="o">=</span> <span class="m">526336</span><span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
+Last sector <span class="o">(</span><span class="m">526336</span>-15728606, <span class="nv">default</span> <span class="o">=</span> <span class="m">15728606</span><span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
+Current <span class="nb">type</span> is <span class="s1">&#39;Linux filesystem&#39;</span>
+Hex code or GUID <span class="o">(</span>L to show codes, <span class="nv">Enter</span> <span class="o">=</span> <span class="m">8300</span><span class="o">)</span>: <span class="m">0700</span>
+Changed <span class="nb">type</span> of partition to <span class="s1">&#39;Microsoft basic data&#39;</span>
 </pre></div>
 <p>これで完成。
 確認して書き込み。</p>
-<div class="highlight"><pre>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: p
-Disk /dev/sdb: <span class="m">15728640</span> sectors, 7.5 GiB
+<div class="highlight"><pre><span></span>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: p
+Disk /dev/sdb: <span class="m">15728640</span> sectors, <span class="m">7</span>.5 GiB
 Logical sector size: <span class="m">512</span> bytes
 Disk identifier <span class="o">(</span>GUID<span class="o">)</span>: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 Partition table holds up to <span class="m">128</span> entries
-First usable sector is 34, last usable sector is 15728606
-Partitions will be aligned on 2048-sector boundaries
+First usable sector is <span class="m">34</span>, last usable sector is <span class="m">15728606</span>
+Partitions will be aligned on <span class="m">2048</span>-sector boundaries
 Total free space is <span class="m">0</span> sectors <span class="o">(</span><span class="m">0</span> bytes<span class="o">)</span>
 
 Number  Start <span class="o">(</span>sector<span class="o">)</span>    End <span class="o">(</span>sector<span class="o">)</span>  Size       Code  Name
-   <span class="m">1</span>            <span class="m">2048</span>          <span class="m">526335</span>   256.0 MiB   EF00  EFI System
-   <span class="m">2</span>          <span class="m">526336</span>        <span class="m">15728606</span>   7.2 GiB     <span class="m">0700</span>  Microsoft basic data
+   <span class="m">1</span>            <span class="m">2048</span>          <span class="m">526335</span>   <span class="m">256</span>.0 MiB   EF00  EFI System
+   <span class="m">2</span>          <span class="m">526336</span>        <span class="m">15728606</span>   <span class="m">7</span>.2 GiB     <span class="m">0700</span>  Microsoft basic data
 
 Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: w
 
@@ -212,9 +212,9 @@ OK<span class="p">;</span> writing new GUID partition table <span class="o">(</s
 The operation has completed successfully.
 </pre></div>
 <p>念のため確認。</p>
-<div class="highlight"><pre>sudo gdisk -l /dev/sdb
+<div class="highlight"><pre><span></span>sudo gdisk -l /dev/sdb
 </pre></div>
-<div class="highlight"><pre>GPT fdisk (gdisk) version 1.0.1
+<div class="highlight"><pre><span></span>GPT fdisk (gdisk) version 1.0.1
 
 Partition table scan:
   MBR: protective
@@ -237,7 +237,7 @@ Number  Start (sector)    End (sector)  Size       Code  Name
 </pre></div>
 <p>FAT32でフォーマットする。
 <tt class="docutils literal">mkfs.vfat</tt> がないという人は <tt class="docutils literal">sudo <span class="pre">apt-get</span> install dosfstools</tt> する。</p>
-<div class="highlight"><pre>sudo mkfs.vfat -F32 /dev/sdb1
+<div class="highlight"><pre><span></span>sudo mkfs.vfat -F32 /dev/sdb1
 sudo mkfs.vfat -F32 /dev/sdb2
 </pre></div>
 <p>なお、EFI SystemパーティションはFATにしないとダメだが、インストールメディアやgrubファイルを置くためのパーティションは別にFATにする必要はない。
@@ -248,14 +248,14 @@ sudo mkfs.vfat -F32 /dev/sdb2
 <h3>grubのインストール（MBR編）</h3>
 <p><tt class="docutils literal"><span class="pre">grub-pc</span></tt> をインストールする。
 <tt class="docutils literal"><span class="pre">grub-efi</span></tt> が一旦アンインストールされるが気にしたら負け。</p>
-<div class="highlight"><pre>sudo apt-get install -y grub-pc
+<div class="highlight"><pre><span></span>sudo apt-get install -y grub-pc
 </pre></div>
 <p>インストールメディアやgrubファイルを置くためのパーティションをマウントして、bootディレクトリを指定してインストール。
 blocklistsが何たらとエラーになるので、 <tt class="docutils literal"><span class="pre">--force</span></tt> を付けて実行する。</p>
-<div class="highlight"><pre>sudo mount /dev/sdb2 /mnt
+<div class="highlight"><pre><span></span>sudo mount /dev/sdb2 /mnt
 sudo grub-install --target<span class="o">=</span>i386-pc --boot-directory<span class="o">=</span>/mnt/boot --force /dev/sdb
 </pre></div>
-<div class="highlight"><pre>Installing for i386-pc platform.
+<div class="highlight"><pre><span></span>Installing for i386-pc platform.
 grub-install: warning: this GPT partition label contains no BIOS Boot Partition; embedding won&#39;t be possible.
 grub-install: warning: Embedding is not possible.  GRUB can only be installed in this setup by using blocklists.  However, blocklists are UNRELIABLE and their use is discouraged..
 Installation finished. No error reported.
@@ -267,24 +267,24 @@ Installation finished. No error reported.
 <h3>grubのインストール（EFI編）</h3>
 <p><tt class="docutils literal"><span class="pre">grub-efi</span></tt> を再び導入する。
 <tt class="docutils literal"><span class="pre">grub-pc</span></tt> はアンインストールされる。</p>
-<div class="highlight"><pre>sudo apt-get install -y grub-efi
+<div class="highlight"><pre><span></span>sudo apt-get install -y grub-efi
 </pre></div>
 <p>マウントポイントが足りないので、EFI用ディレクトリを作ってEFI Systemパーティションをマウントして使う。</p>
-<div class="highlight"><pre>sudo mkdir /mnt/boot/efi
+<div class="highlight"><pre><span></span>sudo mkdir /mnt/boot/efi
 sudo mount /dev/sdb1 /mnt/boot/efi
 sudo grub-install --target<span class="o">=</span>x86_64-efi --efi-directory<span class="o">=</span>/mnt/boot/efi --boot-directory<span class="o">=</span>/mnt/boot
 </pre></div>
-<div class="highlight"><pre>Installing for x86_64-efi platform.
+<div class="highlight"><pre><span></span>Installing for x86_64-efi platform.
 Installation finished. No error reported.
 </pre></div>
 <p>grub-installではremovable media用にいい感じのEFIブートファイルを作ってくれないのでコピーする。</p>
-<div class="highlight"><pre>sudo mkdir /mnt/boot/efi/EFI/BOOT
+<div class="highlight"><pre><span></span>sudo mkdir /mnt/boot/efi/EFI/BOOT
 sudo cp /mnt/boot/efi/EFI/debian/grubx64.efi /mnt/boot/efi/EFI/BOOT/BOOTX64.EFI
 </pre></div>
 <p>これで <tt class="docutils literal">/mnt/boot/efi</tt> の下はこんな感じのディレクトリ構成になるはず。</p>
-<div class="highlight"><pre>ls -FR /mnt/boot/efi
+<div class="highlight"><pre><span></span>ls -FR /mnt/boot/efi
 </pre></div>
-<div class="highlight"><pre>/mnt/boot/efi:
+<div class="highlight"><pre><span></span>/mnt/boot/efi:
 EFI/
 
 /mnt/boot/efi/EFI:
@@ -297,7 +297,7 @@ BOOTX64.EFI*
 grubx64.efi*
 </pre></div>
 <p>アンマウントして完成。</p>
-<div class="highlight"><pre>sudo umount /mnt/boot/efi
+<div class="highlight"><pre><span></span>sudo umount /mnt/boot/efi
 sudo umount /mnt
 </pre></div>
 </div>
@@ -315,7 +315,7 @@ sudo umount /mnt
 パーティション番号が↑と違う場合は適宜書き換える。</p>
 <p>それと、マシンによっては <tt class="docutils literal">video=efifb</tt> ではうまく表示できないかもしれない。
 手元にあるHP EliteBook 820では <tt class="docutils literal">video=vesafb</tt> でないとインストーラ起動後に表示が崩れた。</p>
-<div class="highlight"><pre># Load Graphical modules
+<div class="highlight"><pre><span></span># Load Graphical modules
 insmod efi_gop
 insmod efi_uga
 

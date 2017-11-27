@@ -1,5 +1,285 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2017-08-08T10:00:00+09:00</updated><entry><title>ieicej.clsのfigure環境内でminipageしたときにキャプションがおかしくなる件</title><link href="http://pman0214.github.io/blog/ieice-figure-minipage.html" rel="alternate"></link><published>2017-08-08T10:00:00+09:00</published><updated>2017-08-08T10:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2017-08-08:/blog/ieice-figure-minipage.html</id><summary type="html">TeXで電子情報通信学会提供のクラスファイルieicej.clsを使っているときにfigure環境内でminipageしたときに自動的に改行されない問題を解決する。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2017-11-27T17:51:00+09:00</updated><entry><title>BIOS, UEFI両方で起動可能なdebianインストールUSBメディアを作る</title><link href="http://pman0214.github.io/blog/debian-install-bios-efi.html" rel="alternate"></link><published>2017-11-27T17:51:00+09:00</published><updated>2017-11-27T17:51:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2017-11-27:/blog/debian-install-bios-efi.html</id><summary type="html">BIOS、UEFIの両方で起動するUSBメディアを作ってDebianをインストールする。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://pman0214.github.io/blog/debian-install-efi.html"&gt;EFIブートするUSBメモリでdebianをインストール&lt;/a&gt;においてEFIブートするUSBメモリを作成してDebianをインストールする手順を説明したが、少し内容が古くなってしまっていてうまく適用できない。
+新しい手順を作るついでにBIOS、UEFIの両方で起動するUSBメディアを作ってインストールすることにした。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;前提&lt;/h2&gt;
+&lt;p&gt;母艦となるLinuxマシンが必要。
+EFI起動のLinuxでないとダメなので注意。
+ない場合はVirtualBoxなどでDebianを用意する。
+というか自分はそうした。
+以下の手順ではDebian 9.2を利用した。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h3&gt;パーティション作成&lt;/h3&gt;
+&lt;p&gt;まずはgdiskを使ってパーティションを作成する。
+今回の例では某会議でもらったProceedingsが入っている8GBのディスク（ただしMacでFATで初期化済み）を用いることとする。&lt;/p&gt;
+&lt;p&gt;USBメディアは &lt;tt class="docutils literal"&gt;/dev/sdb&lt;/tt&gt; にあるとする。
+&lt;tt class="docutils literal"&gt;sudo dmesg&lt;/tt&gt; などで確認しておくこと。&lt;/p&gt;
+&lt;p&gt;まずは現在の状態を確認。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo gdisk -l /dev/sdb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;GPT fdisk (gdisk) version 1.0.1
+
+Partition table scan:
+  MBR: MBR only
+  BSD: not present
+  APM: not present
+  GPT: not present
+
+
+***************************************************************
+Found invalid GPT and valid MBR; converting MBR to GPT format
+in memory.
+***************************************************************
+
+
+Warning! Secondary partition table overlaps the last partition by
+33 blocks!
+You will need to delete this partition or resize it in another utility.
+Disk /dev/sdb: 15728640 sectors, 7.5 GiB
+Logical sector size: 512 bytes
+Disk identifier (GUID): xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Partition table holds up to 128 entries
+First usable sector is 34, last usable sector is 15728606
+Partitions will be aligned on 8-sector boundaries
+Total free space is 22 sectors (11.0 KiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1              56        15728639   7.5 GiB     0700  Microsoft basic data
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;なにやらおかしいとエラーが出てるが気にしない。
+消えてもらうぜ。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo gdisk /dev/sdb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;GPT fdisk (gdisk) version 1.0.1
+
+Partition table scan:
+  MBR: MBR only
+  BSD: not present
+  APM: not present
+  GPT: not present
+
+
+***************************************************************
+Found invalid GPT and valid MBR; converting MBR to GPT format
+in memory. THIS OPERATION IS POTENTIALLY DESTRUCTIVE! Exit by
+typing &amp;#39;q&amp;#39; if you don&amp;#39;t want to convert your MBR partitions
+to GPT format!
+***************************************************************
+
+
+Warning! Secondary partition table overlaps the last partition by
+33 blocks!
+You will need to delete this partition or resize it in another utility.
+
+Command (? for help): d
+Using 1
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;BIOS boot partitionを作成するという人もいるようだが、その領域を空けていれば特に問題ないので作成しないこととする。
+セクタ2047までは空けておくこと。&lt;/p&gt;
+&lt;p&gt;EFI Systemパーティションを作成。
+サイズは適当に256Mとした。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Command &lt;span class="o"&gt;(&lt;/span&gt;? &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="nb"&gt;help&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;: n
+Partition number &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;-128, default &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;:
+First sector &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;34&lt;/span&gt;-15728606, &lt;span class="nv"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2048&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; or &lt;span class="o"&gt;{&lt;/span&gt;+-&lt;span class="o"&gt;}&lt;/span&gt;size&lt;span class="o"&gt;{&lt;/span&gt;KMGTP&lt;span class="o"&gt;}&lt;/span&gt;:
+Last sector &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2048&lt;/span&gt;-15728606, &lt;span class="nv"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;15728606&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; or &lt;span class="o"&gt;{&lt;/span&gt;+-&lt;span class="o"&gt;}&lt;/span&gt;size&lt;span class="o"&gt;{&lt;/span&gt;KMGTP&lt;span class="o"&gt;}&lt;/span&gt;: +256M
+Current &lt;span class="nb"&gt;type&lt;/span&gt; is &lt;span class="s1"&gt;&amp;#39;Linux filesystem&amp;#39;&lt;/span&gt;
+Hex code or GUID &lt;span class="o"&gt;(&lt;/span&gt;L to show codes, &lt;span class="nv"&gt;Enter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;8300&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;: ef00
+Changed &lt;span class="nb"&gt;type&lt;/span&gt; of partition to &lt;span class="s1"&gt;&amp;#39;EFI System&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;続いてインストールメディアやgrubファイルを置くためのパーティション。
+ディスクサイズが小さいので残り全部。
+SSDを使って同じようなインストールメディアを作ったときは8GBのパーティションとした。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Command &lt;span class="o"&gt;(&lt;/span&gt;? &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="nb"&gt;help&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;: n
+Partition number &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;-128, default &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;:
+First sector &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;34&lt;/span&gt;-15728606, &lt;span class="nv"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;526336&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; or &lt;span class="o"&gt;{&lt;/span&gt;+-&lt;span class="o"&gt;}&lt;/span&gt;size&lt;span class="o"&gt;{&lt;/span&gt;KMGTP&lt;span class="o"&gt;}&lt;/span&gt;:
+Last sector &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;526336&lt;/span&gt;-15728606, &lt;span class="nv"&gt;default&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;15728606&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; or &lt;span class="o"&gt;{&lt;/span&gt;+-&lt;span class="o"&gt;}&lt;/span&gt;size&lt;span class="o"&gt;{&lt;/span&gt;KMGTP&lt;span class="o"&gt;}&lt;/span&gt;:
+Current &lt;span class="nb"&gt;type&lt;/span&gt; is &lt;span class="s1"&gt;&amp;#39;Linux filesystem&amp;#39;&lt;/span&gt;
+Hex code or GUID &lt;span class="o"&gt;(&lt;/span&gt;L to show codes, &lt;span class="nv"&gt;Enter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;8300&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;: &lt;span class="m"&gt;0700&lt;/span&gt;
+Changed &lt;span class="nb"&gt;type&lt;/span&gt; of partition to &lt;span class="s1"&gt;&amp;#39;Microsoft basic data&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで完成。
+確認して書き込み。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Command &lt;span class="o"&gt;(&lt;/span&gt;? &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="nb"&gt;help&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;: p
+Disk /dev/sdb: &lt;span class="m"&gt;15728640&lt;/span&gt; sectors, &lt;span class="m"&gt;7&lt;/span&gt;.5 GiB
+Logical sector size: &lt;span class="m"&gt;512&lt;/span&gt; bytes
+Disk identifier &lt;span class="o"&gt;(&lt;/span&gt;GUID&lt;span class="o"&gt;)&lt;/span&gt;: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Partition table holds up to &lt;span class="m"&gt;128&lt;/span&gt; entries
+First usable sector is &lt;span class="m"&gt;34&lt;/span&gt;, last usable sector is &lt;span class="m"&gt;15728606&lt;/span&gt;
+Partitions will be aligned on &lt;span class="m"&gt;2048&lt;/span&gt;-sector boundaries
+Total free space is &lt;span class="m"&gt;0&lt;/span&gt; sectors &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; bytes&lt;span class="o"&gt;)&lt;/span&gt;
+
+Number  Start &lt;span class="o"&gt;(&lt;/span&gt;sector&lt;span class="o"&gt;)&lt;/span&gt;    End &lt;span class="o"&gt;(&lt;/span&gt;sector&lt;span class="o"&gt;)&lt;/span&gt;  Size       Code  Name
+   &lt;span class="m"&gt;1&lt;/span&gt;            &lt;span class="m"&gt;2048&lt;/span&gt;          &lt;span class="m"&gt;526335&lt;/span&gt;   &lt;span class="m"&gt;256&lt;/span&gt;.0 MiB   EF00  EFI System
+   &lt;span class="m"&gt;2&lt;/span&gt;          &lt;span class="m"&gt;526336&lt;/span&gt;        &lt;span class="m"&gt;15728606&lt;/span&gt;   &lt;span class="m"&gt;7&lt;/span&gt;.2 GiB     &lt;span class="m"&gt;0700&lt;/span&gt;  Microsoft basic data
+
+Command &lt;span class="o"&gt;(&lt;/span&gt;? &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="nb"&gt;help&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;: w
+
+Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+PARTITIONS!!
+
+Do you want to proceed? &lt;span class="o"&gt;(&lt;/span&gt;Y/N&lt;span class="o"&gt;)&lt;/span&gt;: y
+OK&lt;span class="p"&gt;;&lt;/span&gt; writing new GUID partition table &lt;span class="o"&gt;(&lt;/span&gt;GPT&lt;span class="o"&gt;)&lt;/span&gt; to /dev/sdb.
+The operation has completed successfully.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;念のため確認。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo gdisk -l /dev/sdb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;GPT fdisk (gdisk) version 1.0.1
+
+Partition table scan:
+  MBR: protective
+  BSD: not present
+  APM: not present
+  GPT: present
+
+Found valid GPT with protective MBR; using GPT.
+Disk /dev/sdb: 15728640 sectors, 7.5 GiB
+Logical sector size: 512 bytes
+Disk identifier (GUID): xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Partition table holds up to 128 entries
+First usable sector is 34, last usable sector is 15728606
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2014 sectors (1007.0 KiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1            2048          526335   256.0 MiB   EF00  EFI System
+   2          526336        15728606   7.2 GiB     0700  Microsoft basic data
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;FAT32でフォーマットする。
+&lt;tt class="docutils literal"&gt;mkfs.vfat&lt;/tt&gt; がないという人は &lt;tt class="docutils literal"&gt;sudo &lt;span class="pre"&gt;apt-get&lt;/span&gt; install dosfstools&lt;/tt&gt; する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo mkfs.vfat -F32 /dev/sdb1
+sudo mkfs.vfat -F32 /dev/sdb2
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;なお、EFI SystemパーティションはFATにしないとダメだが、インストールメディアやgrubファイルを置くためのパーティションは別にFATにする必要はない。
+ただ、ファイルを書き換えるときに楽というだけの話。
+変更したい場合は↑でパーティションを作成するときにGUIDもちゃんと変更すること。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="grub-mbr"&gt;
+&lt;h3&gt;grubのインストール（MBR編）&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;grub-pc&lt;/span&gt;&lt;/tt&gt; をインストールする。
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;grub-efi&lt;/span&gt;&lt;/tt&gt; が一旦アンインストールされるが気にしたら負け。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo apt-get install -y grub-pc
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;インストールメディアやgrubファイルを置くためのパーティションをマウントして、bootディレクトリを指定してインストール。
+blocklistsが何たらとエラーになるので、 &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--force&lt;/span&gt;&lt;/tt&gt; を付けて実行する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo mount /dev/sdb2 /mnt
+sudo grub-install --target&lt;span class="o"&gt;=&lt;/span&gt;i386-pc --boot-directory&lt;span class="o"&gt;=&lt;/span&gt;/mnt/boot --force /dev/sdb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Installing for i386-pc platform.
+grub-install: warning: this GPT partition label contains no BIOS Boot Partition; embedding won&amp;#39;t be possible.
+grub-install: warning: Embedding is not possible.  GRUB can only be installed in this setup by using blocklists.  However, blocklists are UNRELIABLE and their use is discouraged..
+Installation finished. No error reported.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;何か色々と言われるが、 &lt;tt class="docutils literal"&gt;No error reported.&lt;/tt&gt; なのできっと問題ないだろう。
+これで &lt;tt class="docutils literal"&gt;/mnt/boot/grub&lt;/tt&gt; に色々なファイルができてるはず。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="grub-efi"&gt;
+&lt;h3&gt;grubのインストール（EFI編）&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;grub-efi&lt;/span&gt;&lt;/tt&gt; を再び導入する。
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;grub-pc&lt;/span&gt;&lt;/tt&gt; はアンインストールされる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo apt-get install -y grub-efi
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;マウントポイントが足りないので、EFI用ディレクトリを作ってEFI Systemパーティションをマウントして使う。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo mkdir /mnt/boot/efi
+sudo mount /dev/sdb1 /mnt/boot/efi
+sudo grub-install --target&lt;span class="o"&gt;=&lt;/span&gt;x86_64-efi --efi-directory&lt;span class="o"&gt;=&lt;/span&gt;/mnt/boot/efi --boot-directory&lt;span class="o"&gt;=&lt;/span&gt;/mnt/boot
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Installing for x86_64-efi platform.
+Installation finished. No error reported.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;grub-installではremovable media用にいい感じのEFIブートファイルを作ってくれないのでコピーする。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo mkdir /mnt/boot/efi/EFI/BOOT
+sudo cp /mnt/boot/efi/EFI/debian/grubx64.efi /mnt/boot/efi/EFI/BOOT/BOOTX64.EFI
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;これで &lt;tt class="docutils literal"&gt;/mnt/boot/efi&lt;/tt&gt; の下はこんな感じのディレクトリ構成になるはず。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ls -FR /mnt/boot/efi
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;/mnt/boot/efi:
+EFI/
+
+/mnt/boot/efi/EFI:
+BOOT/  debian/
+
+/mnt/boot/efi/EFI/BOOT:
+BOOTX64.EFI*
+
+/mnt/boot/efi/EFI/debian:
+grubx64.efi*
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;アンマウントして完成。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo umount /mnt/boot/efi
+sudo umount /mnt
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;インストールメディアとインストーラカーネルの配置&lt;/h2&gt;
+&lt;p&gt;ここまで来たら自分はMacで作業している。
+&lt;tt class="docutils literal"&gt;/dev/sdb2&lt;/tt&gt; をFAT32でフォーマットしているので、Macに接続すると &lt;tt class="docutils literal"&gt;NO NAME&lt;/tt&gt; というボリュームが現れるので、ISOイメージとカーネル、ルートイメージを配置する。&lt;/p&gt;
+&lt;p&gt;ISOイメージとカーネル、ルートイメージは &lt;a class="reference external" href="https://www.debian.org/distrib/netinst"&gt;インターネット経由の Debian のインストール&lt;/a&gt; から取得する。
+「小さな CD または USB メモリ」のamd64をダウンロードし、そのISOファイルを &lt;tt class="docutils literal"&gt;NO NAME&lt;/tt&gt; ボリュームにコピーする。
+これを書いている時点では &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;debian-9.2.1-amd64-netinst.iso&lt;/span&gt;&lt;/tt&gt; が最新の模様。&lt;/p&gt;
+&lt;p&gt;カーネル類は「ネットワークブート」のamd64から &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;hd-media&lt;/span&gt;&lt;/tt&gt; の中の &lt;tt class="docutils literal"&gt;vmlinuz&lt;/tt&gt; と &lt;tt class="docutils literal"&gt;initrd.gz&lt;/tt&gt; を取得して &lt;tt class="docutils literal"&gt;NO NAME&lt;/tt&gt; ボリュームの &lt;tt class="docutils literal"&gt;boot&lt;/tt&gt; ディレクトリにコピーする。&lt;/p&gt;
+&lt;p&gt;あとは以下のような &lt;tt class="docutils literal"&gt;grub.cfg&lt;/tt&gt; を作成して &lt;tt class="docutils literal"&gt;NO NAME&lt;/tt&gt; ボリュームの &lt;tt class="docutils literal"&gt;boot/grub&lt;/tt&gt; ディレクトリに配置する。
+&lt;tt class="docutils literal"&gt;(hd0,gpt2)&lt;/tt&gt; は &lt;tt class="docutils literal"&gt;boot&lt;/tt&gt; が入っているディスク、パーティションを指定している。
+パーティション番号が↑と違う場合は適宜書き換える。&lt;/p&gt;
+&lt;p&gt;それと、マシンによっては &lt;tt class="docutils literal"&gt;video=efifb&lt;/tt&gt; ではうまく表示できないかもしれない。
+手元にあるHP EliteBook 820では &lt;tt class="docutils literal"&gt;video=vesafb&lt;/tt&gt; でないとインストーラ起動後に表示が崩れた。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Load Graphical modules
+insmod efi_gop
+insmod efi_uga
+
+# Load Font module
+insmod font
+
+
+# Setup GFXTERM along with loading unicode.pf2 font file
+
+if loadfont ${prefix}/fonts/unicode.pf2
+then
+   insmod gfxterm
+   set gfxmode=&amp;quot;auto&amp;quot;
+   set gfxpayload=keep
+   terminal_output gfxterm
+
+   set color_normal=light-blue/black
+   set color_highlight=light-cyan/blue
+fi
+
+insmod part_gpt
+insmod part_msdos
+insmod fat
+insmod ext2
+
+# Timeout for menu
+set timeout=5
+
+# Set default boot entry as Entry 0
+set default=0
+
+menuentry &amp;quot;Debian Install (expert mode)&amp;quot; {
+  set root=(hd0,gpt2)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off priority=low ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+menuentry &amp;quot;Debian Install&amp;quot; {
+  set root=(hd0,gpt2)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このメディアのいいところは、grubを更新せずとも新しいインストールイメージを導入できるところ。
+ISOとカーネル類のみ新しいものに入れ替えればOK。&lt;/p&gt;
+&lt;p&gt;なお、testingをインストールする場合はdaily build版を &lt;a class="reference external" href="https://www.debian.org/devel/debian-installer/"&gt;ここ&lt;/a&gt; から取得すると良い。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="debian"></category><category term="bios"></category><category term="efi"></category><category term="install"></category></entry><entry><title>ieicej.clsのfigure環境内でminipageしたときにキャプションがおかしくなる件</title><link href="http://pman0214.github.io/blog/ieice-figure-minipage.html" rel="alternate"></link><published>2017-08-08T10:00:00+09:00</published><updated>2017-08-08T10:00:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2017-08-08:/blog/ieice-figure-minipage.html</id><summary type="html">TeXで電子情報通信学会提供のクラスファイルieicej.clsを使っているときにfigure環境内でminipageしたときに自動的に改行されない問題を解決する。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;p&gt;電子情報通信学会の &lt;tt class="docutils literal"&gt;ieicej.cls&lt;/tt&gt; を使ってTeXで原稿を書くときに、細いカラムの中に縦長の図を横に2つ並べたいときがたまにある。
 このように書いて図を2つ並べようとする。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;\begin&lt;/span&gt;&lt;span class="nb"&gt;{&lt;/span&gt;figure&lt;span class="nb"&gt;}&lt;/span&gt;[bt]
