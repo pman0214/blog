@@ -108,7 +108,7 @@ ImageBuilderを使えば上記のことは可能なような気もするが、�
 <h3>ツールのインストール</h3>
 <p>まず必要ツールをインストールする。
 Debianなので <code>apt-get</code> すればOK。</p>
-<div class="highlight"><pre>% sudo apt-get update
+<div class="highlight"><pre><span></span>% sudo apt-get update
 % sudo apt-get install git-core build-essential libssl-dev <span class="se">\</span>
 libncurses5-dev unzip subversion gawk python gettext pkg-config <span class="se">\</span>
 zip openjdk-7-jdk openjdk-7-jre libxml-parser-perl mercurial <span class="se">\</span>
@@ -121,13 +121,13 @@ zlib1g-dev sdcc bzr
 今回はこの記事執筆時点での最新版を入れることにする。
 意外と時間がかかるので注意。
 自分が取得したのは</p>
-<div class="highlight"><pre>% git clone git://git.openwrt.org/openwrt.git
+<div class="highlight"><pre><span></span>% git clone git://git.openwrt.org/openwrt.git
 </pre></div>
 <p>安定版リリースを使いたい場合には <a class="reference external" href="http://wiki.openwrt.org/doc/howto/buildroot.exigence#downloading_sources">OpenWrtのドキュメント</a> を参照のこと。</p>
 <p>パッケージ類のソースはfeedで管理されているので、これを使って最新のソースを取得してくる。
 <code>feeds.conf</code> を編集すればfeedを追加できる。
 <code>feeds.conf</code> は最初は存在しないので、 <code>feeds.conf.default</code> をコピーして使う。</p>
-<div class="highlight"><pre>% <span class="nb">cd </span>openwrt
+<div class="highlight"><pre><span></span>% <span class="nb">cd</span> openwrt
 % ./scripts/feeds update -a
 % ./scripts/feeds install -a
 </pre></div>
@@ -135,12 +135,12 @@ zlib1g-dev sdcc bzr
 この記事執筆時点では14.07のものが最新なので、これを取得して足りない設定は自分で施す。
 元から <code>.config</code> がある場合にも上書きしてしまう。
 gitから取ってきているので、復活させたければ <code>git checkout</code> すればいい。</p>
-<div class="highlight"><pre>% wget http://downloads.openwrt.org/barrier_breaker/14.07/brcm2708/generic/config.brcm2708_generic
+<div class="highlight"><pre><span></span>% wget http://downloads.openwrt.org/barrier_breaker/14.07/brcm2708/generic/config.brcm2708_generic
 % cp config.brcm2708_generic .config
 </pre></div>
 <p>必要となるパッケージのチェック。
 足りないパッケージがあったら適宜インストールすること。</p>
-<div class="highlight"><pre>% make prereq
+<div class="highlight"><pre><span></span>% make prereq
 </pre></div>
 <p>カーネルコンフィグを変更する。
 特に、Raspberry Pi2を使っている場合は <code>Subtarget</code> を <code>BCM2709</code> に変更しないと動かない（手元にRaspberry Pi2がないから未検証）。
@@ -149,7 +149,7 @@ gitから取ってきているので、復活させたければ <code>git checko
 当然のことだが、パッケージを減らせばビルドが速くなる。
 イメージサイズは組み込むパッケージ数に依存するので、ビルドしたから必ず大きくなるとは限らない。
 ImageBuilderをビルドしておくと単一のパッケージをビルドしたり組み込むパッケージや設定を変更してイメージを作成したりできるので便利。</p>
-<div class="highlight"><pre>% make menuconfig
+<div class="highlight"><pre><span></span>% make menuconfig
 </pre></div>
 <p>あとはmakeするだけなのだが、configファイルを配置したイメージをビルドしたい場合には <code>package/base-files/files/</code> に配置しておく。
 個人的には、設定ファイルを配置したイメージはImageBuilderをビルドしてから作る方が良いように思う。</p>
@@ -157,7 +157,7 @@ ImageBuilderをビルドしておくと単一のパッケージをビルドし�
 CPU数が分かっている場合は <code>-j</code> オプションで指定するとmakeが速くなるかも。
 エラーが出た場合は <code>make -j1 V=s</code> とするとエラーを見ることができる。
 もちろん最初から指定しておいてもOK。</p>
-<div class="highlight"><pre>% make -j5
+<div class="highlight"><pre><span></span>% make -j5
 </pre></div>
 <p>初めてmakeするときは色々なソースコードを取得してくるのでとてつもなく時間がかかる。
 ネットワーク（特に相手側）の速度に依存するため、マシンが速くても速くはならない。</p>
@@ -229,14 +229,13 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -246,7 +245,6 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>

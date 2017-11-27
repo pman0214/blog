@@ -100,16 +100,16 @@
 <div class="section" id="id3">
 <h2>手順</h2>
 <p>まずはソースを取得して展開する。</p>
-<div class="highlight"><pre>% mkdir ~/build
-% <span class="nb">cd</span> !<span class="err">$</span>
+<div class="highlight"><pre><span></span>% mkdir ~/build
+% <span class="nb">cd</span> !$
 % curl -LO http://ftp.gnu.org/pub/gnu/emacs/emacs-24.5.tar.xz
 % curl -LO ftp://ftp.math.s.chiba-u.ac.jp/emacs/emacs-24.5-mac-5.11.tar.gz
 % tar Jxvf emacs-24.5.tar.xz
 % tar zxvf emacs-24.5-mac-5.11.tar.gz
-% <span class="nb">cd </span>emacs-24.5
+% <span class="nb">cd</span> emacs-24.5
 </pre></div>
 <p>パッチを当てて必要ファイルをコピーする。</p>
-<div class="highlight"><pre>% patch -p1 &lt; ../emacs-24.5-mac-5.11/patch-mac
+<div class="highlight"><pre><span></span>% patch -p1 &lt; ../emacs-24.5-mac-5.11/patch-mac
 % cp -R ../emacs-24.5-mac-5.11/mac mac
 % cp ../emacs-24.5-mac-5.11/src/* src
 % cp ../emacs-24.5-mac-5.11/lisp/term/mac-win.el lisp/term
@@ -117,25 +117,25 @@
 </pre></div>
 <p>confiugreする。
 このとき、 <code>--prefix</code> を指定し、使用時にEmacs.appがインストールされるであろう場所に各種ファイルがインストールされるようにする。</p>
-<div class="highlight"><pre>% ./configure --with-mac --without-x --prefix<span class="o">=</span>/Applications/Emacs.app/Contents/MacOS
+<div class="highlight"><pre><span></span>% ./configure --with-mac --without-x --prefix<span class="o">=</span>/Applications/Emacs.app/Contents/MacOS
 </pre></div>
 <p>このディレクトリは多分作成しておかなければならない。
 古いバージョンのEmacsを使っている場合は移動しておくこと。</p>
-<div class="highlight"><pre>% mv /Applications/Emacs.app /Applications/Emacs_24.4.app
+<div class="highlight"><pre><span></span>% mv /Applications/Emacs.app /Applications/Emacs_24.4.app
 % mkdir -p /Applications/Emacs.app/Contents/MacOS
 </pre></div>
 <p>ビルドしてインストールする。</p>
-<div class="highlight"><pre>% make
+<div class="highlight"><pre><span></span>% make
 % make install
 </pre></div>
 <p><code>make install</code> で <code>mac/Emacs.app</code> が作られるのだが、一部のファイル <code>/Applications/Emacs.app/Contents/MacOS</code> に入る。
 なのでこれをコピーする。
 <code>MacOS</code> の後の <code>/</code> をつけないと残念なことになるので注意。</p>
-<div class="highlight"><pre>% <span class="nb">cd </span>mac/Emacs.app/Contents/MacOS
+<div class="highlight"><pre><span></span>% <span class="nb">cd</span> mac/Emacs.app/Contents/MacOS
 % rsync -avrz -e cp /Applications/Emacs.app/Contents/MacOS/ ./
 </pre></div>
 <p><code>Emacs.app</code> の偽物を消して本物をコピーする。</p>
-<div class="highlight"><pre>% <span class="nb">cd</span> ../../..
+<div class="highlight"><pre><span></span>% <span class="nb">cd</span> ../../..
 % rm -rf /Applications/Emacs.app
 % cp -r Emacs.app /Applications/
 </pre></div>
@@ -144,20 +144,20 @@
 <h2>ついでにYaTeXを入れる</h2>
 <p>仕事柄 <a class="reference external" href="https://www.yatex.org/">YaTeX</a> をよく使うので <code>Emacs.app</code> に同梱しておく。
 この記事を執筆時点の最新版は1.78.4。</p>
-<div class="highlight"><pre>% <span class="nb">cd</span> ~/build
+<div class="highlight"><pre><span></span>% <span class="nb">cd</span> ~/build
 % curl -LO https://www.yatex.org/yatex1.78.4.tar.gz
 % tar zxvf yatex1.78.4.tar.gz
-% <span class="nb">cd </span>yatex1.78.4
+% <span class="nb">cd</span> yatex1.78.4
 </pre></div>
 <p><code>Makefile</code> を直接編集する。</p>
-<div class="highlight"><pre><span class="err">...</span>
+<div class="highlight"><pre><span></span><span class="err">...</span>
 <span class="nv">EMACS</span>   <span class="o">=</span> /Applications/Emacs.app/Contents/MacOS/Emacs
 <span class="nv">PREFIX</span>  <span class="o">=</span> /Applications/Emacs.app/Contents/MacOS
 <span class="nv">EMACSDIR</span> <span class="o">=</span> <span class="si">${</span><span class="nv">PREFIX</span><span class="si">}</span>/share/emacs
 <span class="err">...</span>
 </pre></div>
 <p><code>make install</code> すればOK。</p>
-<div class="highlight"><pre>% make install
+<div class="highlight"><pre><span></span>% make install
 % make insta-yahtml
 </pre></div>
 </div>
@@ -221,14 +221,13 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -238,7 +237,6 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>

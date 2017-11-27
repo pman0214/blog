@@ -106,16 +106,16 @@
 <ul>
 <li>
 <p>適当なディレクトリを作成。</p>
-<div class="highlight"><pre>mkdir ~/blog
-<span class="nb">cd</span> !<span class="err">$</span>
+<div class="highlight"><pre><span></span>mkdir ~/blog
+<span class="nb">cd</span> !$
 </pre></div>
 
 
 </li>
 <li>
 <p>virtualenv環境でpelicanを導入。Markdownを使いたいので、Markdownも導入しておく。</p>
-<div class="highlight"><pre>virtualenv --system-site-packages ./
-<span class="nb">source </span>bin/activate
+<div class="highlight"><pre><span></span>virtualenv --system-site-packages ./
+<span class="nb">source</span> bin/activate
 pip install pelican
 pip install Markdown
 </pre></div>
@@ -124,7 +124,7 @@ pip install Markdown
 </li>
 <li>
 <p><code>.gitignore</code>ファイルを作成しておく。なお、<code>.DS_Store</code>などはグローバルに無視する設定をしているので除外してある。</p>
-<div class="highlight"><pre>.Python
+<div class="highlight"><pre><span></span>.Python
 bin/
 include/
 lib/
@@ -145,7 +145,7 @@ cache/
 </ul>
 </li>
 <li>ここでいったんcommitしておくと幸せになれるかも。</li>
-<li>gitレポジトリを作成。<code>git status</code>して出てきたファイルを追加してcommit。<div class="highlight"><pre>git init .
+<li>gitレポジトリを作成。<code>git status</code>して出てきたファイルを追加してcommit。<div class="highlight"><pre><span></span>git init .
 git status
 git add Makefile .gitignore develop_server.sh ...
 git commit -m <span class="s2">&quot;Initial commit with pelican files.&quot;</span>
@@ -160,7 +160,7 @@ git commit -m <span class="s2">&quot;Initial commit with pelican files.&quot;</s
 <ul>
 <li>
 <p><code>publishconf.py</code>を修正</p>
-<div class="highlight"><pre><span class="gh">diff --git a/publishconf.py b/publishconf.py</span>
+<div class="highlight"><pre><span></span><span class="gh">diff --git a/publishconf.py b/publishconf.py</span>
 <span class="gh">index 98162b2..dfb1731 100644</span>
 <span class="gd">--- a/publishconf.py</span>
 <span class="gi">+++ b/publishconf.py</span>
@@ -178,7 +178,7 @@ git commit -m <span class="s2">&quot;Initial commit with pelican files.&quot;</s
 </li>
 <li>
 <p><code>Makefile</code>も修正しておく。<code>make clean</code>すると消えてしまうので。</p>
-<div class="highlight"><pre><span class="gh">diff --git a/Makefile b/Makefile</span>
+<div class="highlight"><pre><span></span><span class="gh">diff --git a/Makefile b/Makefile</span>
 <span class="gh">index dc640c3..35df450 100644</span>
 <span class="gd">--- a/Makefile</span>
 <span class="gi">+++ b/Makefile</span>
@@ -205,7 +205,7 @@ git commit -m <span class="s2">&quot;Initial commit with pelican files.&quot;</s
 <ul>
 <li>
 <p>mdx_linkfyとmdx_del_insを導入。</p>
-<div class="highlight"><pre>pip install mdx_linkify
+<div class="highlight"><pre><span></span>pip install mdx_linkify
 pip install mdx_del_ins
 </pre></div>
 
@@ -213,7 +213,7 @@ pip install mdx_del_ins
 </li>
 <li>
 <p><code>pelicanconf.py</code>に以下を追加する。</p>
-<div class="highlight"><pre><span class="n">MD_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;del_ins&#39;</span><span class="p">,</span> <span class="s">&#39;fenced_code&#39;</span><span class="p">,</span> <span class="s">&#39;codehilite(css_class=highlight)&#39;</span><span class="p">,</span> <span class="s">&#39;tables&#39;</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><span class="n">MD_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;del_ins&#39;</span><span class="p">,</span> <span class="s1">&#39;fenced_code&#39;</span><span class="p">,</span> <span class="s1">&#39;codehilite(css_class=highlight)&#39;</span><span class="p">,</span> <span class="s1">&#39;tables&#39;</span><span class="p">]</span>
 </pre></div>
 
 
@@ -228,15 +228,15 @@ pip install mdx_del_ins
 <ul>
 <li>
 <p>管理を単純にするため、投稿日をファイル名とすることにした。</p>
-<div class="highlight"><pre>touch content <span class="sb">`</span>date +%Y%m%d<span class="sb">`</span>.md
-open !<span class="err">$</span>
+<div class="highlight"><pre><span></span>touch content <span class="sb">`</span>date +%Y%m%d<span class="sb">`</span>.md
+open !$
 </pre></div>
 
 
 </li>
 <li>
 <p>先頭に各種情報を書いておく。</p>
-<div class="highlight"><pre>Title: Pelican+GitHub Pagesでブログ引っ越し
+<div class="highlight"><pre><span></span>Title: Pelican+GitHub Pagesでブログ引っ越し
 Date: 2015-04-26 18:00
 Category: カテゴリ
 Tags: info, blog, python, pelican, github
@@ -254,14 +254,14 @@ Summary: この記事の要約。
 <ul>
 <li>
 <p>htmlファイル群を生成。</p>
-<div class="highlight"><pre>make html
+<div class="highlight"><pre><span></span>make html
 </pre></div>
 
 
 </li>
 <li>
 <p>localでWebサーバを起動。</p>
-<div class="highlight"><pre>make serve
+<div class="highlight"><pre><span></span>make serve
 </pre></div>
 
 
@@ -281,14 +281,14 @@ Summary: この記事の要約。
 <ul>
 <li>
 <p>テーマのレポジトリをsubmoduleとして追加する。</p>
-<div class="highlight"><pre>git submodule add git@github.com:getpelican/pelican-themes.git themes
+<div class="highlight"><pre><span></span>git submodule add git@github.com:getpelican/pelican-themes.git themes
 </pre></div>
 
 
 </li>
 <li>
 <p>先ほどのテーマのディレクトリがsubmoduleであれば、それを取得する。この記事執筆時点では<a href="https://github.com/jody-frankowski/blue-penguin/">blue-penguin</a>を選択した。</p>
-<div class="highlight"><pre><span class="nb">cd </span>themes
+<div class="highlight"><pre><span></span><span class="nb">cd</span> themes
 git submodule init blue-penguin
 git submodule update blue-penguin
 </pre></div>
@@ -299,12 +299,12 @@ git submodule update blue-penguin
 </li>
 <li>
 <p><code>pelicanconf.py</code>に以下のように設定する。</p>
-<div class="highlight"><pre><span class="n">THEME</span> <span class="o">=</span> <span class="s">&quot;pelican-themes/blue-penguin&quot;</span>
+<div class="highlight"><pre><span></span><span class="n">THEME</span> <span class="o">=</span> <span class="s2">&quot;pelican-themes/blue-penguin&quot;</span>
 </pre></div>
 
 
 <ul>
-<li><strong>2015/04/27追記:</strong> 間違ってます。正しくはこうです。<div class="highlight"><pre><span class="n">THEME</span> <span class="o">=</span> <span class="s">&quot;themes/blue-penguin&quot;</span>
+<li><strong>2015/04/27追記:</strong> 間違ってます。正しくはこうです。<div class="highlight"><pre><span></span><span class="n">THEME</span> <span class="o">=</span> <span class="s2">&quot;themes/blue-penguin&quot;</span>
 </pre></div>
 
 
@@ -320,7 +320,7 @@ git submodule update blue-penguin
 <ul>
 <li>
 <p><code>output</code>ディレクトリをgitレポジトリにする。</p>
-<div class="highlight"><pre><span class="nb">cd </span>output
+<div class="highlight"><pre><span></span><span class="nb">cd</span> output
 git init ./
 </pre></div>
 
@@ -328,14 +328,14 @@ git init ./
 </li>
 <li>
 <p><code>gh-pages</code>ブランチに切り替え。</p>
-<div class="highlight"><pre>git checkout -b gh-pages
+<div class="highlight"><pre><span></span>git checkout -b gh-pages
 </pre></div>
 
 
 </li>
 <li>
 <p>全ファイルをadd、そしてcommit。</p>
-<div class="highlight"><pre>git add *
+<div class="highlight"><pre><span></span>git add *
 git commit -m <span class="s2">&quot;Article `date +%Y%m%d`.&quot;</span>
 </pre></div>
 
@@ -343,7 +343,7 @@ git commit -m <span class="s2">&quot;Article `date +%Y%m%d`.&quot;</span>
 </li>
 <li>
 <p>GitHubにpushできるようにする。自分の場合はこんな感じ。</p>
-<div class="highlight"><pre>git remote add origin git@github.com:pman0214/blog.git
+<div class="highlight"><pre><span></span>git remote add origin git@github.com:pman0214/blog.git
 git push origin gh-pages
 </pre></div>
 
@@ -420,14 +420,13 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -437,7 +436,6 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>

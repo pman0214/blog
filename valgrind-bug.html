@@ -90,8 +90,8 @@ The Valgrind distribution currently includes six production-quality tools: a mem
 Linux上でpthreadを使用している場合に常にメモリリークとなってしまう件。</p>
 <p>環境は以下。
 Vagrantで作成したdebian sid。</p>
-<div class="highlight"><pre>% uname -a
-Linux debian 4.2.0-1-amd64 <span class="c">#1 SMP Debian 4.2.6-1 (2015-11-10) x86_64 GNU/Linux</span>
+<div class="highlight"><pre><span></span>% uname -a
+Linux debian <span class="m">4</span>.2.0-1-amd64 <span class="c1">#1 SMP Debian 4.2.6-1 (2015-11-10) x86_64 GNU/Linux</span>
 % valgrind --version
 valgrind-3.11.0
 </pre></div>
@@ -100,9 +100,9 @@ valgrind-3.11.0
 <h2>再現手順</h2>
 <p>メモリリークしないコード <code>test.c</code> を用意する。
 <code>pthread_create</code> して <code>pthread_join</code> するだけの簡単なお仕事。</p>
-<div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
-<span class="cp">#include &lt;pthread.h&gt;</span>
-<span class="cp">#include &lt;unistd.h&gt;</span>
+<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
 
 <span class="kt">void</span> <span class="o">*</span><span class="nf">test</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
 <span class="p">{</span>
@@ -113,7 +113,7 @@ valgrind-3.11.0
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="kt">pthread_t</span> <span class="n">th</span><span class="p">;</span>
+    <span class="n">pthread_t</span> <span class="n">th</span><span class="p">;</span>
 
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">th</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">));</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">pthread_join</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">));</span>
@@ -127,7 +127,7 @@ valgrind-3.11.0
 起動元では <code>pthread_join</code> してあげる。
 これでスレッド用の資源が回収されるのでメモリリークはない。はずなのだが・・・。</p>
 <p>このプログラムをコンパイルして、valgrindを実行してみる。</p>
-<div class="highlight"><pre>% gcc -Wall -g -lpthread -otest test.c
+<div class="highlight"><pre><span></span>% gcc -Wall -g -lpthread -otest test.c
 % valgrind --tool<span class="o">=</span>memcheck <span class="se">\</span>
   --leak-check<span class="o">=</span>yes <span class="se">\</span>
   --leak-resolution<span class="o">=</span>high <span class="se">\</span>
@@ -137,7 +137,7 @@ valgrind-3.11.0
   -v ./test
 </pre></div>
 <p>結果は以下。</p>
-<div class="highlight"><pre>==1424== Memcheck, a memory error detector
+<div class="highlight"><pre><span></span>==1424== Memcheck, a memory error detector
 ==1424== Copyright (C) 2002-2015, and GNU GPL&#39;d, by Julian Seward et al.
 ==1424== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
 ==1424== Command: ./test
@@ -256,7 +256,7 @@ valgrind-3.11.0
 </pre></div>
 <p>この部分が「リークしているかも」と言われている。
 これは明らかに <code>pthread_create</code> した分。</p>
-<div class="highlight"><pre>==1424== 272 bytes in 1 blocks are possibly lost in loss record 4 of 6
+<div class="highlight"><pre><span></span>==1424== 272 bytes in 1 blocks are possibly lost in loss record 4 of 6
 ==1424==    at 0x4C2AC15: calloc (vg_replace_malloc.c:711)
 ==1424==    by 0x4010FE1: allocate_dtv (dl-tls.c:296)
 ==1424==    by 0x40116ED: _dl_allocate_tls (dl-tls.c:460)
@@ -322,14 +322,13 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -339,7 +338,6 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
-    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>
