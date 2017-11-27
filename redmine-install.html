@@ -92,14 +92,14 @@
 <h2>手順</h2>
 <h3>redmine本体</h3>
 <p>必要なツール類をインストールする。MySQLを使うことが多いのだが、個人的な好みによりPostgreSQLを使用することにする。</p>
-<div class="highlight"><pre><span></span>% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev <span class="se">\</span>
+<div class="highlight"><pre>% sudo apt-get install postgresql ruby ruby-dev ruby-pg libpq-dev <span class="se">\</span>
   make build-essential gcc <span class="se">\</span>
   imagemagick libmagickwand-dev git-core subversion
 </pre></div>
 
 
 <p>PostgreSQLに接続してユーザやDBの作成を行う。<code>password</code>の部分はもちろん変更すべし。パスワードに記号が入っているとredmineで接続できない場合があるので、英数に限定する方がいいかも。</p>
-<div class="highlight"><pre><span></span>% sudo -u postgres psql
+<div class="highlight"><pre>% sudo -u postgres psql
 postgres# CREATE ROLE redmine LOGIN ENCRYPTED PASSWORD <span class="s1">&#39;password&#39;</span> NOINHERIT VALID UNTIL <span class="s1">&#39;infinity&#39;</span><span class="p">;</span>
 postgres# CREATE DATABASE redmine WITH <span class="nv">ENCODING</span><span class="o">=</span><span class="s1">&#39;UTF8&#39;</span> <span class="nv">OWNER</span><span class="o">=</span>redmine<span class="p">;</span>
 postgres# <span class="se">\q</span>
@@ -107,21 +107,21 @@ postgres# <span class="se">\q</span>
 
 
 <p>Linuxにユーザ<code>redmine</code>を追加する。</p>
-<div class="highlight"><pre><span></span>% sudo adduser --disabled-login --gecos <span class="s1">&#39;Redmine&#39;</span> redmine
+<div class="highlight"><pre>% sudo adduser --disabled-login --gecos <span class="s1">&#39;Redmine&#39;</span> redmine
 </pre></div>
 
 
 <p>パスワードを設定しておく。</p>
-<div class="highlight"><pre><span></span>% sudo passwd redmine
+<div class="highlight"><pre>% sudo passwd redmine
 </pre></div>
 
 
 <p>sudoグループにユーザ<code>redmine</code>を加えておく。Debianでは<code>visudo</code>でユーザを追加せず、このグループにユーザを追加するだけでsudoできるように設定されている。</p>
-<div class="highlight"><pre><span></span>% sudo vi /etc/group
+<div class="highlight"><pre>% sudo vi /etc/group
 </pre></div>
 
 
-<div class="highlight"><pre><span></span>...
+<div class="highlight"><pre>...
 sudo:x:27:redmine ← ★redmineを追加する
 ...
 </pre></div>
@@ -129,42 +129,42 @@ sudo:x:27:redmine ← ★redmineを追加する
 
 <p><a href="http://www.redmine.org/">Redmineの公式web</a>からソースをゲットする。Backlogsは2.2.4と2.3.2に対応と書かれているが、今回は執筆時点での最新版2.6.5にBacklogsを導入するという暴挙に出る。</p>
 <p><code>sudo -u redmine</code>を多用するのでaliasしておく。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">alias</span> <span class="nv">sr</span><span class="o">=</span><span class="s1">&#39;sudo -u redmine&#39;</span>
+<div class="highlight"><pre>% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s1">&#39;sudo -u redmine&#39;</span>
 % <span class="nb">cd</span> /home/redmine
 % sr wget http://www.redmine.org/releases/redmine-2.6.5.tar.gz
 % sr tar zxvf redmine-2.6.5.tar.gz
 % sr ln -s redmine-2.6.5 redmine
-% <span class="nb">cd</span> redmine
+% <span class="nb">cd </span>redmine
 </pre></div>
 
 
 <p>database.ymlのテンプレートをコピーし、設定を施す。</p>
 <p>MySQLの設定をコメントアウトしてPostgreSQLの設定を有効化し、設定を変更する。
 testもコメントアウトしてしまってOK。</p>
-<div class="highlight"><pre><span></span>% sr cp config/database.yml.example config/database.yml
+<div class="highlight"><pre>% sr cp config/database.yml.example config/database.yml
 % sr vi config/database.yml
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="nn">...</span>
-<span class="l l-Scalar l-Scalar-Plain">production</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">adapter</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">postgresql</span>
-  <span class="l l-Scalar l-Scalar-Plain">database</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">redmine</span>
-  <span class="l l-Scalar l-Scalar-Plain">host</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
-  <span class="l l-Scalar l-Scalar-Plain">username</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">redmine ← ★postgresになっているので変更する</span>
-  <span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span> <span class="s">&quot;password&quot;</span> <span class="l l-Scalar l-Scalar-Plain">← ★パスワードは最初にPostgreSQLに設定したもの。</span>
+<div class="highlight"><pre><span class="nn">...</span>
+<span class="l-Scalar-Plain">production</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">adapter</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">postgresql</span>
+  <span class="l-Scalar-Plain">database</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">redmine</span>
+  <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">localhost</span>
+  <span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">redmine ← ★postgresになっているので変更する</span>
+  <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="s">&quot;password&quot;</span> <span class="l-Scalar-Plain">← ★パスワードは最初にPostgreSQLに設定したもの。</span>
 <span class="nn">...</span>
 </pre></div>
 
 
 <p>bundlerを導入してbundleする。システムのrubyを使っているのでbundlerはsudoで入れてしまう。</p>
-<div class="highlight"><pre><span></span>% sudo gem install bundler
+<div class="highlight"><pre>% sudo gem install bundler
 % sr bundle install --without development <span class="nb">test</span>
 </pre></div>
 
 
 <p>つづいてrake。</p>
-<div class="highlight"><pre><span></span>% sr rake generate_secret_token
+<div class="highlight"><pre>% sr rake generate_secret_token
 % sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production rake db:migrate
 % sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production rake redmine:load_default_data
 Select Language: ja ← ★日本語を指定
@@ -172,7 +172,7 @@ Select Language: ja ← ★日本語を指定
 
 
 <p>試しにサーバを動かしてみる。</p>
-<div class="highlight"><pre><span></span>% sr ruby script/rails server webrick -e production
+<div class="highlight"><pre>% sr ruby script/rails server webrick -e production
 </pre></div>
 
 
@@ -180,11 +180,11 @@ Select Language: ja ← ★日本語を指定
 Ctrl-Cでサーバを停止できる。</p>
 <h3>ログ消去</h3>
 <p>ログが永遠に作成されたら嫌なので、logrotateを使って自動的に消去する。</p>
-<div class="highlight"><pre><span></span>% sudo vi /etc/logrotate.d/redmine
+<div class="highlight"><pre>% sudo vi /etc/logrotate.d/redmine
 </pre></div>
 
 
-<div class="highlight"><pre><span></span>/home/redmine/redmine/log/*.log {
+<div class="highlight"><pre>/home/redmine/redmine/log/*.log {
     rotate 3
     size 1M
     compress
@@ -196,24 +196,24 @@ Ctrl-Cでサーバを停止できる。</p>
 
 
 <p>テストしてみる。</p>
-<div class="highlight"><pre><span></span>% sudo logrotate -dv /etc/logrotate.conf
+<div class="highlight"><pre>% sudo logrotate -dv /etc/logrotate.conf
 </pre></div>
 
 
 <h2>nginx + unicornにする</h2>
 <p>WEBrickを使うのはアレなのでnginxに乗っける。</p>
 <p>まずはunicornをbundleする。</p>
-<div class="highlight"><pre><span></span>% sr vi Gemfile.local
+<div class="highlight"><pre>% sr vi Gemfile.local
 gem <span class="s2">&quot;unicorn&quot;</span>
 </pre></div>
 
 
 <p>unicornの設定ファイルを作成する。</p>
-<div class="highlight"><pre><span></span>% sr vi config/unicorn.rb
+<div class="highlight"><pre>% sr vi config/unicorn.rb
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="n">worker_processes</span> <span class="mi">2</span>
+<div class="highlight"><pre><span class="n">worker_processes</span> <span class="mi">2</span>
 <span class="n">working_directory</span> <span class="s2">&quot;/home/redmine/redmine&quot;</span>
 
 <span class="n">listen</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;tmp/unicorn.sock&quot;</span><span class="p">,</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;RAILS_ROOT&#39;</span><span class="o">]</span><span class="p">)</span>
@@ -252,26 +252,26 @@ gem <span class="s2">&quot;unicorn&quot;</span>
 
 
 <p>initスクリプトを作成する。上の方の設定は自信無い。</p>
-<div class="highlight"><pre><span></span>% sudo vi /etc/init.d/redmine
+<div class="highlight"><pre>% sudo vi /etc/init.d/redmine
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<div class="highlight"><pre><span class="c">#!/bin/sh</span>
 
-<span class="c1">### BEGIN INIT INFO</span>
-<span class="c1"># Provides:          redmine</span>
-<span class="c1"># Required-Start:    $local_fs $remote_fs $network $syslog</span>
-<span class="c1"># Required-Stop:     $local_fs $remote_fs $network $syslog</span>
-<span class="c1"># Default-Start:     2 3 4 5</span>
-<span class="c1"># Default-Stop:      0 1 6</span>
-<span class="c1"># Short-Description: redmine unicorn</span>
-<span class="c1"># Description:       redmine unicorn</span>
-<span class="c1"># chkconfig: - 75 25</span>
-<span class="c1">### END INIT INFO</span>
+<span class="c">### BEGIN INIT INFO</span>
+<span class="c"># Provides:          redmine</span>
+<span class="c"># Required-Start:    $local_fs $remote_fs $network $syslog</span>
+<span class="c"># Required-Stop:     $local_fs $remote_fs $network $syslog</span>
+<span class="c"># Default-Start:     2 3 4 5</span>
+<span class="c"># Default-Stop:      0 1 6</span>
+<span class="c"># Short-Description: redmine unicorn</span>
+<span class="c"># Description:       redmine unicorn</span>
+<span class="c"># chkconfig: - 75 25</span>
+<span class="c">### END INIT INFO</span>
 
-<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span>/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span>/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
 
-<span class="c1"># move to project root directory</span>
+<span class="c"># move to project root directory</span>
 <span class="nv">NAME</span><span class="o">=</span>redmine
 <span class="nv">ENVIROMENT</span><span class="o">=</span>production
 <span class="nv">APP_USER</span><span class="o">=</span><span class="s2">&quot;redmine&quot;</span>
@@ -285,18 +285,18 @@ start<span class="o">()</span>
 <span class="o">{</span>
   <span class="k">if</span> <span class="o">[</span> -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
     <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> already started&quot;</span><span class="p">;</span>
-    <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span>
+    <span class="nb">exit </span>1<span class="p">;</span>
   <span class="k">fi</span>
   <span class="nb">echo</span> <span class="s2">&quot;start </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
   <span class="nb">cd</span> <span class="nv">$ROOT_DIR</span>
-  sudo -u <span class="si">${</span><span class="nv">APP_USER</span><span class="si">}</span> -H bundle <span class="nb">exec</span> unicorn_rails -c <span class="si">${</span><span class="nv">CONF</span><span class="si">}</span> -E <span class="si">${</span><span class="nv">ENVIROMENT</span><span class="si">}</span> -D
+  sudo -u <span class="si">${</span><span class="nv">APP_USER</span><span class="si">}</span> -H bundle <span class="nb">exec </span>unicorn_rails -c <span class="si">${</span><span class="nv">CONF</span><span class="si">}</span> -E <span class="si">${</span><span class="nv">ENVIROMENT</span><span class="si">}</span> -D
 <span class="o">}</span>
 
 stop<span class="o">()</span>
 <span class="o">{</span>
   <span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
     <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> not started&quot;</span><span class="p">;</span>
-    <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span>
+    <span class="nb">exit </span>1<span class="p">;</span>
   <span class="k">fi</span>
   <span class="nb">echo</span> <span class="s2">&quot;stop </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
   <span class="nb">kill</span> -QUIT <span class="sb">`</span>cat <span class="si">${</span><span class="nv">PID</span><span class="si">}</span><span class="sb">`</span>
@@ -307,7 +307,7 @@ force_stop<span class="o">()</span>
 <span class="o">{</span>
   <span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
     <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> not started&quot;</span><span class="p">;</span>
-    <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span>
+    <span class="nb">exit </span>1<span class="p">;</span>
   <span class="k">fi</span>
   <span class="nb">echo</span> <span class="s2">&quot;stop </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
   <span class="nb">kill</span> -TERM <span class="sb">`</span>cat <span class="si">${</span><span class="nv">PID</span><span class="si">}</span><span class="sb">`</span>
@@ -319,7 +319,7 @@ reload<span class="o">()</span>
   <span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$PID</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
     <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$NAME</span><span class="s2"> not started&quot;</span><span class="p">;</span>
     start
-    <span class="nb">exit</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nb">exit </span>0<span class="p">;</span>
   <span class="k">fi</span>
   <span class="nb">echo</span> <span class="s2">&quot;reload </span><span class="nv">$NAME</span><span class="s2">&quot;</span><span class="p">;</span>
   <span class="nb">kill</span> -HUP <span class="sb">`</span>cat <span class="si">${</span><span class="nv">PID</span><span class="si">}</span><span class="sb">`</span>
@@ -355,23 +355,23 @@ restart<span class="o">()</span>
 
 
 <p>permissionを設定し、スタートしておく。</p>
-<div class="highlight"><pre><span></span>% sudo chmod <span class="m">755</span> /etc/init.d/redmine
+<div class="highlight"><pre>% sudo chmod <span class="m">755</span> /etc/init.d/redmine
 % sudo /etc/init.d/redmine start
 </pre></div>
 
 
 <p>自動起動設定もしておく。</p>
-<div class="highlight"><pre><span></span>% sudo update-rc.d redmine defaults
+<div class="highlight"><pre>% sudo update-rc.d redmine defaults
 </pre></div>
 
 
 <p>nginxをインストールし、redmineサイト用の設定ファイルを追加する。</p>
-<div class="highlight"><pre><span></span>% sudo apt-get install nginx
+<div class="highlight"><pre>% sudo apt-get install nginx
 % sudo vi /etc/nginx/sites-available/redmine
 </pre></div>
 
 
-<div class="highlight"><pre><span></span>upstream redmine {
+<div class="highlight"><pre>upstream redmine {
   server 127.0.0.1:8079;
 }
 
@@ -408,7 +408,7 @@ server {
 
 
 <p>サイトを有効化してnginxを起動する。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /etc/nginx/sites-enabled
+<div class="highlight"><pre>% <span class="nb">cd</span> /etc/nginx/sites-enabled
 % sudo ln -s ../sites-available/redmine
 % sudo /etc/init.d/nginx restart
 </pre></div>
@@ -447,49 +447,49 @@ server {
 <p>全部のトラッカーに関してステータスを相互に変更できるように設定する。使い方にもよるが、基本的には非メンバや匿名ユーザは変更できないようにしてしまって問題ない。</p>
 <h3>Backlogsの組込み</h3>
 <p>最新版を取得してくる。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">alias</span> <span class="nv">sr</span><span class="o">=</span><span class="s2">&quot;sudo -u redmine&quot;</span>
+<div class="highlight"><pre>% <span class="nb">alias </span><span class="nv">sr</span><span class="o">=</span><span class="s2">&quot;sudo -u redmine&quot;</span>
 % <span class="nb">cd</span> /home/redmine/redmine/plugins
 % sr git clone git://github.com/backlogs/redmine_backlogs.git
 </pre></div>
 
 
 <p>redmineに導入する。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> redmine_backlogs
+<div class="highlight"><pre>% <span class="nb">cd </span>redmine_backlogs
 % sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle install --without development <span class="nb">test</span>
 % <span class="nb">cd</span> ../..
 % sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle install --without development <span class="nb">test</span>
-% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec</span> rake db:migrate
-% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec</span> rake tmp:cache:clear
-% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec</span> rake tmp:sessions:clear
-% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec</span> rake redmine:backlogs:install
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake db:migrate
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake tmp:cache:clear
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake tmp:sessions:clear
+% sr <span class="nv">RAILS_ENV</span><span class="o">=</span>production bundle <span class="nb">exec </span>rake redmine:backlogs:install
 Which trackers <span class="k">do</span> you want to use <span class="k">for</span> your stories?
-  <span class="m">1</span>. タスク
-  <span class="m">2</span>. ストーリー
-  <span class="m">3</span>. バグ
-  <span class="m">4</span>. 課題
-Separate values with a space <span class="o">(</span>e.g. <span class="m">1</span> <span class="m">3</span><span class="o">)</span>: <span class="m">2</span> ← ★先ほど作った「ストーリー」を選択
+  1. タスク
+  2. ストーリー
+  3. バグ
+  4. 課題
+Separate values with a space <span class="o">(</span>e.g. <span class="m">1</span> 3<span class="o">)</span>: <span class="m">2</span> ← ★先ほど作った「ストーリー」を選択
 Which tracker <span class="k">do</span> you want to use <span class="k">for</span> your tasks?
-  <span class="m">1</span>. タスク
-  <span class="m">2</span>. バグ
-  <span class="m">3</span>. 課題
+  1. タスク
+  2. バグ
+  3. 課題
 Choose one from above <span class="o">(</span>or choose none to create a new tracker<span class="o">)</span>: <span class="m">1</span> ← ★先ほど作った「タスク」を選択
 </pre></div>
 
 
 <p>これでBacklogsが使えるようになっているはず。</p>
 <p>最終的に「管理＞情報」では以下のように表示された。</p>
-<div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">Environment</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">Redmine version                2.6.5.stable</span>
-  <span class="l l-Scalar l-Scalar-Plain">Ruby version                   2.1.5-p273 (2014-11-13) [x86_64-linux-gnu]</span>
-  <span class="l l-Scalar l-Scalar-Plain">Rails version                  3.2.21</span>
-  <span class="l l-Scalar l-Scalar-Plain">Environment                    production</span>
-  <span class="l l-Scalar l-Scalar-Plain">Database adapter               PostgreSQL</span>
-<span class="l l-Scalar l-Scalar-Plain">SCM</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">Subversion                     1.8.10</span>
-  <span class="l l-Scalar l-Scalar-Plain">Git                            2.1.4</span>
-  <span class="l l-Scalar l-Scalar-Plain">Filesystem</span>                     
-<span class="l l-Scalar l-Scalar-Plain">Redmine plugins</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">redmine_backlogs               v1.0.6</span>
+<div class="highlight"><pre><span class="l-Scalar-Plain">Environment</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">Redmine version                2.6.5.stable</span>
+  <span class="l-Scalar-Plain">Ruby version                   2.1.5-p273 (2014-11-13) [x86_64-linux-gnu]</span>
+  <span class="l-Scalar-Plain">Rails version                  3.2.21</span>
+  <span class="l-Scalar-Plain">Environment                    production</span>
+  <span class="l-Scalar-Plain">Database adapter               PostgreSQL</span>
+<span class="l-Scalar-Plain">SCM</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">Subversion                     1.8.10</span>
+  <span class="l-Scalar-Plain">Git                            2.1.4</span>
+  <span class="l-Scalar-Plain">Filesystem</span>                     
+<span class="l-Scalar-Plain">Redmine plugins</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">redmine_backlogs               v1.0.6</span>
 </pre></div>
 </section>
 <section id="comments">
@@ -546,13 +546,14 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -562,6 +563,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>

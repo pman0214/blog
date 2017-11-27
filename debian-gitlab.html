@@ -99,16 +99,16 @@
 <div class="section" id="id4">
 <h3>準備</h3>
 <p>まずは必要ツールをインストールする。</p>
-<div class="highlight"><pre><span></span>% sudo apt-get install build-essential zlib1g-dev libyaml-dev libssl-dev <span class="se">\</span>
+<div class="highlight"><pre>% sudo apt-get install build-essential zlib1g-dev libyaml-dev libssl-dev <span class="se">\</span>
 libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server <span class="se">\</span>
 redis-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev <span class="se">\</span>
 libicu-dev logrotate python-docutils pkg-config cmake nodejs git-core ruby
 </pre></div>
 <p>Kerberosを使う場合にはこれもいるらしい。自分は不要なので無視した。</p>
-<div class="highlight"><pre><span></span>% sudo apt-get install libkrb5-dev
+<div class="highlight"><pre>% sudo apt-get install libkrb5-dev
 </pre></div>
 <p>gitlabユーザを設定する。</p>
-<div class="highlight"><pre><span></span>% sudo adduser --disabled-login --gecos <span class="s1">&#39;GitLab&#39;</span> git
+<div class="highlight"><pre>% sudo adduser --disabled-login --gecos <span class="s1">&#39;GitLab&#39;</span> git
 </pre></div>
 </div>
 <div class="section" id="postgresql">
@@ -117,7 +117,7 @@ libicu-dev logrotate python-docutils pkg-config cmake nodejs git-core ruby
 <code>password</code> の部分は変更すること。
 記号を含むとうまく動かない場合があるので、記号を含まないパスワードの方がいいかもしれない。
 セキュリティ的にはアレだが。</p>
-<div class="highlight"><pre><span></span>% sudo apt-get install postgresql postgresql-client libpq-dev
+<div class="highlight"><pre>% sudo apt-get install postgresql postgresql-client libpq-dev
 % sudo -u postgres psql
 postgres# CREATE ROLE gitlab WITH CREATEDB LOGIN ENCRYPTED PASSWORD <span class="s1">&#39;password&#39;</span> NOINHERIT VALID UNTIL <span class="s1">&#39;infinity&#39;</span><span class="p">;</span>
 postgres# CREATE DATABASE gitlabhq_production OWNER gitlab<span class="p">;</span>
@@ -125,7 +125,7 @@ postgres# <span class="se">\q</span>
 </pre></div>
 <p>試しにつないでみる。
 先ほど設定したパスワードで接続できればOK。</p>
-<div class="highlight"><pre><span></span>% psql -h localhost -d gitlabhq_production -U gitlab -W
+<div class="highlight"><pre>% psql -h localhost -d gitlabhq_production -U gitlab -W
 <span class="nv">gitlabhq_production</span><span class="o">=</span>&gt; <span class="se">\q</span>
 </pre></div>
 </div>
@@ -133,42 +133,42 @@ postgres# <span class="se">\q</span>
 <h3>Redisサーバの導入</h3>
 <p><code>apt-get</code> すればよろし。
 設定はそのままでOK。</p>
-<div class="highlight"><pre><span></span>% sudo apt-get install redis-server
+<div class="highlight"><pre>% sudo apt-get install redis-server
 </pre></div>
 <p>gitをredisグループに追加する。</p>
-<div class="highlight"><pre><span></span>% sudo vi /etc/group
+<div class="highlight"><pre>% sudo vi /etc/group
 </pre></div>
-<div class="highlight"><pre><span></span>...
+<div class="highlight"><pre>...
 redis:x:113:git   ← ★gitを追加する
 </pre></div>
 <div class="section" id="id5">
 <h4>2015/06/23追記:</h4>
 <p>このままでは外部から接続できてしまうので、bindの設定を変えておく。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /etc/redis/
+<div class="highlight"><pre>% <span class="nb">cd</span> /etc/redis/
 % sudo vi redis.conf
 </pre></div>
-<div class="highlight"><pre><span></span>...
+<div class="highlight"><pre>...
 bind 127.0.0.1  ← ★コメントアウトされているので、有効化する
 ...
 </pre></div>
 <p>redis-serverを再起動して完了。</p>
-<div class="highlight"><pre><span></span>% sudo /etc/init.d/redis-server restart
+<div class="highlight"><pre>% sudo /etc/init.d/redis-server restart
 </pre></div>
 </div>
 </div>
 <div class="section" id="gitlab">
 <h3>GitLabの導入</h3>
 <p>まずはソースを落としてくる。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /home/git
-% sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-ce.git -b <span class="m">7</span>-11-stable gitlab
+<div class="highlight"><pre>% <span class="nb">cd</span> /home/git
+% sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-ce.git -b 7-11-stable gitlab
 </pre></div>
 <p>設定する。 <code>host</code> や <code>port</code> 、 <code>email</code> 関連を変更するだけでとりあえずはOK。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /home/git/gitlab
+<div class="highlight"><pre>% <span class="nb">cd</span> /home/git/gitlab
 % sudo -u git -H cp config/gitlab.yml.example config/gitlab.yml
 % sudo -u git -H vi config/gitlab.yml
 </pre></div>
 <p>パーミッションをきちんと設定しろとか。</p>
-<div class="highlight"><pre><span></span>% sudo chown -R git log/
+<div class="highlight"><pre>% sudo chown -R git log/
 % sudo chown -R git tmp/
 % sudo chmod -R u+rwX,go-w log/
 % sudo chmod -R u+rwX tmp/
@@ -177,49 +177,49 @@ bind 127.0.0.1  ← ★コメントアウトされているので、有効化す
 % sudo chmod -R u+rwX public/uploads
 </pre></div>
 <p>Satelliteとかいうのが必要らしい。</p>
-<div class="highlight"><pre><span></span>% sudo -u git -H mkdir /home/git/gitlab-satellites
+<div class="highlight"><pre>% sudo -u git -H mkdir /home/git/gitlab-satellites
 % sudo chmod <span class="m">750</span> /home/git/gitlab-satellites
 </pre></div>
 <p>つづいてUnicorn。</p>
-<div class="highlight"><pre><span></span>% sudo -u git -H cp config/unicorn.rb.example config/unicorn.rb
+<div class="highlight"><pre>% sudo -u git -H cp config/unicorn.rb.example config/unicorn.rb
 </pre></div>
 <p>Rack attack。よく分からん。</p>
-<div class="highlight"><pre><span></span>% sudo -u git -H cp config/initializers/rack_attack.rb.example config/initializers/rack_attack.rb
+<div class="highlight"><pre>% sudo -u git -H cp config/initializers/rack_attack.rb.example config/initializers/rack_attack.rb
 </pre></div>
 <p>Redisの接続設定。
 設定の整合性が取れてないので、設定変更が必要。
 port 6379を使うように修正する。</p>
-<div class="highlight"><pre><span></span>% sudo -u git -H cp config/resque.yml.example config/resque.yml
+<div class="highlight"><pre>% sudo -u git -H cp config/resque.yml.example config/resque.yml
 % sudo vi config/resque.yml
 </pre></div>
-<div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">production</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">redis://localhost:6379  ← ★port 6379を使うように修正する。</span>
+<div class="highlight"><pre><span class="l-Scalar-Plain">production</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">redis://localhost:6379  ← ★port 6379を使うように修正する。</span>
 </pre></div>
 </div>
 <div class="section" id="gitlabdb">
 <h3>GitLabのDB設定</h3>
 <p>DBを設定する。
 production以外はコメントアウトしてしまってOK。</p>
-<div class="highlight"><pre><span></span>% sudo -u git cp config/database.yml.postgresql config/database.yml
+<div class="highlight"><pre>% sudo -u git cp config/database.yml.postgresql config/database.yml
 % sudo -u git -H chmod o-rwx config/database.yml
 % sudo vi config/database.yml
 </pre></div>
-<div class="highlight"><pre><span></span><span class="nn">...</span>
-<span class="l l-Scalar l-Scalar-Plain">production</span><span class="p p-Indicator">:</span>
+<div class="highlight"><pre><span class="nn">...</span>
+<span class="l-Scalar-Plain">production</span><span class="p-Indicator">:</span>
 <span class="nn">...</span>
-  <span class="l l-Scalar l-Scalar-Plain">username</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">gitlab</span>
-  <span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">★自分で設定したもの</span>
-  <span class="l l-Scalar l-Scalar-Plain">host</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
+  <span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">gitlab</span>
+  <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">★自分で設定したもの</span>
+  <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">localhost</span>
 <span class="nn">...</span>
 </pre></div>
 <p>Gemを導入してGitLab Shellをインストールする。</p>
-<div class="highlight"><pre><span></span>% sudo -u git -H bundle install --deployment --without development <span class="nb">test</span> mysql aws kerberos
-% sudo -u git -H bundle <span class="nb">exec</span> rake gitlab:shell:install<span class="o">[</span>v2.6.3<span class="o">]</span> <span class="nv">REDIS_URL</span><span class="o">=</span>unix:/var/run/redis/redis.sock <span class="nv">RAILS_ENV</span><span class="o">=</span>production
+<div class="highlight"><pre>% sudo -u git -H bundle install --deployment --without development <span class="nb">test </span>mysql aws kerberos
+% sudo -u git -H bundle <span class="nb">exec </span>rake gitlab:shell:install<span class="o">[</span>v2.6.3<span class="o">]</span> <span class="nv">REDIS_URL</span><span class="o">=</span>unix:/var/run/redis/redis.sock <span class="nv">RAILS_ENV</span><span class="o">=</span>production
 </pre></div>
 <p>必要があれば設定を変更する。</p>
-<div class="highlight"><pre><span></span>% sudo vi /home/git/gitlab-shell/config.yml
+<div class="highlight"><pre>% sudo vi /home/git/gitlab-shell/config.yml
 </pre></div>
 <p>いよいよbundle。</p>
-<div class="highlight"><pre><span></span>% sudo -u git -H bundle <span class="nb">exec</span> rake gitlab:setup <span class="nv">RAILS_ENV</span><span class="o">=</span>production
+<div class="highlight"><pre>% sudo -u git -H bundle <span class="nb">exec </span>rake gitlab:setup <span class="nv">RAILS_ENV</span><span class="o">=</span>production
 </pre></div>
 <p>最後にデフォルトの管理者アカウントが表示されるのでメモしておく。
 後で必ず変更すること。</p>
@@ -229,29 +229,29 @@ production以外はコメントアウトしてしまってOK。</p>
 <p>テンプレートをコピーして使えばいいらしい。
 特殊な設定にしていない限りはそのままでOK。
 <code>update-rc.d</code> で自動実行登録する。</p>
-<div class="highlight"><pre><span></span>% sudo cp lib/support/init.d/gitlab /etc/init.d/gitlab
-% sudo update-rc.d gitlab defaults <span class="m">21</span>
+<div class="highlight"><pre>% sudo cp lib/support/init.d/gitlab /etc/init.d/gitlab
+% sudo update-rc.d gitlab defaults 21
 </pre></div>
 <p>logrotateの設定も提供してくれているらしい。
 Redmineとはエラい違いだ。</p>
-<div class="highlight"><pre><span></span>% sudo cp lib/support/logrotate/gitlab /etc/logrotate.d/gitlab
+<div class="highlight"><pre>% sudo cp lib/support/logrotate/gitlab /etc/logrotate.d/gitlab
 </pre></div>
 <p>最終チェック。
 そしてコンパイル。</p>
-<div class="highlight"><pre><span></span>% sudo -u git -H bundle <span class="nb">exec</span> rake gitlab:env:info <span class="nv">RAILS_ENV</span><span class="o">=</span>production
+<div class="highlight"><pre>% sudo -u git -H bundle <span class="nb">exec </span>rake gitlab:env:info <span class="nv">RAILS_ENV</span><span class="o">=</span>production
 
 System information
-System:         Debian <span class="m">8</span>.0
+System:         Debian 8.0
 Current User:   git
 Using RVM:      no
-Ruby Version:   <span class="m">2</span>.1.5p273
-Gem Version:    <span class="m">2</span>.2.2
+Ruby Version:   2.1.5p273
+Gem Version:    2.2.2
 Bundler Version:1.10.3
-Rake Version:   <span class="m">10</span>.4.2
+Rake Version:   10.4.2
 Sidekiq Version:3.3.0
 
 GitLab information
-Version:        <span class="m">7</span>.11.4
+Version:        7.11.4
 Revision:       b725318
 Directory:      /home/git/gitlab
 DB Adapter:     postgresql
@@ -262,38 +262,38 @@ Using LDAP:     no
 Using Omniauth: no
 
 GitLab Shell
-Version:        <span class="m">2</span>.6.3
+Version:        2.6.3
 Repositories:   /home/git/repositories/
 Hooks:          /home/git/gitlab-shell/hooks/
 Git:            /usr/bin/git
-% sudo -u git -H bundle <span class="nb">exec</span> rake assets:precompile <span class="nv">RAILS_ENV</span><span class="o">=</span>production
+% sudo -u git -H bundle <span class="nb">exec </span>rake assets:precompile <span class="nv">RAILS_ENV</span><span class="o">=</span>production
 </pre></div>
 <p>試しに起動してみる。</p>
-<div class="highlight"><pre><span></span>% sudo /etc/init.d/gitlab start
+<div class="highlight"><pre>% sudo /etc/init.d/gitlab start
 </pre></div>
 <p>デフォルトでは <code>127.0.0.1:8080</code> で起動しているので、サーバ上でブラウザを実行できればアクセスできる。</p>
 </div>
 <div class="section" id="nginx">
 <h3>Nginxに載せる</h3>
 <p>なにはともあれnginxをインストール。</p>
-<div class="highlight"><pre><span></span>% sudo apt-get install nginx
+<div class="highlight"><pre>% sudo apt-get install nginx
 </pre></div>
 <p>nginx用の設定テンプレートも用意してくれている。
 素晴らしい。</p>
-<div class="highlight"><pre><span></span>% sudo cp lib/support/nginx/gitlab /etc/nginx/sites-available/gitlab
+<div class="highlight"><pre>% sudo cp lib/support/nginx/gitlab /etc/nginx/sites-available/gitlab
 % sudo vi /etc/nginx/sites-available/gitlab
 </pre></div>
 <p>Redmineと共存させるため、 <code>server_name</code> は違うものにしておくことが必須。
 あとはIPv6でlistenしたくないなら <code>listen [::]:80 default_server</code> はコメントアウトするか削除してしまう。</p>
 <p>設定を有効化して、テスト。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /etc/nginx/sites-enabled/
+<div class="highlight"><pre>% <span class="nb">cd</span> /etc/nginx/sites-enabled/
 % sudo ln -s ../sites-available/gitlab ./
 % sudo nginx -t
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-nginx: configuration file /etc/nginx/nginx.conf <span class="nb">test</span> is successful
+nginx: configuration file /etc/nginx/nginx.conf <span class="nb">test </span>is successful
 </pre></div>
 <p>OKならnginxを再起動する。</p>
-<div class="highlight"><pre><span></span>% sudo /etc/init.d/nginx restart
+<div class="highlight"><pre>% sudo /etc/init.d/nginx restart
 </pre></div>
 <p>ブラウザからアクセスすれば見えるはず。</p>
 <p>見えないときは、どこまで接続できているかによって見るログが変わってくる。
@@ -306,16 +306,16 @@ nginxのリバースプロキシでgitlabに接続できないときは、unicor
 <h3>GitLab-Shellの設定変更</h3>
 <p>sshでpushしたときには <code>GitLab-Shell</code> というのが呼ばれるのだが、ここもまたRedis関連の設定の整合性が取れてないので、設定変更が必要。
 <code>localhost:6379</code> を使うように修正する。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /home/git/gitlab-shell
+<div class="highlight"><pre>% <span class="nb">cd</span> /home/git/gitlab-shell
 % sudo -u git vi config.yml
 </pre></div>
-<div class="highlight"><pre><span></span><span class="nn">...</span>
-<span class="l l-Scalar l-Scalar-Plain">redis</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">...</span>
-  <span class="l l-Scalar l-Scalar-Plain">host</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost  ← ★追加する</span>
-  <span class="l l-Scalar l-Scalar-Plain">port</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">6379       ← ★追加する</span>
+<div class="highlight"><pre><span class="nn">...</span>
+<span class="l-Scalar-Plain">redis</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">...</span>
+  <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">localhost  ← ★追加する</span>
+  <span class="l-Scalar-Plain">port</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">6379       ← ★追加する</span>
   <span class="c1"># socket: /var/run/redis/redis.sock  ← ★コメントアウトする</span>
-  <span class="l l-Scalar l-Scalar-Plain">...</span>
+  <span class="l-Scalar-Plain">...</span>
 </pre></div>
 </div>
 </div>
@@ -375,13 +375,14 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -391,6 +392,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>

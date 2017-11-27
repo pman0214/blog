@@ -93,32 +93,32 @@
 <p>ぶっちゃけ、かなり簡単。</p>
 <p>まず、GitLabを停止させる。</p>
 <p><a class="reference external" href="http://pman0214.github.io/blog/debian-gitlab.html">このブログのGitLabインストール手順</a> に従っている場合、 <code>/etc/init.d/gitlab</code> というスクリプトがあるはずなので、これを使って停止させる。</p>
-<div class="highlight"><pre><span></span>% sudo /etc/init.d/gitlab stop
+<div class="highlight"><pre>% sudo /etc/init.d/gitlab stop
 </pre></div>
 <p>次に、レポジトリを移動する。
 デフォルトの設定から変更していなければ、 <code>/home/git/repositories</code> というディレクトリにレポジトリが格納されている。
 ファイルサーバをNFSでマウントしているディレクトリにこのレポジトリ格納ディレクトリを移動する。
 怖い場合はユーザ情報を保持したままコピーする方が良い。</p>
-<div class="highlight"><pre><span></span>% sudo mv /home/git/repositories /path/to/nfs-dir/
+<div class="highlight"><pre>% sudo mv /home/git/repositories /path/to/nfs-dir/
 </pre></div>
 <p>設定を変更する。
 設定は、gitlab本体とgitlab-shellの両方に必要なので注意。</p>
-<div class="highlight"><pre><span></span>% <span class="nb">cd</span> /home/git
+<div class="highlight"><pre>% <span class="nb">cd</span> /home/git
 % sudo -u git vi gitlab/config/gitlab.yml
 </pre></div>
-<div class="highlight"><pre><span></span><span class="nn">...</span>
+<div class="highlight"><pre><span class="nn">...</span>
 <span class="c1"># REPOS_PATH MUST NOT BE A SYMLINK!!!</span>
-<span class="l l-Scalar l-Scalar-Plain">repos_path</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/nfs-dir/repositories/  ★ここを変更する</span>
+<span class="l-Scalar-Plain">repos_path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/nfs-dir/repositories/  ★ここを変更する</span>
 <span class="nn">...</span>
 </pre></div>
-<div class="highlight"><pre><span></span>% sudo -u git vi gitlab-shell/config.yml
+<div class="highlight"><pre>% sudo -u git vi gitlab-shell/config.yml
 </pre></div>
-<div class="highlight"><pre><span></span><span class="nn">...</span>
-<span class="l l-Scalar l-Scalar-Plain">repos_path</span><span class="p p-Indicator">:</span> <span class="s">&quot;/path/to/nfs-dir/repositories/&quot;</span>  <span class="l l-Scalar l-Scalar-Plain">★ここを変更する</span>
+<div class="highlight"><pre><span class="nn">...</span>
+<span class="l-Scalar-Plain">repos_path</span><span class="p-Indicator">:</span> <span class="s">&quot;/path/to/nfs-dir/repositories/&quot;</span>  <span class="l-Scalar-Plain">★ここを変更する</span>
 <span class="nn">...</span>
 </pre></div>
 <p>これでGitLabを起動させれば完了。</p>
-<div class="highlight"><pre><span></span>% sudo /etc/init.d/gitlab start
+<div class="highlight"><pre>% sudo /etc/init.d/gitlab start
 </pre></div>
 <p>念のため、新しいレポジトリを作成したり、git pushできるかなどを確認しよう。</p>
 </div>
@@ -178,13 +178,14 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -194,6 +195,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>

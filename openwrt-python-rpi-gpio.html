@@ -138,16 +138,16 @@
 <p>Buildrootのfeed設定に今作成したfeed用レポジトリを追加してやる。
 こんな感じ。
 <tt class="docutils literal">feeds.conf</tt> に空行を入れたらエラーになった。</p>
-<div class="highlight"><pre><span></span>% vi feeds.conf
+<div class="highlight"><pre>% vi feeds.conf
 </pre></div>
-<div class="highlight"><pre><span></span>...
+<div class="highlight"><pre>...
 src-git python_rpi https://github.com/pman0214/python_rpi.git
 ...
 </pre></div>
 <p><tt class="docutils literal"><span class="pre">src-git</span></tt> と書いていることから、もしかするとgit以外も使えるのかもしれない。
 ドキュメント参照ということで。</p>
 <p>あとは普通に、feedを取得してパッケージをインストール。</p>
-<div class="highlight"><pre><span></span>% ./scripts/feeds update python_rpi
+<div class="highlight"><pre>% ./scripts/feeds update python_rpi
 % ./scripts/feeds install python-rpi-gpio
 </pre></div>
 <p>updateで <tt class="docutils literal">feeds/</tt> の下に <tt class="docutils literal">python_rpi</tt> というディレクトリが作成される。
@@ -159,17 +159,17 @@ src-git python_rpi https://github.com/pman0214/python_rpi.git
 <h3>働いたらmake！</h3>
 <p>手順は <a class="reference external" href="https://wiki.openwrt.org/doc/howtobuild/single.package">How to Build a Single Package</a> に書いてある。
 まずはツール類をビルドする。</p>
-<div class="highlight"><pre><span></span>% make tools/install
+<div class="highlight"><pre>% make tools/install
 % make toolchain/install
 </pre></div>
 <p>そしてパッケージをビルドする。</p>
-<div class="highlight"><pre><span></span>% make package/python-rpi-gpip/compile
+<div class="highlight"><pre>% make package/python-rpi-gpip/compile
 </pre></div>
 </div>
 <div class="section" id="id7">
 <h3>Image Generatorでパッケージにアクセス</h3>
 <p>Image Generatorの <tt class="docutils literal">repositories.conf</tt> の上の方にコメントアウトしてある行を参考にして、以下のように書く。</p>
-<div class="highlight"><pre><span></span>src custom file:///usr/src/openwrt/bin/brcm2708/packages
+<div class="highlight"><pre>src custom file:///usr/src/openwrt/bin/brcm2708/packages
 </pre></div>
 <p>ここで、 <tt class="docutils literal">/usr/src/openwrt</tt> がBuildrootへのパス。
 今回のターゲットマシンはRaspberry Piなので、ビルドしたパッケージは <tt class="docutils literal">bin/brcm2708/packages/</tt> に格納されている。</p>
@@ -181,7 +181,7 @@ src-git python_rpi https://github.com/pman0214/python_rpi.git
 <p>一番メモしたいと思っていた情報を書き忘れていた。
 パッケージをビルドしただけでは <tt class="docutils literal">Packages</tt> や <tt class="docutils literal">Packages.gz</tt> が存在しないため、 <tt class="docutils literal">repositories.conf</tt> を書き換えてもエラーになる。
 パッケージを新たに追加した場合はBuildrootにおいて再インデックスが必要。</p>
-<div class="highlight"><pre><span></span>% make package/index
+<div class="highlight"><pre>% make package/index
 </pre></div>
 </div>
 
@@ -240,13 +240,14 @@ var disqus_config = function () {
     <h1>Tags</h1>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
-    <a class="tag tag-0" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
@@ -256,6 +257,7 @@ var disqus_config = function () {
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>

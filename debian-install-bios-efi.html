@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>BIOS, UEFI両方で起動可能なdebianインストールUSBメディアを作る - pLog</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=11">
+  <meta name="author" content="pman0214">
+  <meta name="keywords" content="debian,bios,efi,install">
+  <meta name="description" content="BIOS、UEFIの両方で起動するUSBメディアを作ってDebianをインストールする。">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments/github.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-min.css">
+  <!--<![endif]-->
+  <!--[if lt IE 9]>
+    <script src="http://pman0214.github.io/blog/theme/js/html5shiv.js"></script>
+  <![endif]-->
+  <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="pLog Full Atom Feed">
+  <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
+  <!-- open graph tags -->
+  <meta property="og:site_name" content="pLog">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="BIOS, UEFI両方で起動可能なdebianインストールUSBメディアを作る">
+  <meta property="og:url" content="http://pman0214.github.io/blog/debian-install-bios-efi.html">
+  <meta property="og:description" content="BIOS、UEFIの両方で起動するUSBメディアを作ってDebianをインストールする。">
+  <meta property="article:published_time" content="2017-11-27">
+  <meta property="article:section" content="linux">
+  <meta property="article:tag" content="debian">
+  <meta property="article:tag" content="bios">
+  <meta property="article:tag" content="efi">
+  <meta property="article:tag" content="install">
+</head>
+
+<body>
+<header>
+  <nav id="menu">
+    <div class="pure-menu pure-menu-horizontal">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog" class="pure-menu-heading pure-menu-link">pLog</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+          <a href="#" class="pure-menu-link">Categories</a>
+          <ul class="pure-menu-children">
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
+            <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
+          </ul>
+        </li>
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/archives.html" class="pure-menu-link">Archives</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div id="layout" class="pure-g">
+<div class="pure-u-1 pure-u-lg-3-4">
+<main id="main">
+<article>
+<header>
+  <h1><a href="http://pman0214.github.io/blog/debian-install-bios-efi.html" rel="bookmark" title="Permalink to BIOS, UEFI両方で起動可能なdebianインストールUSBメディアを作る">BIOS, UEFI両方で起動可能なdebianインストールUSBメディアを作る</a></h1>
+  <div class="article-info">
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2017-11-27T17:51:00+09:00">2017年11月27日 17:51</time></div>
+    </div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
+    <div class="tags">Tags:
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/install.html">install</a>
+    </div>
+  </div>
+</header>
+<section class="contents">
+<!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id1">
+<h2>概要</h2>
+<p><a class="reference external" href="http://pman0214.github.io/blog/debian-install-efi.html">EFIブートするUSBメモリでdebianをインストール</a>においてEFIブートするUSBメモリを作成してDebianをインストールする手順を説明したが、少し内容が古くなってしまっていてうまく適用できない。
+新しい手順を作るついでにBIOS、UEFIの両方で起動するUSBメディアを作ってインストールすることにした。</p>
+</div>
+<div class="section" id="id2">
+<h2>前提</h2>
+<p>母艦となるLinuxマシンが必要。
+EFI起動のLinuxでないとダメなので注意。
+ない場合はVirtualBoxなどでDebianを用意する。
+というか自分はそうした。
+以下の手順ではDebian 9.2を利用した。</p>
+</div>
+<div class="section" id="id3">
+<h2>手順</h2>
+<div class="section" id="id4">
+<h3>パーティション作成</h3>
+<p>まずはgdiskを使ってパーティションを作成する。
+BIOSのための領域（MBR）部分を空けておいてもできるのかもしれないが、念のためBIOS boot partitionとして確保しておく。</p>
+<p>今回の例では某会議でもらったProceedingsが入っている8GBのディスク（ただしMacでFATで初期化済み）を用いることとする。</p>
+<p>USBメディアは <tt class="docutils literal">/dev/sdb</tt> にあるとする。
+<tt class="docutils literal">sudo dmesg</tt> などで確認しておくこと。</p>
+<p>まずは現在の状態を確認。</p>
+<div class="highlight"><pre>sudo gdisk -l /dev/sdb
+</pre></div>
+<div class="highlight"><pre>GPT fdisk (gdisk) version 1.0.1
+
+Partition table scan:
+  MBR: MBR only
+  BSD: not present
+  APM: not present
+  GPT: not present
+
+
+***************************************************************
+Found invalid GPT and valid MBR; converting MBR to GPT format
+in memory.
+***************************************************************
+
+
+Warning! Secondary partition table overlaps the last partition by
+33 blocks!
+You will need to delete this partition or resize it in another utility.
+Disk /dev/sdb: 15728640 sectors, 7.5 GiB
+Logical sector size: 512 bytes
+Disk identifier (GUID): xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Partition table holds up to 128 entries
+First usable sector is 34, last usable sector is 15728606
+Partitions will be aligned on 8-sector boundaries
+Total free space is 22 sectors (11.0 KiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1              56        15728639   7.5 GiB     0700  Microsoft basic data
+</pre></div>
+<p>なにやらおかしいとエラーが出てるが気にしない。
+消えてもらうぜ。</p>
+<div class="highlight"><pre>sudo gdisk /dev/sdb
+</pre></div>
+<div class="highlight"><pre>GPT fdisk (gdisk) version 1.0.1
+
+Partition table scan:
+  MBR: MBR only
+  BSD: not present
+  APM: not present
+  GPT: not present
+
+
+***************************************************************
+Found invalid GPT and valid MBR; converting MBR to GPT format
+in memory. THIS OPERATION IS POTENTIALLY DESTRUCTIVE! Exit by
+typing &#39;q&#39; if you don&#39;t want to convert your MBR partitions
+to GPT format!
+***************************************************************
+
+
+Warning! Secondary partition table overlaps the last partition by
+33 blocks!
+You will need to delete this partition or resize it in another utility.
+
+Command (? for help): d
+Using 1
+</pre></div>
+<p>BIOS boot partitionを作成するという人もいるようだが、その領域を空けていれば特に問題ないので作成しないこととする。</p>
+<p>EFI Systemパーティションを作成。
+サイズは適当に256Mとした。</p>
+<div class="highlight"><pre>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: n
+Partition number <span class="o">(</span>1-128, default 1<span class="o">)</span>:
+First sector <span class="o">(</span>34-15728606, <span class="nv">default</span> <span class="o">=</span> 2048<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
+Last sector <span class="o">(</span>2048-15728606, <span class="nv">default</span> <span class="o">=</span> 15728606<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>: +256M
+Current <span class="nb">type </span>is <span class="s1">&#39;Linux filesystem&#39;</span>
+Hex code or GUID <span class="o">(</span>L to show codes, <span class="nv">Enter</span> <span class="o">=</span> 8300<span class="o">)</span>: ef00
+Changed <span class="nb">type </span>of partition to <span class="s1">&#39;EFI System&#39;</span>
+</pre></div>
+<p>続いてインストールメディアやgrubファイルを置くためのパーティション。
+ディスクサイズが小さいので残り全部。
+SSDを使って同じようなインストールメディアを作ったときは8GBのパーティションとした。</p>
+<div class="highlight"><pre>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: n
+Partition number <span class="o">(</span>2-128, default 2<span class="o">)</span>:
+First sector <span class="o">(</span>34-15728606, <span class="nv">default</span> <span class="o">=</span> 526336<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
+Last sector <span class="o">(</span>526336-15728606, <span class="nv">default</span> <span class="o">=</span> 15728606<span class="o">)</span> or <span class="o">{</span>+-<span class="o">}</span>size<span class="o">{</span>KMGTP<span class="o">}</span>:
+Current <span class="nb">type </span>is <span class="s1">&#39;Linux filesystem&#39;</span>
+Hex code or GUID <span class="o">(</span>L to show codes, <span class="nv">Enter</span> <span class="o">=</span> 8300<span class="o">)</span>: 0700
+Changed <span class="nb">type </span>of partition to <span class="s1">&#39;Microsoft basic data&#39;</span>
+</pre></div>
+<p>これで完成。
+確認して書き込み。</p>
+<div class="highlight"><pre>Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: p
+Disk /dev/sdb: <span class="m">15728640</span> sectors, 7.5 GiB
+Logical sector size: <span class="m">512</span> bytes
+Disk identifier <span class="o">(</span>GUID<span class="o">)</span>: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Partition table holds up to <span class="m">128</span> entries
+First usable sector is 34, last usable sector is 15728606
+Partitions will be aligned on 2048-sector boundaries
+Total free space is <span class="m">0</span> sectors <span class="o">(</span><span class="m">0</span> bytes<span class="o">)</span>
+
+Number  Start <span class="o">(</span>sector<span class="o">)</span>    End <span class="o">(</span>sector<span class="o">)</span>  Size       Code  Name
+   <span class="m">1</span>            <span class="m">2048</span>          <span class="m">526335</span>   256.0 MiB   EF00  EFI System
+   <span class="m">2</span>          <span class="m">526336</span>        <span class="m">15728606</span>   7.2 GiB     <span class="m">0700</span>  Microsoft basic data
+
+Command <span class="o">(</span>? <span class="k">for</span> <span class="nb">help</span><span class="o">)</span>: w
+
+Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+PARTITIONS!!
+
+Do you want to proceed? <span class="o">(</span>Y/N<span class="o">)</span>: y
+OK<span class="p">;</span> writing new GUID partition table <span class="o">(</span>GPT<span class="o">)</span> to /dev/sdb.
+The operation has completed successfully.
+</pre></div>
+<p>念のため確認。</p>
+<div class="highlight"><pre>sudo gdisk -l /dev/sdb
+</pre></div>
+<div class="highlight"><pre>GPT fdisk (gdisk) version 1.0.1
+
+Partition table scan:
+  MBR: protective
+  BSD: not present
+  APM: not present
+  GPT: present
+
+Found valid GPT with protective MBR; using GPT.
+Disk /dev/sdb: 15728640 sectors, 7.5 GiB
+Logical sector size: 512 bytes
+Disk identifier (GUID): xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Partition table holds up to 128 entries
+First usable sector is 34, last usable sector is 15728606
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2014 sectors (1007.0 KiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1            2048          526335   256.0 MiB   EF00  EFI System
+   2          526336        15728606   7.2 GiB     0700  Microsoft basic data
+</pre></div>
+<p>FAT32でフォーマットする。
+<tt class="docutils literal">mkfs.vfat</tt> がないという人は <tt class="docutils literal">sudo <span class="pre">apt-get</span> install dosfstools</tt> する。</p>
+<div class="highlight"><pre>sudo mkfs.vfat -F32 /dev/sdb1
+sudo mkfs.vfat -F32 /dev/sdb2
+</pre></div>
+<p>なお、EFI SystemパーティションはFATにしないとダメだが、インストールメディアやgrubファイルを置くためのパーティションは別にFATにする必要はない。
+ただ、ファイルを書き換えるときに楽というだけの話。
+変更したい場合は↑でパーティションを作成するときにGUIDもちゃんと変更すること。</p>
+</div>
+<div class="section" id="grub-mbr">
+<h3>grubのインストール（MBR編）</h3>
+<p><tt class="docutils literal"><span class="pre">grub-pc</span></tt> をインストールする。
+<tt class="docutils literal"><span class="pre">grub-efi</span></tt> が一旦アンインストールされるが気にしたら負け。</p>
+<div class="highlight"><pre>sudo apt-get install -y grub-pc
+</pre></div>
+<p>インストールメディアやgrubファイルを置くためのパーティションをマウントして、bootディレクトリを指定してインストール。
+blocklistsが何たらとエラーになるので、 <tt class="docutils literal"><span class="pre">--force</span></tt> を付けて実行する。</p>
+<div class="highlight"><pre>sudo mount /dev/sdb2 /mnt
+sudo grub-install --target<span class="o">=</span>i386-pc --boot-directory<span class="o">=</span>/mnt/boot --force /dev/sdb
+</pre></div>
+<div class="highlight"><pre>Installing for i386-pc platform.
+grub-install: warning: this GPT partition label contains no BIOS Boot Partition; embedding won&#39;t be possible.
+grub-install: warning: Embedding is not possible.  GRUB can only be installed in this setup by using blocklists.  However, blocklists are UNRELIABLE and their use is discouraged..
+Installation finished. No error reported.
+</pre></div>
+<p>何か色々と言われるが、 <tt class="docutils literal">No error reported.</tt> なのできっと問題ないだろう。
+これで <tt class="docutils literal">/mnt/boot/grub</tt> に色々なファイルができてるはず。</p>
+</div>
+<div class="section" id="grub-efi">
+<h3>grubのインストール（EFI編）</h3>
+<p><tt class="docutils literal"><span class="pre">grub-efi</span></tt> を再び導入する。
+<tt class="docutils literal"><span class="pre">grub-pc</span></tt> はアンインストールされる。</p>
+<div class="highlight"><pre>sudo apt-get install -y grub-efi
+</pre></div>
+<p>マウントポイントが足りないので、EFI用ディレクトリを作ってEFI Systemパーティションをマウントして使う。</p>
+<div class="highlight"><pre>sudo mkdir /mnt/boot/efi
+sudo mount /dev/sdb1 /mnt/boot/efi
+sudo grub-install --target<span class="o">=</span>x86_64-efi --efi-directory<span class="o">=</span>/mnt/boot/efi --boot-directory<span class="o">=</span>/mnt/boot
+</pre></div>
+<div class="highlight"><pre>Installing for x86_64-efi platform.
+Installation finished. No error reported.
+</pre></div>
+<p>grub-installではremovable media用にいい感じのEFIブートファイルを作ってくれないのでコピーする。</p>
+<div class="highlight"><pre>sudo mkdir /mnt/boot/efi/EFI/BOOT
+sudo cp /mnt/boot/efi/EFI/debian/grubx64.efi /mnt/boot/efi/EFI/BOOT/BOOTX64.EFI
+</pre></div>
+<p>これで <tt class="docutils literal">/mnt/boot/efi</tt> の下はこんな感じのディレクトリ構成になるはず。</p>
+<div class="highlight"><pre>ls -FR /mnt/boot/efi
+</pre></div>
+<div class="highlight"><pre>/mnt/boot/efi:
+EFI/
+
+/mnt/boot/efi/EFI:
+BOOT/  debian/
+
+/mnt/boot/efi/EFI/BOOT:
+BOOTX64.EFI*
+
+/mnt/boot/efi/EFI/debian:
+grubx64.efi*
+</pre></div>
+<p>アンマウントして完成。</p>
+<div class="highlight"><pre>sudo umount /mnt/boot/efi
+sudo umount /mnt
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>インストールメディアとインストーラカーネルの配置</h2>
+<p>ここまで来たら自分はMacで作業している。
+<tt class="docutils literal">/dev/sdb2</tt> をFAT32でフォーマットしているので、Macに接続すると <tt class="docutils literal">NO NAME</tt> というボリュームが現れるので、ISOイメージとカーネル、ルートイメージを配置する。</p>
+<p>ISOイメージとカーネル、ルートイメージは <a class="reference external" href="https://www.debian.org/distrib/netinst">インターネット経由の Debian のインストール</a> から取得する。
+「小さな CD または USB メモリ」のamd64をダウンロードし、そのISOファイルを <tt class="docutils literal">NO NAME</tt> ボリュームにコピーする。
+これを書いている時点では <tt class="docutils literal"><span class="pre">debian-9.2.1-amd64-netinst.iso</span></tt> が最新の模様。</p>
+<p>カーネル類は「ネットワークブート」のamd64から <tt class="docutils literal"><span class="pre">hd-media</span></tt> の中の <tt class="docutils literal">vmlinuz</tt> と <tt class="docutils literal">initrd.gz</tt> を取得して <tt class="docutils literal">NO NAME</tt> ボリュームの <tt class="docutils literal">boot</tt> ディレクトリにコピーする。</p>
+<p>あとは以下のような <tt class="docutils literal">grub.cfg</tt> を作成して <tt class="docutils literal">NO NAME</tt> ボリュームの <tt class="docutils literal">boot/grub</tt> ディレクトリに配置する。
+<tt class="docutils literal">(hd0,gpt2)</tt> は <tt class="docutils literal">boot</tt> が入っているディスク、パーティションを指定している。
+パーティション番号が↑と違う場合は適宜書き換える。</p>
+<p>それと、マシンによっては <tt class="docutils literal">video=efifb</tt> ではうまく表示できないかもしれない。
+手元にあるHP EliteBook 820では <tt class="docutils literal">video=vesafb</tt> でないとインストーラ起動後に表示が崩れた。</p>
+<div class="highlight"><pre># Load Graphical modules
+insmod efi_gop
+insmod efi_uga
+
+# Load Font module
+insmod font
+
+
+# Setup GFXTERM along with loading unicode.pf2 font file
+
+if loadfont ${prefix}/fonts/unicode.pf2
+then
+   insmod gfxterm
+   set gfxmode=&quot;auto&quot;
+   set gfxpayload=keep
+   terminal_output gfxterm
+
+   set color_normal=light-blue/black
+   set color_highlight=light-cyan/blue
+fi
+
+insmod part_gpt
+insmod part_msdos
+insmod fat
+insmod ext2
+
+# Timeout for menu
+set timeout=5
+
+# Set default boot entry as Entry 0
+set default=0
+
+menuentry &quot;Debian Install (expert mode)&quot; {
+  set root=(hd0,gpt2)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off priority=low ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+menuentry &quot;Debian Install&quot; {
+  set root=(hd0,gpt2)
+  linux /boot/vmlinuz root=/dev/sda1 ro video=efifb agp=off ipv6.disable=1
+  initrd /boot/initrd.gz
+}
+</pre></div>
+<p>このメディアのいいところは、grubを更新せずとも新しいインストールイメージを導入できるところ。
+ISOとカーネル類のみ新しいものに入れ替えればOK。</p>
+<p>なお、testingをインストールする場合はdaily build版を <a class="reference external" href="https://www.debian.org/devel/debian-installer/">ここ</a> から取得すると良い。</p>
+</div>
+
+</section>
+<section id="comments">
+<!-- Disqus -->
+<div id="disqus_thread"></div>
+<script>
+/**
+ *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
+ *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+ *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+ *    https://disqus.com/admin/universalcode/#configuration-variables
+ */
+var disqus_config = function () {
+  this.language = 'ja';
+  this.page.url = 'http://pman0214.github.io/blog/debian-install-bios-efi.html';
+  this.page.identifier = 'debian-install-bios-efi';
+};
+(function() {  // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//pman0214-plog.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</section>
+</article>
+</main>
+</div>
+
+<div class="pure-u-1 pure-u-lg-1-4">
+<aside id="sidebar">
+    <section>
+      <h1>About pman0214</h1>
+      <p>ハードからソフトまで分かる研究者。そういうものに私はなりたい。</p>
+    </section>
+  <section>
+    <h1>Links</h1>
+    <ul class="links">
+      <li><a href="https://www.f.ait.kyushu-u.ac.jp/~ishida/">Research</a></li>
+    </ul>
+  </section>
+  <section>
+    <h1>Social Links</h1>
+    <ul class="links">
+      <li><a href="https://www.facebook.com/pman0214">facebook</a></li>
+      <li><a href="https://twitter.com/pman0214">twitter</a></li>
+      <li><a href="https://github.com/pman0214">github</a></li>
+    </ul>
+  </section>
+  <section class="tags">
+    <h1>Tags</h1>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/github.html">github</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/openwrt.html">openwrt</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/openwrt-package.html">openwrt package</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/osx.html">osx</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pandas.html">pandas</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pelican.html">pelican</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pthread.html">pthread</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/python.html">python</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/yatex.html">yatex</a>
+    <p><a href="http://pman0214.github.io/blog/tags.html">See all...</a></p>
+  </section>
+</aside>
+</div>
+<!-- #layout --></div>
+
+<footer id="footer">
+  &copy; 2017 pman0214
+  &nbsp; | &nbsp;
+  Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+  with <a href="https://github.com/pman0214/pelican-pure" target="_blank">Pure theme</a>
+</footer>
+</body>
+</html>
