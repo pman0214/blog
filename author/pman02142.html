@@ -61,6 +61,24 @@
 </header>
 <article class="index">
   <header>
+    <h1><a href="http://pman0214.github.io/blog/valgrind-bug.html">Valgrindでのメモリリークチェックがおかしい件</a></h1>
+    <div class="article-info">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-11-17T16:42:00+09:00">2015年11月17日 16:42</time></div>
+      </div>
+      <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
+      <div class="tags">Tags:
+        <a class="pure-button" href="http://pman0214.github.io/blog/tag/pthread.html">pthread</a>
+        <a class="pure-button" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
+      </div>
+    </div>
+  </header>
+  <section class="contents">
+    <p>Valgrindでメモリリークをチェックする場合にpthreadを使っているとうまくいかない件について。</p>
+  </section>
+</article>
+<article class="index">
+  <header>
     <h1><a href="http://pman0214.github.io/blog/debian-autofs.html">Debianでautofsを使う</a></h1>
     <div class="article-info">
       <div class="pure-g">
@@ -224,25 +242,6 @@
     <p><p>RedmineでGitHubレポジトリを登録し、web-hookで自動的にレポジトリ状態をアップデートする手順。</p></p>
   </section>
 </article>
-<article class="index">
-  <header>
-    <h1><a href="http://pman0214.github.io/blog/redmine-install.html">Debian jessieにRedmineをインストールする</a></h1>
-    <div class="article-info">
-      <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-05-16T15:00:00+09:00">2015年05月16日 15:00</time></div>
-      </div>
-      <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
-      <div class="tags">Tags:
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
-      </div>
-    </div>
-  </header>
-  <section class="contents">
-    <p><p>Debian jessieのnginx上にRedmine+Backlogsを導入する手順について説明する。</p></p>
-  </section>
-</article>
 <div id="pagination">
   <a class="pure-button" href="http://pman0214.github.io/blog/author/pman0214.html">&laquo;</a>
   <a class="pure-button" href="http://pman0214.github.io/blog/author/pman0214.html">1</a>
@@ -288,6 +287,7 @@
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/format.html">format</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/github.html">github</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
@@ -310,9 +310,11 @@
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
     <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/thin-client.html">thin client</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/windows.html">windows</a>
     <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/yatex.html">yatex</a>
     <p><a href="http://pman0214.github.io/blog/tags.html">See all...</a></p>
   </section>
@@ -321,7 +323,7 @@
 <!-- #layout --></div>
 
 <footer id="footer">
-  &copy; 2017 pman0214
+  &copy; 2018 pman0214
   &nbsp; | &nbsp;
   Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
   with <a href="https://github.com/pman0214/pelican-pure" target="_blank">Pure theme</a>

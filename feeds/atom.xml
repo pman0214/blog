@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2017-11-27T17:51:00+09:00</updated><entry><title>BIOS, UEFI両方で起動可能なdebianインストールUSBメディアを作る</title><link href="http://pman0214.github.io/blog/debian-install-bios-efi.html" rel="alternate"></link><published>2017-11-27T17:51:00+09:00</published><updated>2017-11-27T17:51:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2017-11-27:/blog/debian-install-bios-efi.html</id><summary type="html">BIOS、UEFIの両方で起動するUSBメディアを作ってDebianをインストールする。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2018-03-19T09:30:00+09:00</updated><entry><title>シンクライアントなマシン全てのデータドライブフォーマット</title><link href="http://pman0214.github.io/blog/win7-format-think-client.html" rel="alternate"></link><published>2018-03-19T09:30:00+09:00</published><updated>2018-03-19T09:30:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2018-03-19:/blog/win7-format-think-client.html</id><summary type="html">シンクライアントなマシン全部のデータドライブをコマンドを使ってフォーマットする手順。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;背景&lt;/h2&gt;
+&lt;p&gt;シンクライアントで管理している70台ほどのWindows機がある。
+Cドライブは起動の度に元の状態に戻るように設定してあるのでユーザがデータを残す際はファイルサーバ上という原則で使っているが、それでは遅い場合用にローカルの一時データドライブとしてDドライブを用意している。&lt;/p&gt;
+&lt;p&gt;しかし、一時データドライブなのにみんなが中身を消してくれないので、定期的に70台全部のドライブを消去する必要がある。
+たちの悪いことに、某ソフトが他ユーザが書き込み・変更できない権限でファイル・ディレクトリを作成してくれるため、管理者でも削除ができない。
+なのでフォーマットして消去する。&lt;/p&gt;
+&lt;p&gt;環境はWindows 7。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;課題&lt;/h2&gt;
+&lt;p&gt;全マシンをGUIで操作するのは非現実的。
+シンクライアントなので全マシン上で指定したコマンドを実行することはできるが、 &lt;tt class="docutils literal"&gt;format&lt;/tt&gt; コマンドを実行するとプロンプトを求められ、 &lt;tt class="docutils literal"&gt;y&lt;/tt&gt; などと入力する必要がある。
+しかし、そんな機能は付いていないのであった。&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;format&lt;/tt&gt; コマンドのオプションを調べたが、プロンプトなしに問答無用で実行することはできなかった。（少なくともWindows 7では）&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;解決策&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;diskpart&lt;/tt&gt; コマンドを使う。&lt;/p&gt;
+&lt;p&gt;前提として、全マシンがアクセスしている共有フォルダがあるものとする。
+以下のような内容のファイルを共有フォルダに作成する。
+ここではDドライブを消去する例を示している。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;set vol d:
+list partition
+format
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;このファイルを &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Z:¥diskpart_format_d_drive.txt&lt;/span&gt;&lt;/tt&gt; として保存しているとすると、全マシンで以下を実行すれば良い。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cmd /c diskpart /s Z:¥diskpart_format_d_drive.txt
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;結論&lt;/h2&gt;
+&lt;p&gt;シンクライアントを提供する会社さんはきちんとマニュアルを整備してくださいね。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="windows"></category><category term="thin client"></category><category term="format"></category></entry><entry><title>BIOS, UEFI両方で起動可能なdebianインストールUSBメディアを作る</title><link href="http://pman0214.github.io/blog/debian-install-bios-efi.html" rel="alternate"></link><published>2017-11-27T17:51:00+09:00</published><updated>2017-11-27T17:51:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2017-11-27:/blog/debian-install-bios-efi.html</id><summary type="html">BIOS、UEFIの両方で起動するUSBメディアを作ってDebianをインストールする。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://pman0214.github.io/blog/debian-install-efi.html"&gt;EFIブートするUSBメモリでdebianをインストール&lt;/a&gt;においてEFIブートするUSBメモリを作成してDebianをインストールする手順を説明したが、少し内容が古くなってしまっていてうまく適用できない。

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>pLog</title>
+  <title>シンクライアントなマシン全てのデータドライブフォーマット - pLog</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <meta name="author" content="pman0214">
+  <meta name="keywords" content="windows,thin client,format">
+  <meta name="description" content="シンクライアントなマシン全部のデータドライブをコマンドを使ってフォーマットする手順。">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -23,10 +25,15 @@
   <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
   <!-- open graph tags -->
   <meta property="og:site_name" content="pLog">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="pLog">
-  <meta property="og:url" content="http://pman0214.github.io/blog">
-  <meta property="og:description" content="pLog">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="シンクライアントなマシン全てのデータドライブフォーマット">
+  <meta property="og:url" content="http://pman0214.github.io/blog/win7-format-think-client.html">
+  <meta property="og:description" content="シンクライアントなマシン全部のデータドライブをコマンドを使ってフォーマットする手順。">
+  <meta property="article:published_time" content="2018-03-19">
+  <meta property="article:section" content="devel">
+  <meta property="article:tag" content="windows">
+  <meta property="article:tag" content="thin client">
+  <meta property="article:tag" content="format">
 </head>
 
 <body>
@@ -38,7 +45,7 @@
         <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
           <a href="#" class="pure-menu-link">Categories</a>
           <ul class="pure-menu-children">
-            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
@@ -56,90 +63,87 @@
 <div id="layout" class="pure-g">
 <div class="pure-u-1 pure-u-lg-3-4">
 <main id="main">
-<article class="index">
-  <header>
-    <h1><a href="http://pman0214.github.io/blog/redmine-install.html">Debian jessieにRedmineをインストールする</a></h1>
-    <div class="article-info">
-      <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-05-16T15:00:00+09:00">2015年05月16日 15:00</time></div>
-      </div>
-      <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
-      <div class="tags">Tags:
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
-      </div>
+<article>
+<header>
+  <h1><a href="http://pman0214.github.io/blog/win7-format-think-client.html" rel="bookmark" title="Permalink to シンクライアントなマシン全てのデータドライブフォーマット">シンクライアントなマシン全てのデータドライブフォーマット</a></h1>
+  <div class="article-info">
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2018-03-19T09:30:00+09:00">2018年03月19日 09:30</time></div>
     </div>
-  </header>
-  <section class="contents">
-    <p><p>Debian jessieのnginx上にRedmine+Backlogsを導入する手順について説明する。</p></p>
-  </section>
-</article>
-<article class="index">
-  <header>
-    <h1><a href="http://pman0214.github.io/blog/cron-python-virtualenv.html">virtualenv環境のpythonをcronで呼ぶ</a></h1>
-    <div class="article-info">
-      <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-05-06T18:58:00+09:00">2015年05月06日 18:58</time></div>
-      </div>
-      <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/python.html">python</a></div>
-      <div class="tags">Tags:
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/python.html">python</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
-      </div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/devel.html">devel</a></div>
+    <div class="tags">Tags:
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/windows.html">windows</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/thin-client.html">thin client</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/format.html">format</a>
     </div>
-  </header>
-  <section class="contents">
-    <p><p>virtualenv環境のpythonスクリプトをcronから呼び出す方法。</p></p>
-  </section>
-</article>
-<article class="index">
-  <header>
-    <h1><a href="http://pman0214.github.io/blog/debian-install-efi.html">EFIブートするUSBメモリでdebianをインストール</a></h1>
-    <div class="article-info">
-      <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-04-30T12:55:00+09:00">2015年04月30日 12:55</time></div>
-      </div>
-      <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
-      <div class="tags">Tags:
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
-      </div>
-    </div>
-  </header>
-  <section class="contents">
-    <p><p>EFIブートするUSBメモリを作成し、debianをインストールするまで。</p></p>
-  </section>
-</article>
-<article class="index">
-  <header>
-    <h1><a href="http://pman0214.github.io/blog/pelican-blog-github.html">Pelican+GitHub Pagesでブログ引っ越し</a></h1>
-    <div class="article-info">
-      <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2015-04-26T18:00:00+09:00">2015年04月26日 18:00</time></div>
-      </div>
-      <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/info.html">info</a></div>
-      <div class="tags">Tags:
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/info.html">info</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/python.html">python</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/pelican.html">pelican</a>
-        <a class="pure-button" href="http://pman0214.github.io/blog/tag/github.html">github</a>
-      </div>
-    </div>
-  </header>
-  <section class="contents">
-    <p><p>技術系ネタを書くことが多いので、FC2からブログ引っ越してきました。</p></p>
-  </section>
-</article>
-<div id="pagination">
-  <a class="pure-button" href="http://pman0214.github.io/blog/index2.html">&laquo;</a>
-  <a class="pure-button" href="http://pman0214.github.io/blog/index.html">1</a>
-  <a class="pure-button" href="http://pman0214.github.io/blog/index2.html">2</a>
-  <a class="pure-button pure-button-active pure-button-primary" href="http://pman0214.github.io/blog/index3.html">3</a>
-  <a class="pure-button pure-button-disabled" href="#">&raquo;</a>
+  </div>
+</header>
+<section class="contents">
+<!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id2">
+<h2>背景</h2>
+<p>シンクライアントで管理している70台ほどのWindows機がある。
+Cドライブは起動の度に元の状態に戻るように設定してあるのでユーザがデータを残す際はファイルサーバ上という原則で使っているが、それでは遅い場合用にローカルの一時データドライブとしてDドライブを用意している。</p>
+<p>しかし、一時データドライブなのにみんなが中身を消してくれないので、定期的に70台全部のドライブを消去する必要がある。
+たちの悪いことに、某ソフトが他ユーザが書き込み・変更できない権限でファイル・ディレクトリを作成してくれるため、管理者でも削除ができない。
+なのでフォーマットして消去する。</p>
+<p>環境はWindows 7。</p>
 </div>
+<div class="section" id="id3">
+<h2>課題</h2>
+<p>全マシンをGUIで操作するのは非現実的。
+シンクライアントなので全マシン上で指定したコマンドを実行することはできるが、 <tt class="docutils literal">format</tt> コマンドを実行するとプロンプトを求められ、 <tt class="docutils literal">y</tt> などと入力する必要がある。
+しかし、そんな機能は付いていないのであった。</p>
+<p><tt class="docutils literal">format</tt> コマンドのオプションを調べたが、プロンプトなしに問答無用で実行することはできなかった。（少なくともWindows 7では）</p>
+</div>
+<div class="section" id="id4">
+<h2>解決策</h2>
+<p><tt class="docutils literal">diskpart</tt> コマンドを使う。</p>
+<p>前提として、全マシンがアクセスしている共有フォルダがあるものとする。
+以下のような内容のファイルを共有フォルダに作成する。
+ここではDドライブを消去する例を示している。</p>
+<div class="highlight"><pre><span></span>set vol d:
+list partition
+format
+</pre></div>
+<p>このファイルを <tt class="docutils literal"><span class="pre">Z:¥diskpart_format_d_drive.txt</span></tt> として保存しているとすると、全マシンで以下を実行すれば良い。</p>
+<div class="highlight"><pre><span></span>cmd /c diskpart /s Z:¥diskpart_format_d_drive.txt
+</pre></div>
+</div>
+<div class="section" id="id5">
+<h2>結論</h2>
+<p>シンクライアントを提供する会社さんはきちんとマニュアルを整備してくださいね。</p>
+</div>
+
+</section>
+<section id="comments">
+<!-- Disqus -->
+<div id="disqus_thread"></div>
+<script>
+/**
+ *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
+ *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+ *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+ *    https://disqus.com/admin/universalcode/#configuration-variables
+ */
+var disqus_config = function () {
+  this.language = 'ja';
+  this.page.url = 'http://pman0214.github.io/blog/win7-format-think-client.html';
+  this.page.identifier = 'win7-format-think-client';
+};
+(function() {  // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//pman0214-plog.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</section>
+</article>
 </main>
 </div>
 
