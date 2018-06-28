@@ -1,5 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2018-03-19T09:30:00+09:00</updated><entry><title>シンクライアントなマシン全てのデータドライブフォーマット</title><link href="http://pman0214.github.io/blog/win7-format-think-client.html" rel="alternate"></link><published>2018-03-19T09:30:00+09:00</published><updated>2018-03-19T09:30:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2018-03-19:/blog/win7-format-think-client.html</id><summary type="html">シンクライアントなマシン全部のデータドライブをコマンドを使ってフォーマットする手順。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2018-06-28T09:18:00+09:00</updated><entry><title>macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う</title><link href="http://pman0214.github.io/blog/usb-serial-sierra.html" rel="alternate"></link><published>2018-06-28T09:18:00+09:00</published><updated>2018-06-28T09:18:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2018-06-28:/blog/usb-serial-sierra.html</id><summary type="html">USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;概要&lt;/h2&gt;
+&lt;p&gt;USB-RSAQ2とUSB-RSAQ5のOSXドライバは10.4くらいまでしか提供されていない。
+macOS Sierra (10.12)上で使うためにProlificのドライバーを導入した上で改造する。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;手順&lt;/h2&gt;
+&lt;div class="section" id="prolific-pl2303"&gt;
+&lt;h3&gt;Prolific PL2303ドライバをインストールする&lt;/h3&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&amp;amp;pcid=41]"&gt;ここ&lt;/a&gt; からドライバをダウンロードしてインストールする。
+現時点では10.13用まで提供されている。
+（ただし、10.13に導入する際は注意書きが付いている）&lt;/p&gt;
+&lt;p&gt;導入後は再起動を求められる。
+このときに &lt;tt class="docutils literal"&gt;Command+R&lt;/tt&gt; を押しながら起動してリカバリモードで起動する。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="kext"&gt;
+&lt;h3&gt;kextの署名チェックを無効化する&lt;/h3&gt;
+&lt;p&gt;自己責任で実施のこと。
+しかし、これをやらないとProlificのドライバーは導入できない。と思う。&lt;/p&gt;
+&lt;p&gt;リカバリモードで起動してからターミナルを開き、以下のコマンドを実行する。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ csrutil &lt;span class="nb"&gt;enable&lt;/span&gt; --without kext
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;実行したら再起動する。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usb-rsaq2usb-rsaq5"&gt;
+&lt;h3&gt;USB-RSAQ2とUSB-RSAQ5の情報を調べる&lt;/h3&gt;
+&lt;p&gt;MacにUSB-RSAQ2あるいはUSB-RSAQ5を接続する。
+System Informationを起動し（Optionを押しながらメニューバー左のりんごマークを押すなどすれば）、USBの項目でProduct IDとVendor IDをメモる。&lt;/p&gt;
+&lt;p&gt;自分が確認したものは以下の通り。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;USB-RSAQ2
+  Product ID: 0x04bb
+  Vendor ID: 0x067b
+
+USB-RSAQ5
+  Product ID: 0x0a0e
+  Vendor ID: 0x04bb
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;16進数はbcコマンドや電卓で10進数を確認しておく。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;ibase=16; 4BB; 67B; A0E; 4BB&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; bc
+&lt;span class="m"&gt;1211&lt;/span&gt;
+&lt;span class="m"&gt;1659&lt;/span&gt;
+&lt;span class="m"&gt;2574&lt;/span&gt;
+&lt;span class="m"&gt;1211&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h3&gt;USB-RSAQ2とUSB-RSAQ5の情報を追加する&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;/Library/Extensions/ProlificUsbSerial.kext/Contents/Info.plist&lt;/tt&gt; を↓のような感じで変更する。
+&lt;tt class="docutils literal"&gt;&amp;lt;key&amp;gt;&lt;/tt&gt; のところは16進数のProduct IDとVendor IDを &lt;tt class="docutils literal"&gt;_&lt;/tt&gt; でつなげたものとなっているようなので、該当のものがないことを検索して確認してから追加すると良い。
+&lt;tt class="docutils literal"&gt;idProduct&lt;/tt&gt; と &lt;tt class="docutils literal"&gt;idVendor&lt;/tt&gt; は先ほど調べた10進数を書く。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gd"&gt;--- /Library/Extensions/ProlificUsbSerial.kext/Contents/Info.plist.orig      2018-06-28 08:30:29.000000000 +0900&lt;/span&gt;
+&lt;span class="gi"&gt;+++ /Library/Extensions/ProlificUsbSerial.kext/Contents/Info.plist   2018-06-28 08:36:18.000000000 +0900&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -108,6 +108,40 @@&lt;/span&gt;
+                     &amp;lt;key&amp;gt;idVendor&amp;lt;/key&amp;gt;
+                     &amp;lt;integer&amp;gt;1659&amp;lt;/integer&amp;gt;
+             &amp;lt;/dict&amp;gt;
+&lt;span class="gi"&gt;+            &amp;lt;key&amp;gt;067B_04BB&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+            &amp;lt;dict&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;CFBundleIdentifier&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;string&amp;gt;com.prolific.driver.PL2303&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;IOClass&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;string&amp;gt;com_prolific_driver_PL2303&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;IOProviderClass&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;string&amp;gt;IOUSBInterface&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;bConfigurationValue&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;1&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;bInterfaceNumber&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;0&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;idProduct&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;1211&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;idVendor&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;1659&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+            &amp;lt;/dict&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+            &amp;lt;key&amp;gt;04BB_0A0E&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+            &amp;lt;dict&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;CFBundleIdentifier&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;string&amp;gt;com.prolific.driver.PL2303&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;IOClass&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;string&amp;gt;com_prolific_driver_PL2303&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;IOProviderClass&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;string&amp;gt;IOUSBInterface&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;bConfigurationValue&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;1&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;bInterfaceNumber&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;0&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;idProduct&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;2574&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;key&amp;gt;idVendor&amp;lt;/key&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+                    &amp;lt;integer&amp;gt;1211&amp;lt;/integer&amp;gt;&lt;/span&gt;
+&lt;span class="gi"&gt;+            &amp;lt;/dict&amp;gt;&lt;/span&gt;
+     &amp;lt;/dict&amp;gt;
+     &amp;lt;key&amp;gt;OSBundleLibraries&amp;lt;/key&amp;gt;
+     &amp;lt;dict&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="kextload"&gt;
+&lt;h3&gt;kextload！&lt;/h3&gt;
+&lt;p&gt;あとは &lt;tt class="docutils literal"&gt;kextload&lt;/tt&gt; すれば幸せになれる。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo kextload /Library/Extensions/ProlificUsbSerial.kext
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;USB-RSAQ2などをMacにつなぐと &lt;tt class="docutils literal"&gt;/dev/cu.usbserial&lt;/tt&gt; が現れる。
+2つ同時につなぐと &lt;tt class="docutils literal"&gt;/dev/cu.usbserial6&lt;/tt&gt; というのも現れた。
+数字がどうやって決まるのかは良く分かっていない。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls /dev/cu.usb*
+/dev/cu.usbserial       /dev/cu.usbserial6
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;参考にしたページ&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://qiita.com/kawasakisa/items/9ecfbbc67dc0a7ceae65"&gt;Qiita「USB-RSAQ2(PL2303)をMacOS Sierraで使う」&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="usbserial"></category><category term="prolific"></category><category term="pl2303"></category><category term="osx"></category></entry><entry><title>シンクライアントなマシン全てのデータドライブフォーマット</title><link href="http://pman0214.github.io/blog/win7-format-think-client.html" rel="alternate"></link><published>2018-03-19T09:30:00+09:00</published><updated>2018-03-19T09:30:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2018-03-19:/blog/win7-format-think-client.html</id><summary type="html">シンクライアントなマシン全部のデータドライブをコマンドを使ってフォーマットする手順。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;背景&lt;/h2&gt;
 &lt;p&gt;シンクライアントで管理している70台ほどのWindows機がある。

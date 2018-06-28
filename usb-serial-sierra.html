@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>Python RPi.GPIOのOpenWrtパッケージを作ってみた - pLog</title>
+  <title>macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う - pLog</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <meta name="author" content="pman0214">
-  <meta name="keywords" content="linux,openwrt,openwrt package,raspberry pi">
-  <meta name="description" content="Python RPi.GPIOのOpenWrtパッケージを作成したときの手順メモ。">
+  <meta name="keywords" content="usbserial,prolific,pl2303,osx">
+  <meta name="description" content="USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -26,15 +26,15 @@
   <!-- open graph tags -->
   <meta property="og:site_name" content="pLog">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Python RPi.GPIOのOpenWrtパッケージを作ってみた">
-  <meta property="og:url" content="http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html">
-  <meta property="og:description" content="Python RPi.GPIOのOpenWrtパッケージを作成したときの手順メモ。">
-  <meta property="article:published_time" content="2016-04-25">
-  <meta property="article:section" content="linux">
-  <meta property="article:tag" content="linux">
-  <meta property="article:tag" content="openwrt">
-  <meta property="article:tag" content="openwrt package">
-  <meta property="article:tag" content="raspberry pi">
+  <meta property="og:title" content="macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う">
+  <meta property="og:url" content="http://pman0214.github.io/blog/usb-serial-sierra.html">
+  <meta property="og:description" content="USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定">
+  <meta property="article:published_time" content="2018-06-28">
+  <meta property="article:section" content="osx">
+  <meta property="article:tag" content="usbserial">
+  <meta property="article:tag" content="prolific">
+  <meta property="article:tag" content="pl2303">
+  <meta property="article:tag" content="osx">
 </head>
 
 <body>
@@ -48,8 +48,8 @@
           <ul class="pure-menu-children">
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
-            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
-            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
             <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
             <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
@@ -66,123 +66,136 @@
 <main id="main">
 <article>
 <header>
-  <h1><a href="http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html" rel="bookmark" title="Permalink to Python RPi.GPIOのOpenWrtパッケージを作ってみた">Python RPi.GPIOのOpenWrtパッケージを作ってみた</a></h1>
+  <h1><a href="http://pman0214.github.io/blog/usb-serial-sierra.html" rel="bookmark" title="Permalink to macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う">macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う</a></h1>
   <div class="article-info">
 
     <div class="pure-g">
-      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2016-04-25T14:38:00+09:00">2016年04月25日 14:38</time></div>
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2018-06-28T09:18:00+09:00">2018年06月28日 09:18</time></div>
     </div>
-    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/linux.html">linux</a></div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/osx.html">osx</a></div>
     <div class="tags">Tags:
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/openwrt.html">openwrt</a>
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/openwrt-package.html">openwrt package</a>
-      <a class="pure-button" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/usbserial.html">usbserial</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/prolific.html">prolific</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/pl2303.html">pl2303</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/osx.html">osx</a>
     </div>
   </div>
 </header>
 <section class="contents">
 <!-- -*- coding: utf-8; -*- -->
 <div class="section" id="id1">
-<h2>モチベーション</h2>
-<p>Raspberry PiにRaspbianを載せるとちょっと重くなるので、自分は <a class="reference external" href="https://openwrt.org/">OpenWrt</a> を載せることが多い。</p>
-<p>Raspberry Piを使うならばGPIOが使えなければ始まらない（←何が!?）。
-最近はPythonでコードを書いているので <a class="reference external" href="https://pypi.python.org/pypi/RPi.GPIO">RPi.GPIOパッケージ</a> を入れようとpipを走らせたものの、ビルドはめっちゃ遅いし <tt class="docutils literal">Python.hがないよ！</tt> と怒られたので、メロスは激怒してパッケージ化しようと決意した。</p>
-<p>Image Generatorを使って作成したパッケージを含むイメージを作成するところまでやっちゃう。</p>
+<h2>概要</h2>
+<p>USB-RSAQ2とUSB-RSAQ5のOSXドライバは10.4くらいまでしか提供されていない。
+macOS Sierra (10.12)上で使うためにProlificのドライバーを導入した上で改造する。</p>
 </div>
 <div class="section" id="id2">
-<h2>前提</h2>
-<ul class="simple">
-<li>OpenWrtの <a class="reference external" href="https://wiki.openwrt.org/jp/about/toolchain">Buildroot</a> がすでに使える。</li>
-<li>Raspberry Pi用の <tt class="docutils literal">.config</tt> はすでに用意してある。</li>
-<li><a class="reference external" href="https://wiki.openwrt.org/doc/howto/obtain.firmware.generate">Image Generator</a> も用意してある。</li>
-</ul>
+<h2>手順</h2>
+<div class="section" id="prolific-pl2303">
+<h3>Prolific PL2303ドライバをインストールする</h3>
+<p><a class="reference external" href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&amp;pcid=41]">ここ</a> からドライバをダウンロードしてインストールする。
+現時点では10.13用まで提供されている。
+（ただし、10.13に導入する際は注意書きが付いている）</p>
+<p>導入後は再起動を求められる。
+このときに <tt class="docutils literal">Command+R</tt> を押しながら起動してリカバリモードで起動する。</p>
 </div>
-<div class="section" id="id3">
-<h2>環境</h2>
-<ul class="simple">
-<li>ビルド機はDebian 8.0。</li>
-<li>ビルド対象はChaos Calmer 15.05。</li>
-<li>ターゲットマシンはRaspberry Pi。</li>
-</ul>
+<div class="section" id="kext">
+<h3>kextの署名チェックを無効化する</h3>
+<p>自己責任で実施のこと。
+しかし、これをやらないとProlificのドライバーは導入できない。と思う。</p>
+<p>リカバリモードで起動してからターミナルを開き、以下のコマンドを実行する。</p>
+<div class="highlight"><pre><span></span>$ csrutil <span class="nb">enable</span> --without kext
+</pre></div>
+<p>実行したら再起動する。</p>
+</div>
+<div class="section" id="usb-rsaq2usb-rsaq5">
+<h3>USB-RSAQ2とUSB-RSAQ5の情報を調べる</h3>
+<p>MacにUSB-RSAQ2あるいはUSB-RSAQ5を接続する。
+System Informationを起動し（Optionを押しながらメニューバー左のりんごマークを押すなどすれば）、USBの項目でProduct IDとVendor IDをメモる。</p>
+<p>自分が確認したものは以下の通り。</p>
+<div class="highlight"><pre><span></span>USB-RSAQ2
+  Product ID: 0x04bb
+  Vendor ID: 0x067b
+
+USB-RSAQ5
+  Product ID: 0x0a0e
+  Vendor ID: 0x04bb
+</pre></div>
+<p>16進数はbcコマンドや電卓で10進数を確認しておく。</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">echo</span> <span class="s2">&quot;ibase=16; 4BB; 67B; A0E; 4BB&quot;</span> <span class="p">|</span> bc
+<span class="m">1211</span>
+<span class="m">1659</span>
+<span class="m">2574</span>
+<span class="m">1211</span>
+</pre></div>
 </div>
 <div class="section" id="id4">
-<h2>やり方</h2>
-<div class="section" id="makefile">
-<h3>パッケージビルド用Makefileの作成</h3>
-<p>パッケージ用のソースはネットのどこかにあるものである場合が多いので、それを自動的に取得してきてパッケージ化するための <tt class="docutils literal">Makefile</tt> を書けばOK。</p>
-<p>自分が書いたものは <a class="reference external" href="https://github.com/pman0214/python_rpi/blob/master/python-rpi-gpio/Makefile">Githubで公開</a> している。
-書き方はOpenWrtのドキュメントを見ても良いし、Buildrootの <tt class="docutils literal">feeds/packages/</tt> の下にあるテキトーなパッケージの <tt class="docutils literal">Makefile</tt> を見るのがとても参考になる。</p>
+<h3>USB-RSAQ2とUSB-RSAQ5の情報を追加する</h3>
+<p><tt class="docutils literal">/Library/Extensions/ProlificUsbSerial.kext/Contents/Info.plist</tt> を↓のような感じで変更する。
+<tt class="docutils literal">&lt;key&gt;</tt> のところは16進数のProduct IDとVendor IDを <tt class="docutils literal">_</tt> でつなげたものとなっているようなので、該当のものがないことを検索して確認してから追加すると良い。
+<tt class="docutils literal">idProduct</tt> と <tt class="docutils literal">idVendor</tt> は先ほど調べた10進数を書く。</p>
+<div class="highlight"><pre><span></span><span class="gd">--- /Library/Extensions/ProlificUsbSerial.kext/Contents/Info.plist.orig      2018-06-28 08:30:29.000000000 +0900</span>
+<span class="gi">+++ /Library/Extensions/ProlificUsbSerial.kext/Contents/Info.plist   2018-06-28 08:36:18.000000000 +0900</span>
+<span class="gu">@@ -108,6 +108,40 @@</span>
+                     &lt;key&gt;idVendor&lt;/key&gt;
+                     &lt;integer&gt;1659&lt;/integer&gt;
+             &lt;/dict&gt;
+<span class="gi">+            &lt;key&gt;067B_04BB&lt;/key&gt;</span>
+<span class="gi">+            &lt;dict&gt;</span>
+<span class="gi">+                    &lt;key&gt;CFBundleIdentifier&lt;/key&gt;</span>
+<span class="gi">+                    &lt;string&gt;com.prolific.driver.PL2303&lt;/string&gt;</span>
+<span class="gi">+                    &lt;key&gt;IOClass&lt;/key&gt;</span>
+<span class="gi">+                    &lt;string&gt;com_prolific_driver_PL2303&lt;/string&gt;</span>
+<span class="gi">+                    &lt;key&gt;IOProviderClass&lt;/key&gt;</span>
+<span class="gi">+                    &lt;string&gt;IOUSBInterface&lt;/string&gt;</span>
+<span class="gi">+                    &lt;key&gt;bConfigurationValue&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;1&lt;/integer&gt;</span>
+<span class="gi">+                    &lt;key&gt;bInterfaceNumber&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;0&lt;/integer&gt;</span>
+<span class="gi">+                    &lt;key&gt;idProduct&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;1211&lt;/integer&gt;</span>
+<span class="gi">+                    &lt;key&gt;idVendor&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;1659&lt;/integer&gt;</span>
+<span class="gi">+            &lt;/dict&gt;</span>
+<span class="gi">+            &lt;key&gt;04BB_0A0E&lt;/key&gt;</span>
+<span class="gi">+            &lt;dict&gt;</span>
+<span class="gi">+                    &lt;key&gt;CFBundleIdentifier&lt;/key&gt;</span>
+<span class="gi">+                    &lt;string&gt;com.prolific.driver.PL2303&lt;/string&gt;</span>
+<span class="gi">+                    &lt;key&gt;IOClass&lt;/key&gt;</span>
+<span class="gi">+                    &lt;string&gt;com_prolific_driver_PL2303&lt;/string&gt;</span>
+<span class="gi">+                    &lt;key&gt;IOProviderClass&lt;/key&gt;</span>
+<span class="gi">+                    &lt;string&gt;IOUSBInterface&lt;/string&gt;</span>
+<span class="gi">+                    &lt;key&gt;bConfigurationValue&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;1&lt;/integer&gt;</span>
+<span class="gi">+                    &lt;key&gt;bInterfaceNumber&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;0&lt;/integer&gt;</span>
+<span class="gi">+                    &lt;key&gt;idProduct&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;2574&lt;/integer&gt;</span>
+<span class="gi">+                    &lt;key&gt;idVendor&lt;/key&gt;</span>
+<span class="gi">+                    &lt;integer&gt;1211&lt;/integer&gt;</span>
+<span class="gi">+            &lt;/dict&gt;</span>
+     &lt;/dict&gt;
+     &lt;key&gt;OSBundleLibraries&lt;/key&gt;
+     &lt;dict&gt;
+</pre></div>
 </div>
-<div class="section" id="feed">
-<h3>パッケージ提供feedの作成</h3>
-<p>OpenWrtでは新しいパッケージを追加する場合にfeedというものを追加する。
-なので作成したパッケージを追加するfeedを用意する。</p>
-<p>と言っても、作成したパッケージ用Makefileが入ったディレクトリを含むgitレポジトリを用意すればいいだけ。
-自分の場合、 <tt class="docutils literal"><span class="pre">python-rpi-gpio</span></tt> パッケージを作成したので <a class="reference external" href="https://github.com/pman0214/python_rpi">feed用レポジトリ</a> の構成は以下のようになった。</p>
+<div class="section" id="kextload">
+<h3>kextload！</h3>
+<p>あとは <tt class="docutils literal">kextload</tt> すれば幸せになれる。</p>
+<div class="highlight"><pre><span></span>$ sudo kextload /Library/Extensions/ProlificUsbSerial.kext
+</pre></div>
+<p>USB-RSAQ2などをMacにつなぐと <tt class="docutils literal">/dev/cu.usbserial</tt> が現れる。
+2つ同時につなぐと <tt class="docutils literal">/dev/cu.usbserial6</tt> というのも現れた。
+数字がどうやって決まるのかは良く分かっていない。</p>
+<div class="highlight"><pre><span></span>$ ls /dev/cu.usb*
+/dev/cu.usbserial       /dev/cu.usbserial6
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>参考にしたページ</h2>
 <ul class="simple">
-<li><a class="reference external" href="https://github.com/pman0214/python_rpi">python_rpiレポジトリ</a><ul>
-<li>python-rpi-gpio/<ul>
-<li>Makefile</li>
+<li><a class="reference external" href="https://qiita.com/kawasakisa/items/9ecfbbc67dc0a7ceae65">Qiita「USB-RSAQ2(PL2303)をMacOS Sierraで使う」</a></li>
 </ul>
-</li>
-<li>LICENSE</li>
-<li>README.rst</li>
-</ul>
-</li>
-</ul>
-<p>外に公開する場合にはきちんとLICENSEを定義してあげよう。</p>
-</div>
-<div class="section" id="id6">
-<h3>feedの追加</h3>
-<p>Buildrootのfeed設定に今作成したfeed用レポジトリを追加してやる。
-こんな感じ。
-<tt class="docutils literal">feeds.conf</tt> に空行を入れたらエラーになった。</p>
-<div class="highlight"><pre><span></span>% vi feeds.conf
-</pre></div>
-<div class="highlight"><pre><span></span>...
-src-git python_rpi https://github.com/pman0214/python_rpi.git
-...
-</pre></div>
-<p><tt class="docutils literal"><span class="pre">src-git</span></tt> と書いていることから、もしかするとgit以外も使えるのかもしれない。
-ドキュメント参照ということで。</p>
-<p>あとは普通に、feedを取得してパッケージをインストール。</p>
-<div class="highlight"><pre><span></span>% ./scripts/feeds update python_rpi
-% ./scripts/feeds install python-rpi-gpio
-</pre></div>
-<p>updateで <tt class="docutils literal">feeds/</tt> の下に <tt class="docutils literal">python_rpi</tt> というディレクトリが作成される。
-これはfeed用レポジトリのmasterだけを <tt class="docutils literal"><span class="pre">--single-branch</span></tt> でcloneしたもの。</p>
-<p>installを実行すると <tt class="docutils literal">packages/feeds/</tt> の下に <tt class="docutils literal">python_rpi</tt> というディレクトリが作成され、その下にinstallしたパッケージのリンクが作成される。
-このディレクトリにあるものは <tt class="docutils literal">make</tt> したときに呼び出されるということのようだ。</p>
-</div>
-<div class="section" id="make">
-<h3>働いたらmake！</h3>
-<p>手順は <a class="reference external" href="https://wiki.openwrt.org/doc/howtobuild/single.package">How to Build a Single Package</a> に書いてある。
-まずはツール類をビルドする。</p>
-<div class="highlight"><pre><span></span>% make tools/install
-% make toolchain/install
-</pre></div>
-<p>そしてパッケージをビルドする。</p>
-<div class="highlight"><pre><span></span>% make package/python-rpi-gpip/compile
-</pre></div>
-</div>
-<div class="section" id="id7">
-<h3>Image Generatorでパッケージにアクセス</h3>
-<p>Image Generatorの <tt class="docutils literal">repositories.conf</tt> の上の方にコメントアウトしてある行を参考にして、以下のように書く。</p>
-<div class="highlight"><pre><span></span>src custom file:///usr/src/openwrt/bin/brcm2708/packages
-</pre></div>
-<p>ここで、 <tt class="docutils literal">/usr/src/openwrt</tt> がBuildrootへのパス。
-今回のターゲットマシンはRaspberry Piなので、ビルドしたパッケージは <tt class="docutils literal">bin/brcm2708/packages/</tt> に格納されている。</p>
-<p>あとはImage Generatorの <tt class="docutils literal">PACKAGES</tt> で自分の作成したパッケージを指定すればOK。</p>
-</div>
-</div>
-<div class="section" id="id8">
-<h2>追記（2016-04-25 18:15）</h2>
-<p>一番メモしたいと思っていた情報を書き忘れていた。
-パッケージをビルドしただけでは <tt class="docutils literal">Packages</tt> や <tt class="docutils literal">Packages.gz</tt> が存在しないため、 <tt class="docutils literal">repositories.conf</tt> を書き換えてもエラーになる。
-パッケージを新たに追加した場合はBuildrootにおいて再インデックスが必要。</p>
-<div class="highlight"><pre><span></span>% make package/index
-</pre></div>
 </div>
 
 </section>
@@ -198,8 +211,8 @@ src-git python_rpi https://github.com/pman0214/python_rpi.git
  */
 var disqus_config = function () {
   this.language = 'ja';
-  this.page.url = 'http://pman0214.github.io/blog/openwrt-python-rpi-gpio.html';
-  this.page.identifier = 'openwrt-python-rpi-gpio';
+  this.page.url = 'http://pman0214.github.io/blog/usb-serial-sierra.html';
+  this.page.identifier = 'usb-serial-sierra';
 };
 (function() {  // DON'T EDIT BELOW THIS LINE
   var d = document, s = d.createElement('script');
