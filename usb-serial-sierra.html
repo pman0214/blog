@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <meta name="author" content="pman0214">
   <meta name="keywords" content="usbserial,prolific,pl2303,osx">
-  <meta name="description" content="USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定">
+  <meta name="description" content="USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定。">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
   <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
@@ -28,7 +28,7 @@
   <meta property="og:type" content="article">
   <meta property="og:title" content="macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う">
   <meta property="og:url" content="http://pman0214.github.io/blog/usb-serial-sierra.html">
-  <meta property="og:description" content="USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定">
+  <meta property="og:description" content="USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定。">
   <meta property="article:published_time" content="2018-06-28">
   <meta property="article:section" content="osx">
   <meta property="article:tag" content="usbserial">
@@ -86,7 +86,7 @@
 <div class="section" id="id1">
 <h2>概要</h2>
 <p>USB-RSAQ2とUSB-RSAQ5のOSXドライバは10.4くらいまでしか提供されていない。
-macOS Sierra (10.12)上で使うためにProlificのドライバーを導入した上で改造する。</p>
+macOS Sierra (10.12)上で使うためにProlificのドライバーを導入した上でUSB-RSAQ2とUSB-RSAQ5の情報を追加する。</p>
 </div>
 <div class="section" id="id2">
 <h2>手順</h2>
@@ -105,7 +105,24 @@ macOS Sierra (10.12)上で使うためにProlificのドライバーを導入し�
 <p>リカバリモードで起動してからターミナルを開き、以下のコマンドを実行する。</p>
 <div class="highlight"><pre><span></span>$ csrutil <span class="nb">enable</span> --without kext
 </pre></div>
-<p>実行したら再起動する。</p>
+<p>実行したら再起動する。
+再起動後にcsrutilで状態を確認するとこんな感じに <tt class="docutils literal">Kext Signing</tt> が <tt class="docutils literal">disabled</tt> になるはず。</p>
+<div class="highlight"><pre><span></span>$ csrutil status
+System Integrity Protection status: enabled <span class="o">(</span>Custom Configuration<span class="o">)</span>.
+
+Configuration:
+        Apple Internal: disabled
+        Kext Signing: disabled
+        Filesystem Protections: enabled
+        Debugging Restrictions: enabled
+        DTrace Restrictions: enabled
+        NVRAM Protections: enabled
+        BaseSystem Verification: enabled
+
+This is an unsupported configuration, likely to <span class="nb">break</span> in the future and leave your machine in an unknown state.
+</pre></div>
+<p>なお、 <tt class="docutils literal">Apple Internal</tt> は <tt class="docutils literal">disabled</tt> と表示されていても有効らしい。
+なぜかは分からんので気にしたら負け。</p>
 </div>
 <div class="section" id="usb-rsaq2usb-rsaq5">
 <h3>USB-RSAQ2とUSB-RSAQ5の情報を調べる</h3>

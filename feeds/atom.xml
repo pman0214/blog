@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2018-06-28T09:18:00+09:00</updated><entry><title>macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う</title><link href="http://pman0214.github.io/blog/usb-serial-sierra.html" rel="alternate"></link><published>2018-06-28T09:18:00+09:00</published><updated>2018-06-28T09:18:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2018-06-28:/blog/usb-serial-sierra.html</id><summary type="html">USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>pLog</title><link href="http://pman0214.github.io/blog/" rel="alternate"></link><link href="http://pman0214.github.io/blog/feeds/atom.xml" rel="self"></link><id>http://pman0214.github.io/blog/</id><updated>2018-06-28T09:42:00+09:00</updated><entry><title>macOS SierraでUSB-RSAQ2とUSB-RSAQ5を使う</title><link href="http://pman0214.github.io/blog/usb-serial-sierra.html" rel="alternate"></link><published>2018-06-28T09:18:00+09:00</published><updated>2018-06-28T09:42:00+09:00</updated><author><name>pman0214</name></author><id>tag:pman0214.github.io,2018-06-28:/blog/usb-serial-sierra.html</id><summary type="html">USB-RSAQ2及びUSB-RSAQ5をmacOS Sierra上で使うための設定。</summary><content type="html">&lt;!-- -*- coding: utf-8; -*- --&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;概要&lt;/h2&gt;
 &lt;p&gt;USB-RSAQ2とUSB-RSAQ5のOSXドライバは10.4くらいまでしか提供されていない。
-macOS Sierra (10.12)上で使うためにProlificのドライバーを導入した上で改造する。&lt;/p&gt;
+macOS Sierra (10.12)上で使うためにProlificのドライバーを導入した上でUSB-RSAQ2とUSB-RSAQ5の情報を追加する。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;手順&lt;/h2&gt;
@@ -22,7 +22,24 @@ macOS Sierra (10.12)上で使うためにProlificのドライバーを導入し�
 &lt;p&gt;リカバリモードで起動してからターミナルを開き、以下のコマンドを実行する。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ csrutil &lt;span class="nb"&gt;enable&lt;/span&gt; --without kext
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;実行したら再起動する。&lt;/p&gt;
+&lt;p&gt;実行したら再起動する。
+再起動後にcsrutilで状態を確認するとこんな感じに &lt;tt class="docutils literal"&gt;Kext Signing&lt;/tt&gt; が &lt;tt class="docutils literal"&gt;disabled&lt;/tt&gt; になるはず。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ csrutil status
+System Integrity Protection status: enabled &lt;span class="o"&gt;(&lt;/span&gt;Custom Configuration&lt;span class="o"&gt;)&lt;/span&gt;.
+
+Configuration:
+        Apple Internal: disabled
+        Kext Signing: disabled
+        Filesystem Protections: enabled
+        Debugging Restrictions: enabled
+        DTrace Restrictions: enabled
+        NVRAM Protections: enabled
+        BaseSystem Verification: enabled
+
+This is an unsupported configuration, likely to &lt;span class="nb"&gt;break&lt;/span&gt; in the future and leave your machine in an unknown state.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;なお、 &lt;tt class="docutils literal"&gt;Apple Internal&lt;/tt&gt; は &lt;tt class="docutils literal"&gt;disabled&lt;/tt&gt; と表示されていても有効らしい。
+なぜかは分からんので気にしたら負け。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="usb-rsaq2usb-rsaq5"&gt;
 &lt;h3&gt;USB-RSAQ2とUSB-RSAQ5の情報を調べる&lt;/h3&gt;
