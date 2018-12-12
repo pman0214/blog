@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>np.fft.fftとnp.fft.rfft - pLog</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=11">
+  <meta name="author" content="pman0214">
+  <meta name="keywords" content="python,numpy,fft,rfft">
+  <meta name="description" content="numpyにはfft以外にrfftなるものがあるということ。">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pure-min.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/ext-pure.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/style.css">
+  <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/pygments/github.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="http://pman0214.github.io/blog/theme/css/grids-responsive-min.css">
+  <!--<![endif]-->
+  <!--[if lt IE 9]>
+    <script src="http://pman0214.github.io/blog/theme/js/html5shiv.js"></script>
+  <![endif]-->
+  <link href="http://pman0214.github.io/blog/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="pLog Full Atom Feed">
+  <link href="http://pman0214.github.io/blog/feeds/rss.xml" type="application/rss+xml" rel="alternate" title="pLog Full RSS Feed">
+  <!-- open graph tags -->
+  <meta property="og:site_name" content="pLog">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="np.fft.fftとnp.fft.rfft">
+  <meta property="og:url" content="http://pman0214.github.io/blog/fft-rfft.html">
+  <meta property="og:description" content="numpyにはfft以外にrfftなるものがあるということ。">
+  <meta property="article:published_time" content="2018-12-12">
+  <meta property="article:section" content="python">
+  <meta property="article:tag" content="python">
+  <meta property="article:tag" content="numpy">
+  <meta property="article:tag" content="fft">
+  <meta property="article:tag" content="rfft">
+</head>
+
+<body>
+<header>
+  <nav id="menu">
+    <div class="pure-menu pure-menu-horizontal">
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog" class="pure-menu-heading pure-menu-link">pLog</a></li>
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+          <a href="#" class="pure-menu-link">Categories</a>
+          <ul class="pure-menu-children">
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/devel.html" class="pure-menu-link">devel</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/info.html" class="pure-menu-link">info</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/linux.html" class="pure-menu-link">linux</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/osx.html" class="pure-menu-link">osx</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://pman0214.github.io/blog/category/python.html" class="pure-menu-link">python</a></li>
+            <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/category/tex.html" class="pure-menu-link">tex</a></li>
+            <li class="pure-menu-item menu-item-divided"><a href="http://pman0214.github.io/blog/categories.html" class="pure-menu-link">See all...</a></li>
+          </ul>
+        </li>
+        <li class="pure-menu-item"><a href="http://pman0214.github.io/blog/archives.html" class="pure-menu-link">Archives</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div id="layout" class="pure-g">
+<div class="pure-u-1 pure-u-lg-3-4">
+<main id="main">
+<article>
+<header>
+  <h1><a href="http://pman0214.github.io/blog/fft-rfft.html" rel="bookmark" title="Permalink to np.fft.fftとnp.fft.rfft">np.fft.fftとnp.fft.rfft</a></h1>
+  <div class="article-info">
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2 on-create"><time datetime="2018-12-12T10:55:00+09:00">2018年12月12日 10:55</time></div>
+    </div>
+    <div class="category">Category: <a class="pure-button" href="http://pman0214.github.io/blog/category/python.html">python</a></div>
+    <div class="tags">Tags:
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/python.html">python</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/numpy.html">numpy</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/fft.html">fft</a>
+      <a class="pure-button" href="http://pman0214.github.io/blog/tag/rfft.html">rfft</a>
+    </div>
+  </div>
+</header>
+<section class="contents">
+<!-- -*- coding: utf-8; -*- -->
+<div class="section" id="id1">
+<h2>概要</h2>
+<p>Numpyを使ってFFTをするときにこれまで <tt class="docutils literal">fft</tt> を使っていたのだが、少なくとも工学系は多くの場合で <tt class="docutils literal">rfft</tt> で十分なのではないかというお話。</p>
+</div>
+<div class="section" id="numpyfft">
+<h2>NumpyのFFT</h2>
+<p>PythonでFFTするときはこれまで <tt class="docutils literal">np.fft.fft</tt> を使っていた。
+たとえばsin波をFFTするときはこんな感じ。</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="mi">100</span>                         <span class="c1"># 周波数 [Hz]</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="mf">1e3</span>                        <span class="c1"># サンプリング周波数 [Hz]</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mf">100e-3</span>                      <span class="c1"># 作成する長さ [s]</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">64</span>                          <span class="c1"># FFT点数</span>
+
+<span class="c1"># 時刻の刻みを作成</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">fs</span><span class="p">))</span> <span class="o">/</span> <span class="n">fs</span>
+<span class="c1"># 各時刻のsinを計算</span>
+<span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+
+
+<span class="c1"># FFT用の窓</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hamming</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># signalの先頭のN点を取り出してFFT</span>
+<span class="n">fft_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">win</span> <span class="o">*</span> <span class="n">signal</span><span class="p">[:</span><span class="n">N</span><span class="p">])</span>
+</pre></div>
+<p>signalはsin波で実数なので、この結果はこんな感じになる。</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">fft_signal</span><span class="p">)</span>
+<span class="p">[</span> <span class="mf">1.74438136e-01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.75287567e-01</span><span class="o">-</span><span class="mf">3.73272090e-03j</span>
+  <span class="mf">1.74864008e-01</span><span class="o">-</span><span class="mf">4.65222105e-03j</span>  <span class="mf">1.54867450e-01</span><span class="o">+</span><span class="mf">6.33587976e-03j</span>
+ <span class="o">-</span><span class="mf">6.65125615e-03</span><span class="o">+</span><span class="mf">8.15314012e-02j</span> <span class="o">-</span><span class="mf">2.64383920e+00</span><span class="o">+</span><span class="mf">1.13615380e+00j</span>
+  <span class="mf">1.42449339e+01</span><span class="o">-</span><span class="mf">4.87427558e+00j</span> <span class="o">-</span><span class="mf">1.22519849e+01</span><span class="o">+</span><span class="mf">3.64618279e+00j</span>
+  <span class="mf">1.42875862e+00</span><span class="o">-</span><span class="mf">2.86537737e-01j</span>  <span class="mf">4.61355027e-02</span><span class="o">+</span><span class="mf">4.43652316e-02j</span>
+ <span class="o">-</span><span class="mf">8.10435063e-02</span><span class="o">+</span><span class="mf">6.14333092e-02j</span> <span class="o">-</span><span class="mf">9.78142067e-02</span><span class="o">+</span><span class="mf">5.65090513e-02j</span>
+ <span class="o">-</span><span class="mf">9.49462631e-02</span><span class="o">+</span><span class="mf">4.95953839e-02j</span> <span class="o">-</span><span class="mf">8.83469778e-02</span><span class="o">+</span><span class="mf">4.33662615e-02j</span>
+ <span class="o">-</span><span class="mf">8.16619311e-02</span><span class="o">+</span><span class="mf">3.80927286e-02j</span> <span class="o">-</span><span class="mf">7.57470422e-02</span><span class="o">+</span><span class="mf">3.36457356e-02j</span>
+ <span class="o">-</span><span class="mf">7.07203111e-02</span><span class="o">+</span><span class="mf">2.98558880e-02j</span> <span class="o">-</span><span class="mf">6.65017794e-02</span><span class="o">+</span><span class="mf">2.65799365e-02j</span>
+ <span class="o">-</span><span class="mf">6.29706590e-02</span><span class="o">+</span><span class="mf">2.37069165e-02j</span> <span class="o">-</span><span class="mf">6.00116496e-02</span><span class="o">+</span><span class="mf">2.11525123e-02j</span>
+ <span class="o">-</span><span class="mf">5.75267151e-02</span><span class="o">+</span><span class="mf">1.88524960e-02j</span> <span class="o">-</span><span class="mf">5.54359559e-02</span><span class="o">+</span><span class="mf">1.67574133e-02j</span>
+ <span class="o">-</span><span class="mf">5.36753399e-02</span><span class="o">+</span><span class="mf">1.48286456e-02j</span> <span class="o">-</span><span class="mf">5.21938770e-02</span><span class="o">+</span><span class="mf">1.30355650e-02j</span>
+ <span class="o">-</span><span class="mf">5.09510518e-02</span><span class="o">+</span><span class="mf">1.13534853e-02j</span> <span class="o">-</span><span class="mf">4.99147118e-02</span><span class="o">+</span><span class="mf">9.76217367e-03j</span>
+ <span class="o">-</span><span class="mf">4.90594004e-02</span><span class="o">+</span><span class="mf">8.24475811e-03j</span> <span class="o">-</span><span class="mf">4.83650717e-02</span><span class="o">+</span><span class="mf">6.78691140e-03j</span>
+ <span class="o">-</span><span class="mf">4.78161104e-02</span><span class="o">+</span><span class="mf">5.37623094e-03j</span> <span class="o">-</span><span class="mf">4.74005959e-02</span><span class="o">+</span><span class="mf">4.00175686e-03j</span>
+ <span class="o">-</span><span class="mf">4.71097580e-02</span><span class="o">+</span><span class="mf">2.65358782e-03j</span> <span class="o">-</span><span class="mf">4.69375890e-02</span><span class="o">+</span><span class="mf">1.32256471e-03j</span>
+ <span class="o">-</span><span class="mf">4.68805834e-02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.69375890e-02</span><span class="o">-</span><span class="mf">1.32256471e-03j</span>
+ <span class="o">-</span><span class="mf">4.71097580e-02</span><span class="o">-</span><span class="mf">2.65358782e-03j</span> <span class="o">-</span><span class="mf">4.74005959e-02</span><span class="o">-</span><span class="mf">4.00175686e-03j</span>
+ <span class="o">-</span><span class="mf">4.78161104e-02</span><span class="o">-</span><span class="mf">5.37623094e-03j</span> <span class="o">-</span><span class="mf">4.83650717e-02</span><span class="o">-</span><span class="mf">6.78691140e-03j</span>
+ <span class="o">-</span><span class="mf">4.90594004e-02</span><span class="o">-</span><span class="mf">8.24475811e-03j</span> <span class="o">-</span><span class="mf">4.99147118e-02</span><span class="o">-</span><span class="mf">9.76217367e-03j</span>
+ <span class="o">-</span><span class="mf">5.09510518e-02</span><span class="o">-</span><span class="mf">1.13534853e-02j</span> <span class="o">-</span><span class="mf">5.21938770e-02</span><span class="o">-</span><span class="mf">1.30355650e-02j</span>
+ <span class="o">-</span><span class="mf">5.36753399e-02</span><span class="o">-</span><span class="mf">1.48286456e-02j</span> <span class="o">-</span><span class="mf">5.54359559e-02</span><span class="o">-</span><span class="mf">1.67574133e-02j</span>
+ <span class="o">-</span><span class="mf">5.75267151e-02</span><span class="o">-</span><span class="mf">1.88524960e-02j</span> <span class="o">-</span><span class="mf">6.00116496e-02</span><span class="o">-</span><span class="mf">2.11525123e-02j</span>
+ <span class="o">-</span><span class="mf">6.29706590e-02</span><span class="o">-</span><span class="mf">2.37069165e-02j</span> <span class="o">-</span><span class="mf">6.65017794e-02</span><span class="o">-</span><span class="mf">2.65799365e-02j</span>
+ <span class="o">-</span><span class="mf">7.07203111e-02</span><span class="o">-</span><span class="mf">2.98558880e-02j</span> <span class="o">-</span><span class="mf">7.57470422e-02</span><span class="o">-</span><span class="mf">3.36457356e-02j</span>
+ <span class="o">-</span><span class="mf">8.16619311e-02</span><span class="o">-</span><span class="mf">3.80927286e-02j</span> <span class="o">-</span><span class="mf">8.83469778e-02</span><span class="o">-</span><span class="mf">4.33662615e-02j</span>
+ <span class="o">-</span><span class="mf">9.49462631e-02</span><span class="o">-</span><span class="mf">4.95953839e-02j</span> <span class="o">-</span><span class="mf">9.78142067e-02</span><span class="o">-</span><span class="mf">5.65090513e-02j</span>
+ <span class="o">-</span><span class="mf">8.10435063e-02</span><span class="o">-</span><span class="mf">6.14333092e-02j</span>  <span class="mf">4.61355027e-02</span><span class="o">-</span><span class="mf">4.43652316e-02j</span>
+  <span class="mf">1.42875862e+00</span><span class="o">+</span><span class="mf">2.86537737e-01j</span> <span class="o">-</span><span class="mf">1.22519849e+01</span><span class="o">-</span><span class="mf">3.64618279e+00j</span>
+  <span class="mf">1.42449339e+01</span><span class="o">+</span><span class="mf">4.87427558e+00j</span> <span class="o">-</span><span class="mf">2.64383920e+00</span><span class="o">-</span><span class="mf">1.13615380e+00j</span>
+ <span class="o">-</span><span class="mf">6.65125615e-03</span><span class="o">-</span><span class="mf">8.15314012e-02j</span>  <span class="mf">1.54867450e-01</span><span class="o">-</span><span class="mf">6.33587976e-03j</span>
+  <span class="mf">1.74864008e-01</span><span class="o">+</span><span class="mf">4.65222105e-03j</span>  <span class="mf">1.75287567e-01</span><span class="o">+</span><span class="mf">3.73272090e-03j</span><span class="p">]</span>
+</pre></div>
+<p>64点でFFTしたので、（0を含んで）正の周波数32点と負の周波数32点の結果が格納されている。
+各要素がどの周波数と対応するのかは <tt class="docutils literal">np.fft.fftfreq</tt> で作成できる。</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">fft_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">fft_freq</span><span class="p">)</span>
+<span class="p">[</span>   <span class="mf">0.</span>      <span class="mf">15.625</span>   <span class="mf">31.25</span>    <span class="mf">46.875</span>   <span class="mf">62.5</span>     <span class="mf">78.125</span>   <span class="mf">93.75</span>   <span class="mf">109.375</span>
+  <span class="mf">125.</span>     <span class="mf">140.625</span>  <span class="mf">156.25</span>   <span class="mf">171.875</span>  <span class="mf">187.5</span>    <span class="mf">203.125</span>  <span class="mf">218.75</span>   <span class="mf">234.375</span>
+  <span class="mf">250.</span>     <span class="mf">265.625</span>  <span class="mf">281.25</span>   <span class="mf">296.875</span>  <span class="mf">312.5</span>    <span class="mf">328.125</span>  <span class="mf">343.75</span>   <span class="mf">359.375</span>
+  <span class="mf">375.</span>     <span class="mf">390.625</span>  <span class="mf">406.25</span>   <span class="mf">421.875</span>  <span class="mf">437.5</span>    <span class="mf">453.125</span>  <span class="mf">468.75</span>   <span class="mf">484.375</span>
+ <span class="o">-</span><span class="mf">500.</span>    <span class="o">-</span><span class="mf">484.375</span> <span class="o">-</span><span class="mf">468.75</span>  <span class="o">-</span><span class="mf">453.125</span> <span class="o">-</span><span class="mf">437.5</span>   <span class="o">-</span><span class="mf">421.875</span> <span class="o">-</span><span class="mf">406.25</span>  <span class="o">-</span><span class="mf">390.625</span>
+ <span class="o">-</span><span class="mf">375.</span>    <span class="o">-</span><span class="mf">359.375</span> <span class="o">-</span><span class="mf">343.75</span>  <span class="o">-</span><span class="mf">328.125</span> <span class="o">-</span><span class="mf">312.5</span>   <span class="o">-</span><span class="mf">296.875</span> <span class="o">-</span><span class="mf">281.25</span>  <span class="o">-</span><span class="mf">265.625</span>
+ <span class="o">-</span><span class="mf">250.</span>    <span class="o">-</span><span class="mf">234.375</span> <span class="o">-</span><span class="mf">218.75</span>  <span class="o">-</span><span class="mf">203.125</span> <span class="o">-</span><span class="mf">187.5</span>   <span class="o">-</span><span class="mf">171.875</span> <span class="o">-</span><span class="mf">156.25</span>  <span class="o">-</span><span class="mf">140.625</span>
+ <span class="o">-</span><span class="mf">125.</span>    <span class="o">-</span><span class="mf">109.375</span>  <span class="o">-</span><span class="mf">93.75</span>   <span class="o">-</span><span class="mf">78.125</span>  <span class="o">-</span><span class="mf">62.5</span>    <span class="o">-</span><span class="mf">46.875</span>  <span class="o">-</span><span class="mf">31.25</span>   <span class="o">-</span><span class="mf">15.625</span><span class="p">]</span>
+</pre></div>
+<p>並べて表示してみる。
+複素数になってしまうので見づらくなるが、左側が周波数、右側が各周波数のFFT要素である。</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">fft_freq</span><span class="p">,</span> <span class="n">fft_signal</span><span class="p">])</span>
+<span class="p">[[</span> <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.74438136e-01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.56250000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.75287567e-01</span><span class="o">-</span><span class="mf">3.73272090e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.12500000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.74864008e-01</span><span class="o">-</span><span class="mf">4.65222105e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.68750000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.54867450e-01</span><span class="o">+</span><span class="mf">6.33587976e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">6.25000000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.65125615e-03</span><span class="o">+</span><span class="mf">8.15314012e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">7.81250000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">2.64383920e+00</span><span class="o">+</span><span class="mf">1.13615380e+00j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">9.37500000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.42449339e+01</span><span class="o">-</span><span class="mf">4.87427558e+00j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.09375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">1.22519849e+01</span><span class="o">+</span><span class="mf">3.64618279e+00j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.25000000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.42875862e+00</span><span class="o">-</span><span class="mf">2.86537737e-01j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.40625000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">4.61355027e-02</span><span class="o">+</span><span class="mf">4.43652316e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.56250000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">8.10435063e-02</span><span class="o">+</span><span class="mf">6.14333092e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.71875000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">9.78142067e-02</span><span class="o">+</span><span class="mf">5.65090513e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.87500000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">9.49462631e-02</span><span class="o">+</span><span class="mf">4.95953839e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.03125000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">8.83469778e-02</span><span class="o">+</span><span class="mf">4.33662615e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.18750000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">8.16619311e-02</span><span class="o">+</span><span class="mf">3.80927286e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.34375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">7.57470422e-02</span><span class="o">+</span><span class="mf">3.36457356e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.50000000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">7.07203111e-02</span><span class="o">+</span><span class="mf">2.98558880e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.65625000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.65017794e-02</span><span class="o">+</span><span class="mf">2.65799365e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.81250000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.29706590e-02</span><span class="o">+</span><span class="mf">2.37069165e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.96875000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.00116496e-02</span><span class="o">+</span><span class="mf">2.11525123e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.12500000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.75267151e-02</span><span class="o">+</span><span class="mf">1.88524960e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.28125000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.54359559e-02</span><span class="o">+</span><span class="mf">1.67574133e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.43750000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.36753399e-02</span><span class="o">+</span><span class="mf">1.48286456e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.59375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.21938770e-02</span><span class="o">+</span><span class="mf">1.30355650e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.75000000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.09510518e-02</span><span class="o">+</span><span class="mf">1.13534853e-02j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.90625000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.99147118e-02</span><span class="o">+</span><span class="mf">9.76217367e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.06250000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.90594004e-02</span><span class="o">+</span><span class="mf">8.24475811e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.21875000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.83650717e-02</span><span class="o">+</span><span class="mf">6.78691140e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.37500000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.78161104e-02</span><span class="o">+</span><span class="mf">5.37623094e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.53125000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.74005959e-02</span><span class="o">+</span><span class="mf">4.00175686e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.68750000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.71097580e-02</span><span class="o">+</span><span class="mf">2.65358782e-03j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.84375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.69375890e-02</span><span class="o">+</span><span class="mf">1.32256471e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">5.00000000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.68805834e-02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">4.84375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.69375890e-02</span><span class="o">-</span><span class="mf">1.32256471e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">4.68750000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.71097580e-02</span><span class="o">-</span><span class="mf">2.65358782e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">4.53125000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.74005959e-02</span><span class="o">-</span><span class="mf">4.00175686e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">4.37500000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.78161104e-02</span><span class="o">-</span><span class="mf">5.37623094e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">4.21875000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.83650717e-02</span><span class="o">-</span><span class="mf">6.78691140e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">4.06250000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.90594004e-02</span><span class="o">-</span><span class="mf">8.24475811e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">3.90625000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.99147118e-02</span><span class="o">-</span><span class="mf">9.76217367e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">3.75000000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.09510518e-02</span><span class="o">-</span><span class="mf">1.13534853e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">3.59375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.21938770e-02</span><span class="o">-</span><span class="mf">1.30355650e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">3.43750000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.36753399e-02</span><span class="o">-</span><span class="mf">1.48286456e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">3.28125000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.54359559e-02</span><span class="o">-</span><span class="mf">1.67574133e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">3.12500000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">5.75267151e-02</span><span class="o">-</span><span class="mf">1.88524960e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">2.96875000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.00116496e-02</span><span class="o">-</span><span class="mf">2.11525123e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">2.81250000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.29706590e-02</span><span class="o">-</span><span class="mf">2.37069165e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">2.65625000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.65017794e-02</span><span class="o">-</span><span class="mf">2.65799365e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">2.50000000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">7.07203111e-02</span><span class="o">-</span><span class="mf">2.98558880e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">2.34375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">7.57470422e-02</span><span class="o">-</span><span class="mf">3.36457356e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">2.18750000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">8.16619311e-02</span><span class="o">-</span><span class="mf">3.80927286e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">2.03125000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">8.83469778e-02</span><span class="o">-</span><span class="mf">4.33662615e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.87500000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">9.49462631e-02</span><span class="o">-</span><span class="mf">4.95953839e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.71875000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">9.78142067e-02</span><span class="o">-</span><span class="mf">5.65090513e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.56250000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">8.10435063e-02</span><span class="o">-</span><span class="mf">6.14333092e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.40625000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">4.61355027e-02</span><span class="o">-</span><span class="mf">4.43652316e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.25000000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.42875862e+00</span><span class="o">+</span><span class="mf">2.86537737e-01j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.09375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">1.22519849e+01</span><span class="o">-</span><span class="mf">3.64618279e+00j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">9.37500000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.42449339e+01</span><span class="o">+</span><span class="mf">4.87427558e+00j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">7.81250000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">2.64383920e+00</span><span class="o">-</span><span class="mf">1.13615380e+00j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">6.25000000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">6.65125615e-03</span><span class="o">-</span><span class="mf">8.15314012e-02j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">4.68750000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.54867450e-01</span><span class="o">-</span><span class="mf">6.33587976e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">3.12500000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.74864008e-01</span><span class="o">+</span><span class="mf">4.65222105e-03j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.56250000e+01</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.75287567e-01</span><span class="o">+</span><span class="mf">3.73272090e-03j</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="section" id="fftrfft">
+<h2>fftとrfft</h2>
+<p>FFT結果で注目すべき点は、-500Hzの要素を境に対象な形になっている点である。
+例えば484.375Hzと-484.375Hzの要素を取り出すと、</p>
+<div class="highlight"><pre><span></span><span class="p">[</span> <span class="mf">4.84375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.69375890e-02</span><span class="o">+</span><span class="mf">1.32256471e-03j</span><span class="p">]</span>
+<span class="p">[</span><span class="o">-</span><span class="mf">4.84375000e+02</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.69375890e-02</span><span class="o">-</span><span class="mf">1.32256471e-03j</span><span class="p">]</span>
+</pre></div>
+<p>であり、FFT要素は複素共役となっていることが分かる。
+この関係は他の周波数でも成り立っている。</p>
+<p>また、-500HzのFFT要素の虚部はゼロである。
+計算されていない500HzのFFT要素は-500HzのFFT要素の複素共役となると考えられることから、虚部がゼロの場合は-500HzのFFT要素と等しい。</p>
+<p>なので、0〜484.375Hzの要素と-500Hzの要素、すなわち最初の33（=N/2 + 1）個の要素さえあれば情報量としては十分である。</p>
+<p>これは実数をFFTしたときに成り立つ話であり、工学系の多くの用途に当てはまる。
+このため、実数のFFTに特化した <tt class="docutils literal">np.fft.rfft</tt> が用意されている。</p>
+<div class="highlight"><pre><span></span><span class="c1"># signalの先頭のN点を取り出して実数FFT</span>
+<span class="n">rfft_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">win</span> <span class="o">*</span> <span class="n">signal</span><span class="p">[:</span><span class="n">N</span><span class="p">])</span>
+</pre></div>
+<p><tt class="docutils literal">rfft_signal</tt> の長さは33で、0〜484.375Hzと-500HzのFFT要素、すなわち <tt class="docutils literal"><span class="pre">fft_signal[:33]</span></tt> が格納されている。</p>
+<p>実際には同じ計算をするわけではないため計算誤差により要素は完全には一致しない。
+しかしその差は極めて小さい。</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">fft_signal</span><span class="p">[:</span><span class="mi">33</span><span class="p">]</span> <span class="o">-</span> <span class="n">rfft_signal</span><span class="p">)</span>
+<span class="p">[</span> <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">1.11022302e-16</span><span class="o">+</span><span class="mf">7.25114413e-16j</span>
+  <span class="mf">7.77156117e-16</span><span class="o">-</span><span class="mf">1.73472348e-16j</span>  <span class="mf">2.22044605e-16</span><span class="o">-</span><span class="mf">4.11129464e-16j</span>
+  <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.44089210e-16</span><span class="o">-</span><span class="mf">4.44089210e-16j</span>
+ <span class="o">-</span><span class="mf">1.77635684e-15</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">1.77635684e-15</span><span class="o">+</span><span class="mf">4.44089210e-16j</span>
+  <span class="mf">0.00000000e+00</span><span class="o">-</span><span class="mf">5.55111512e-17j</span>  <span class="mf">0.00000000e+00</span><span class="o">-</span><span class="mf">1.11022302e-16j</span>
+ <span class="o">-</span><span class="mf">1.11022302e-15</span><span class="o">+</span><span class="mf">4.44089210e-16j</span> <span class="o">-</span><span class="mf">1.11022302e-16</span><span class="o">-</span><span class="mf">2.77555756e-16j</span>
+  <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">2.08166817e-16</span><span class="o">-</span><span class="mf">1.38777878e-17j</span>
+  <span class="mf">1.52655666e-16</span><span class="o">-</span><span class="mf">4.85722573e-16j</span>  <span class="mf">7.07767178e-16</span><span class="o">-</span><span class="mf">6.17561557e-16j</span>
+  <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">4.02455846e-16</span><span class="o">-</span><span class="mf">4.37150316e-16j</span>
+  <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">1.24900090e-16j</span> <span class="o">-</span><span class="mf">1.31838984e-16</span><span class="o">+</span><span class="mf">2.25514052e-16j</span>
+  <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>  <span class="mf">5.55111512e-17</span><span class="o">-</span><span class="mf">1.11022302e-16j</span>
+ <span class="o">-</span><span class="mf">4.44089210e-16</span><span class="o">-</span><span class="mf">4.44089210e-16j</span>  <span class="mf">4.44089210e-16</span><span class="o">+</span><span class="mf">7.77156117e-16j</span>
+  <span class="mf">1.11022302e-16</span><span class="o">+</span><span class="mf">5.55111512e-17j</span> <span class="o">-</span><span class="mf">8.88178420e-16</span><span class="o">+</span><span class="mf">0.00000000e+00j</span>
+  <span class="mf">8.88178420e-16</span><span class="o">+</span><span class="mf">8.88178420e-16j</span>  <span class="mf">0.00000000e+00</span><span class="o">-</span><span class="mf">1.11022302e-16j</span>
+ <span class="o">-</span><span class="mf">6.93889390e-18</span><span class="o">+</span><span class="mf">0.00000000e+00j</span> <span class="o">-</span><span class="mf">1.52655666e-16</span><span class="o">+</span><span class="mf">5.20417043e-18j</span>
+  <span class="mf">9.02056208e-16</span><span class="o">-</span><span class="mf">2.11636264e-16j</span> <span class="o">-</span><span class="mf">8.04911693e-16</span><span class="o">+</span><span class="mf">4.51028104e-17j</span>
+  <span class="mf">0.00000000e+00</span><span class="o">+</span><span class="mf">0.00000000e+00j</span><span class="p">]</span>
+</pre></div>
+<p>実行時間は半分にはならないが、 <tt class="docutils literal">np.fft.rfft</tt> の方が速い。</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">win</span> <span class="o">*</span> <span class="n">signal</span><span class="p">[:</span><span class="n">N</span><span class="p">])</span>
+<span class="mf">30.7</span> <span class="err">µ</span><span class="n">s</span> <span class="err">±</span> <span class="mi">354</span> <span class="n">ns</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">win</span> <span class="o">*</span> <span class="n">signal</span><span class="p">[:</span><span class="n">N</span><span class="p">])</span>
+<span class="mi">21</span> <span class="err">µ</span><span class="n">s</span> <span class="err">±</span> <span class="mi">155</span> <span class="n">ns</span> <span class="n">per</span> <span class="n">loop</span> <span class="p">(</span><span class="n">mean</span> <span class="err">±</span> <span class="n">std</span><span class="o">.</span> <span class="n">dev</span><span class="o">.</span> <span class="n">of</span> <span class="mi">7</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">10000</span> <span class="n">loops</span> <span class="n">each</span><span class="p">)</span>
+</pre></div>
+<p>逆FFT <tt class="docutils literal">np.fft.irfft</tt> も用意されている。
+33点のrfft結果を入力すれば64点の時間領域信号が得られる。</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">rfft_signal</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">64</span><span class="p">,)</span>
+</pre></div>
+<p>周波数との対応は <tt class="docutils literal">np.fft.rfftfreq</tt> で得られる。
+最後の要素は-500Hzではなく500Hzとなっている（どっちも同じだけど）。</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">rfft_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">rfft_freq</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">0.</span>     <span class="mf">15.625</span>  <span class="mf">31.25</span>   <span class="mf">46.875</span>  <span class="mf">62.5</span>    <span class="mf">78.125</span>  <span class="mf">93.75</span>  <span class="mf">109.375</span> <span class="mf">125.</span>
+ <span class="mf">140.625</span> <span class="mf">156.25</span>  <span class="mf">171.875</span> <span class="mf">187.5</span>   <span class="mf">203.125</span> <span class="mf">218.75</span>  <span class="mf">234.375</span> <span class="mf">250.</span>    <span class="mf">265.625</span>
+ <span class="mf">281.25</span>  <span class="mf">296.875</span> <span class="mf">312.5</span>   <span class="mf">328.125</span> <span class="mf">343.75</span>  <span class="mf">359.375</span> <span class="mf">375.</span>    <span class="mf">390.625</span> <span class="mf">406.25</span>
+ <span class="mf">421.875</span> <span class="mf">437.5</span>   <span class="mf">453.125</span> <span class="mf">468.75</span>  <span class="mf">484.375</span> <span class="mf">500.</span>   <span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h2>おわりに</h2>
+<p>本記事では実数のFFTに特化した <tt class="docutils literal">np.fft.rfft</tt> を紹介した。
+N点でFFTしたときになぜ(N/2 + 1)点になるのかが自分には謎だったので、本記事で簡単にまとめた。
+実数をFFTして結果の半分を捨てている人は活用すると良いと思う。</p>
+</div>
+
+</section>
+<section id="comments">
+<!-- Disqus -->
+<div id="disqus_thread"></div>
+<script>
+/**
+ *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE
+ *  SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+ *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+ *    https://disqus.com/admin/universalcode/#configuration-variables
+ */
+var disqus_config = function () {
+  this.language = 'ja';
+  this.page.url = 'http://pman0214.github.io/blog/fft-rfft.html';
+  this.page.identifier = 'fft-rfft';
+};
+(function() {  // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+
+  s.src = '//pman0214-plog.disqus.com/embed.js';
+
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</section>
+</article>
+</main>
+</div>
+
+<div class="pure-u-1 pure-u-lg-1-4">
+<aside id="sidebar">
+    <section>
+      <h1>About pman0214</h1>
+      <p>ハードからソフトまで分かる研究者。そういうものに私はなりたい。</p>
+    </section>
+  <section>
+    <h1>Links</h1>
+    <ul class="links">
+      <li><a href="https://www.f.ait.kyushu-u.ac.jp/~ishida/">Research</a></li>
+    </ul>
+  </section>
+  <section>
+    <h1>Social Links</h1>
+    <ul class="links">
+      <li><a href="https://www.facebook.com/pman0214">facebook</a></li>
+      <li><a href="https://twitter.com/pman0214">twitter</a></li>
+      <li><a href="https://github.com/pman0214">github</a></li>
+    </ul>
+  </section>
+  <section class="tags">
+    <h1>Tags</h1>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/autofs.html">autofs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/backlogs.html">backlogs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/bios.html">bios</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/blog.html">blog</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/category.html">category</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chrome.html">chrome</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/chromium.html">chromium</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/cron.html">cron</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/css-framework.html">css framework</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/debian.html">debian</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/dpkg.html">dpkg</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/efi.html">efi</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/emacs.html">emacs</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/fft.html">fft</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/format.html">format</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/github.html">github</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/gitlab.html">gitlab</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/gnuplot.html">gnuplot</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/html.html">html</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/ieice.html">ieice</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/info.html">info</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/install.html">install</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/latex.html">latex</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/ldap.html">ldap</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/line-style.html">line style</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/linux.html">linux</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/numpy.html">numpy</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/openwrt.html">openwrt</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/openwrt-package.html">openwrt package</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/osx.html">osx</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pandas.html">pandas</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pelican.html">pelican</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pl2303.html">pl2303</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/prolific.html">prolific</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/pthread.html">pthread</a>
+    <a class="tag tag-1" href="http://pman0214.github.io/blog/tag/python.html">python</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/raid.html">raid</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/raspberry-pi.html">raspberry pi</a>
+    <a class="tag tag-2" href="http://pman0214.github.io/blog/tag/redmine.html">redmine</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/rfft.html">rfft</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/tex.html">tex</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/thin-client.html">thin client</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/timezone.html">timezone</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/usbserial.html">usbserial</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/valgrind.html">valgrind</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/virtualenv.html">virtualenv</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/windows.html">windows</a>
+    <a class="tag tag-4" href="http://pman0214.github.io/blog/tag/yatex.html">yatex</a>
+    <p><a href="http://pman0214.github.io/blog/tags.html">See all...</a></p>
+  </section>
+</aside>
+</div>
+<!-- #layout --></div>
+
+<footer id="footer">
+  &copy; 2018 pman0214
+  &nbsp; | &nbsp;
+  Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+  with <a href="https://github.com/pman0214/pelican-pure" target="_blank">Pure theme</a>
+</footer>
+</body>
+</html>
